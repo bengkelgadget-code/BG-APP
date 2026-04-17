@@ -33,6 +33,7 @@
         #mainContainer { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .main-active-modal { transform: scale(0.97) translateY(10px); opacity: 0.4; filter: blur(2px); pointer-events: none; }
         
+        .thermal-receipt { font-family: 'Courier New', Courier, monospace; background-color: #fffdf2; border: 1px dashed #ccc; color: #000; }
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 4rem; font-weight: bold; opacity: 0.1; pointer-events: none; }
         .watermark.lunas { color: green; } .watermark.belum { color: red; }
         
@@ -108,7 +109,7 @@
             
             <div class="px-5 py-2.5 bg-slate-800 border-b border-slate-700/50 shadow-inner flex flex-col items-center justify-center">
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Halaman Aktif</span>
-                <span id="sidebarPageTitle" class="text-sm font-black text-[#39ff14] text-center uppercase tracking-wide">Service HP</span>
+                <span id="sidebarPageTitle" class="text-sm font-black text-[#39ff14] text-center uppercase tracking-wide">Konter HP</span>
             </div>
             
             <nav class="flex-1 overflow-y-auto py-2 custom-scrollbar">
@@ -207,7 +208,7 @@
         <main class="flex-1 flex flex-col h-full relative overflow-hidden w-full bg-slate-50">
             
             <div class="md:hidden bg-white shadow-sm border-b border-slate-200 px-4 py-3 flex justify-between items-center shrink-0 z-20">
-                <h2 class="font-black text-slate-800 text-lg uppercase tracking-wide text-blue-600" id="mobilePageTitle">Service HP</h2>
+                <h2 class="font-black text-slate-800 text-lg uppercase tracking-wide text-blue-600" id="mobilePageTitle">Konter HP</h2>
                 <button onclick="toggleSidebar()" class="text-slate-600 hover:text-blue-600 text-2xl transition-colors"><i class="fa-solid fa-bars"></i></button>
             </div>
 
@@ -487,19 +488,18 @@
             </button>
         </div>
         
-        <div id="thermalReceipt" class="bg-white p-5 w-full max-w-sm relative shadow-2xl mb-4 text-black font-sans leading-snug">
+        <div id="thermalReceipt" class="bg-white p-5 w-full max-w-sm relative shadow-2xl mb-4 text-black font-sans leading-snug print-container">
             <div id="notaWatermark" class="watermark lunas">LUNAS</div>
             
-            <div class="text-center relative z-10 mb-2">
-                <h2 class="font-black text-2xl mb-1 uppercase">BENGKEL GADGET L2</h2>
-                <p class="text-sm font-bold">Alamat Konter</p>
+            <div class="text-center relative z-10 pb-4">
+                <h2 class="font-black text-[22px] tracking-[0.1em] mb-1 uppercase whitespace-nowrap overflow-hidden text-center w-full" id="printStoreName" style="transform-origin: center;">BENGKEL GADGET L2</h2>
+                <p class="font-bold text-[15px]">Alamat Konter</p>
             </div>
             
             <div class="text-sm relative z-10">
-                <div class="grid grid-cols-[80px_10px_1fr] items-start">
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>No.Nota</span><span>:</span><span id="prNota" class="font-bold">BG/XXXXXXXX</span>
                 </div>
-                <div class="border-b border-dashed border-black my-2"></div>
                 
                 <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>Tanggal</span><span>:</span><span id="prTgl"></span>
@@ -524,13 +524,13 @@
                 <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>Status</span><span>:</span><span id="prStatus"></span>
                 </div>
-                <div class="grid grid-cols-[80px_10px_1fr] items-start font-bold text-base">
+                <div class="grid grid-cols-[80px_10px_1fr] items-start font-black text-[17px] mt-2">
                     <span>Total</span><span>:</span><span id="prTotal" class="uppercase"></span>
                 </div>
                 
                 <div class="border-b border-dashed border-black my-2"></div>
                 
-                <div class="text-[11px] mt-3 space-y-1">
+                <div class="text-[9px] pt-2 space-y-1">
                     <p>- Wajib membawa nota saat pengambilan</p>
                     <p>- Komplain berlaku selama masa garansi</p>
                     <p>- Device yang tidak diambil lebih dari 1 (satu) tahun bukan tanggung jawab kami</p>
@@ -545,13 +545,8 @@
 
     <!-- JAVASCRIPT SYSTEM -->
     <script>
-        // =========================================================================================
-        // 🚨 LANGKAH WAJIB: GANTI URL DI BAWAH INI DENGAN URL "WEB APP" GOOGLE APPS SCRIPT ANDA! 🚨
-        // Pastikan URL berakhiran /exec dan memiliki https://script.google.com/...
-        // =========================================================================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbz5bAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
 
-        // ZETTBOT FIX: Mesin API Tangguh (Anti CORS Preflight & Deteksi Error Akurat)
         function gasRun(funcName, ...args) {
             return new Promise(async function(resolve, reject) {
                 if (!API_URL || !API_URL.startsWith("https://script.google.com")) {
@@ -559,7 +554,6 @@
                     return;
                 }
                 
-                // Cegah penggunaan URL /dev yang selalu ditolak oleh sistem keamanan (CORS) Google
                 if (API_URL.includes("/dev")) {
                     reject(new Error("GAGAL: Anda menggunakan URL Test (/dev). WAJIB gunakan URL Web App resmi yang berakhiran '/exec'."));
                     return;
@@ -600,7 +594,7 @@
         } catch(e) {}
         
         var isSidebarOpen = false;
-        var isServiceMode = false; // Diubah untuk memastikan default bukan ServiceHP
+        var isServiceMode = false; 
         var isKonterMode = true;
         var activeRole = '';
         var currentSheet = 'Konter';
@@ -653,7 +647,6 @@
                 }
             } catch(e) { console.error("Select2 Error:", e); }
 
-            // ZETTBOT: Jadikan halaman utama menjadi Konter HP sesuai permintaan
             switchPage('Konter', 'Konter HP');
             
             autoConnectPrinter();
@@ -969,7 +962,8 @@
 
                 if (forceRefresh || !window.BGL2_CACHE[sheet] || window.BGL2_CACHE[sheet].length === 0) {
                     tbody.innerHTML = '<tr><td colspan="'+hdrs.length+'" class="p-8 text-center text-blue-500 font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 block"></i><br><span class="text-sm">Memuat Data...</span></td></tr>';
-                    refreshActiveData(forceRefresh);
+                    // Render UI first, then fetch
+                    setTimeout(() => refreshActiveData(forceRefresh), 0);
                 } else {
                     if (isServiceMode) renderServiceTable(window.BGL2_CACHE['DB_service'] || [], hdrs.length);
                     else if (isKonterMode) { renderKonterTable(window.BGL2_CACHE['DB_konter'] || [], hdrs.length); renderMiniDashboard(); }
@@ -1358,13 +1352,30 @@
             setTxt('prKeluhan', payload.kerusakan);
             setTxt('prKet', payload.ketTambahan);
             setTxt('prStatus', payload.ketBayar);
-            setTxt('prTotal', payload.totalBiaya);
+            
+            // ZETTBOT: Tambah spasi setelah Rp untuk tampilan nota
+            var totalStr = payload.totalBiaya || '-';
+            totalStr = totalStr.replace(/Rp\s*/i, 'Rp.  '); 
+            setTxt('prTotal', totalStr);
             
             document.querySelectorAll('#notaWatermark').forEach(wm => {
                 if(payload.ketBayar === 'Lunas') { wm.innerText = 'LUNAS'; wm.className = 'watermark lunas'; } 
                 else { wm.innerText = 'BELUM LUNAS'; wm.className = 'watermark belum'; }
             });
+            
             openModal('modalNota');
+            
+            // Auto scale font size untuk nama konter agar muat 1 baris
+            setTimeout(() => {
+                const storeNameEl = document.getElementById('printStoreName');
+                if(storeNameEl) {
+                    storeNameEl.style.fontSize = '22px'; // Reset default
+                    while(storeNameEl.scrollWidth > storeNameEl.clientWidth && parseInt(window.getComputedStyle(storeNameEl).fontSize) > 10) {
+                        let currentSize = parseInt(window.getComputedStyle(storeNameEl).fontSize);
+                        storeNameEl.style.fontSize = (currentSize - 1) + 'px';
+                    }
+                }
+            }, 10);
         }
 
         function printNota() {
@@ -1378,23 +1389,23 @@
             var statusBayar = getEl('prStatus') ? getEl('prStatus').innerText : '-';
             var total = getEl('prTotal') ? getEl('prTotal').innerText : '-';
 
-            var receiptText = "BENGKEL GADGET L2\n";
-            receiptText += "Alamat Konter\n";
+            // Konstruksi teks untuk RawBT atau Bluetooth Langsung
+            var receiptText = "[C]<b>BENGKEL GADGET L2</b>\n";
+            receiptText += "[C]<b>Alamat Konter</b>\n\n";
+            receiptText += "[L]No.Nota   : " + noNota + "\n";
             receiptText += "--------------------------------\n";
-            receiptText += "No.Nota   : " + noNota + "\n";
-            receiptText += "--------------------------------\n";
-            receiptText += "Tanggal   : " + tgl + "\n";
-            receiptText += "Nama      : " + nama + "\n";
-            receiptText += "No HP     : " + hp + "\n\n";
-            receiptText += "Unit      : " + unit + "\n";
-            receiptText += "Kerusakan : " + keluhan + "\n";
-            receiptText += "Keterangan: " + ket + "\n\n";
-            receiptText += "Status    : " + statusBayar + "\n";
-            receiptText += "Total     : " + total + "\n";
-            receiptText += "--------------------------------\n";
-            receiptText += "- Wajib membawa nota saat\n  pengambilan\n";
+            receiptText += "[L]Tanggal   : " + tgl + "\n";
+            receiptText += "[L]Nama      : " + nama + "\n";
+            receiptText += "[L]No HP     : " + hp + "\n\n";
+            receiptText += "[L]Unit      : " + unit + "\n";
+            receiptText += "[L]Kerusakan : " + keluhan + "\n";
+            receiptText += "[L]Keterangan: " + ket + "\n\n";
+            receiptText += "[L]Status    : " + statusBayar + "\n";
+            receiptText += "[L]<b>Total     : " + total + "</b>\n";
+            receiptText += "--------------------------------\n\n";
+            receiptText += "[L]<font size='small'>- Wajib membawa nota saat\n  pengambilan\n";
             receiptText += "- Komplain berlaku selama masa\n  garansi\n";
-            receiptText += "- Device yang tidak diambil\n  lebih dari 1 (satu) tahun\n  bukan tanggung jawab kami\n";
+            receiptText += "- Device yang tidak diambil\n  lebih dari 1 (satu) tahun\n  bukan tanggung jawab kami</font>\n";
             receiptText += "\n\n\n";
 
             if (window.printerDevice && window.printerServer) {
@@ -1429,7 +1440,14 @@
                 const characteristic = await service.getCharacteristic(characteristicUuid);
 
                 const encoder = new TextEncoder();
-                const data = encoder.encode(text);
+                // Replace ESC/POS style tags if raw bluetooth printing doesn't support them natively, 
+                // but since standard mini printers usually accept raw text, we just send it.
+                // Note: Real ESC/POS formatting requires hex codes, but we'll send the text for now 
+                // as many generic printers print it fine, or use RawBT format if rawbt app is used.
+                // If it's a direct connection without rawbt app, we strip the tags and just send pure text:
+                let pureText = text.replace(/\[C\]/g, '').replace(/\[L\]/g, '').replace(/<\/?b>/g, '').replace(/<\/?font[^>]*>/g, '');
+
+                const data = encoder.encode(pureText);
 
                 const chunkSize = 20;
                 for (let i = 0; i < data.length; i += chunkSize) {
@@ -1640,7 +1658,7 @@
             });
         }
 
-        // ... (Fungsi render tabel lainnya tetap persis sama)
+        // ZETTBOT FIX: Single Loop Optimization untuk Kecepatan Render Tabel
         function renderServiceTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
@@ -1648,25 +1666,24 @@
                 tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; 
             }
             
-            var reversedData = [];
-            for (var k = data.length - 1; k >= 0; k--) {
-                if(data[k] && Array.isArray(data[k]) && data[k].length > 0 && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k});
-            }
-            currentTableData = reversedData;
-
-            if(reversedData.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
-            
             var rowsHtml = []; 
-            for(var i=0; i<reversedData.length; i++) {
-                var row = reversedData[i].row; var origIdx = reversedData[i].originalIndex;
+            currentTableData = [];
+            
+            for (var k = data.length - 1; k >= 0; k--) {
+                var row = data[k]; 
+                if(!row || !Array.isArray(row) || row.length === 0 || row[0] === "") continue;
+                
+                var origIdx = k;
+                currentTableData.push({row: row, originalIndex: origIdx});
+                
                 var idCust = String(row[2] || '').trim(); var custMatch = customerMap[idCust]; 
                 var cleanHp = custMatch ? custMatch.hp : 'Unknown'; var namaCust = custMatch ? custMatch.nama : 'Unknown';
                 
-                var html = '<td class="py-1.5 px-3 font-mono font-bold text-center align-middle">'+(row[0]||'-')+'</td><td class="py-1.5 px-3 text-center align-middle">'+(row[1]||'-')+'</td><td class="py-1.5 px-3 font-semibold text-center align-middle">'+namaCust+' <br><span class="text-[10px] text-slate-400">'+cleanHp+'</span></td><td class="py-1.5 px-3 text-center align-middle">'+(row[3]||'-')+'</td><td class="py-1.5 px-3 text-emerald-600 font-bold text-center align-middle">'+(row[9]||'-')+'</td>';
+                var html = '<td class="py-2.5 px-3 font-mono font-bold text-center align-middle">'+(row[0]||'-')+'</td><td class="py-2.5 px-3 text-center align-middle">'+(row[1]||'-')+'</td><td class="py-2.5 px-3 font-semibold text-center align-middle">'+namaCust+' <br><span class="text-[10px] text-slate-400">'+cleanHp+'</span></td><td class="py-2.5 px-3 text-center align-middle">'+(row[3]||'-')+'</td><td class="py-2.5 px-3 text-emerald-600 font-bold text-center align-middle">'+(row[9]||'-')+'</td>';
                 
                 var statusHtml = '';
                 if(activeRole === 'Admin') {
-                    statusHtml = '<select onchange="updateStatusAdmin(this, ' + i + ')" class="border border-slate-300 rounded text-xs py-1 px-2 focus:outline-none text-slate-700 mx-auto block">' +
+                    statusHtml = '<select onchange="updateStatusAdmin(this, ' + (currentTableData.length - 1) + ')" class="border border-slate-300 rounded text-xs py-1 px-2 focus:outline-none text-slate-700 mx-auto block">' +
                         '<option value="Proses" ' + (row[12]==='Proses'?'selected':'') + '>Proses</option>' +
                         '<option value="Selesai" ' + (row[12]==='Selesai'?'selected':'') + '>Selesai</option>' +
                         '<option value="Diambil" ' + (row[12]==='Diambil'?'selected':'') + '>Diambil</option></select>';
@@ -1685,12 +1702,19 @@
                 act += '<button type="button" onclick="sendWAFromTable('+origIdx+')" class="bg-green-100 hover:bg-green-200 text-green-700 h-7 w-7 flex-shrink-0 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Kirim WA"><i class="fa-brands fa-whatsapp text-xs"></i></button>';
                 act += '</div>';
                 
-                html += '<td class="py-1.5 px-3 align-middle">'+statusHtml+'</td><td class="py-1.5 px-3 align-middle">'+act+'</td>';
+                html += '<td class="py-2.5 px-3 align-middle">'+statusHtml+'</td><td class="py-2.5 px-3 align-middle">'+act+'</td>';
                 rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
             }
+            
+            if(rowsHtml.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
+            
+            // Render sekali jalan (Sangat cepat)
+            tbody.style.display = 'none';
             tbody.innerHTML = rowsHtml.join(''); 
+            tbody.style.display = '';
         }
 
+        // ZETTBOT FIX: Single Loop Optimization untuk Kecepatan Render Tabel
         function renderKonterTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
@@ -1698,23 +1722,22 @@
                 tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; 
             }
             
-            var reversedData = [];
-            for (var k = data.length - 1; k >= 0; k--) {
-                if(data[k] && Array.isArray(data[k]) && data[k].length > 0 && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k});
-            }
-            currentTableData = reversedData;
-
-            if(reversedData.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
-            
             var rowsHtml = []; 
-            for(var i=0; i<reversedData.length; i++) {
-                var row = reversedData[i].row; var origIdx = reversedData[i].originalIndex; var html = '';
+            currentTableData = [];
+            
+            for (var k = data.length - 1; k >= 0; k--) {
+                var row = data[k]; 
+                if(!row || !Array.isArray(row) || row.length === 0 || row[0] === "") continue;
                 
-                html += '<td class="py-1.5 px-3 font-mono font-bold text-center align-middle">'+(row[0]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 text-center align-middle">'+(row[1]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 font-bold text-blue-700 text-center align-middle">'+(row[2]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 text-center align-middle">'+(row[3]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 font-bold text-emerald-600 text-center align-middle">'+(row[5]||'-')+'</td>';
+                var origIdx = k; 
+                currentTableData.push({row: row, originalIndex: origIdx});
+                var html = '';
+                
+                html += '<td class="py-2.5 px-3 font-mono font-bold text-center align-middle">'+(row[0]||'-')+'</td>';
+                html += '<td class="py-2.5 px-3 text-center align-middle">'+(row[1]||'-')+'</td>';
+                html += '<td class="py-2.5 px-3 font-bold text-blue-700 text-center align-middle">'+(row[2]||'-')+'</td>';
+                html += '<td class="py-2.5 px-3 text-center align-middle">'+(row[3]||'-')+'</td>';
+                html += '<td class="py-2.5 px-3 font-bold text-emerald-600 text-center align-middle">'+(row[5]||'-')+'</td>';
                 
                 var act = '<div class="flex space-x-1.5 justify-center">';
                 if(activeRole === 'Admin') {
@@ -1723,12 +1746,18 @@
                 } else { act += '<i class="fa-solid fa-ban text-slate-300"></i>'; }
                 act += '</div>';
                 
-                html += '<td class="py-1.5 px-3 align-middle">' + act + '</td>';
+                html += '<td class="py-2.5 px-3 align-middle">' + act + '</td>';
                 rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
             }
+            
+            if(rowsHtml.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
+            
+            tbody.style.display = 'none';
             tbody.innerHTML = rowsHtml.join('');
+            tbody.style.display = '';
         }
 
+        // ZETTBOT FIX: Single Loop Optimization untuk Kecepatan Render Tabel
         function renderGenericTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
@@ -1736,35 +1765,39 @@
                 tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; 
             }
             
-            var reversedData = [];
-            for (var k = data.length - 1; k >= 0; k--) {
-                if(data[k] && Array.isArray(data[k]) && data[k].length > 0 && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k});
-            }
-            currentTableData = reversedData;
-
-            if(reversedData.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
-            
             var rowsHtml = []; 
-            for(var i=0; i<reversedData.length; i++) {
-                var row = reversedData[i].row; var origIdx = reversedData[i].originalIndex; var html = '';
+            currentTableData = [];
+            
+            for (var k = data.length - 1; k >= 0; k--) {
+                var row = data[k]; 
+                if(!row || !Array.isArray(row) || row.length === 0 || row[0] === "") continue;
+                
+                var origIdx = k; 
+                currentTableData.push({row: row, originalIndex: origIdx});
+                var html = '';
                 
                 for(var j=0; j<row.length; j++) {
                     var cellVal = String(row[j] || '').replace(/^'/, '');
-                    if (currentSheet === 'Users' && j === 1) html += '<td class="py-1.5 px-3 text-center align-middle">••••••••</td>';
-                    else html += '<td class="py-1.5 px-3 text-center align-middle">'+cellVal+'</td>';
+                    if (currentSheet === 'Users' && j === 1) html += '<td class="py-2.5 px-3 text-center align-middle">••••••••</td>';
+                    else html += '<td class="py-2.5 px-3 text-center align-middle">'+cellVal+'</td>';
                 }
                 
                 var btnHtml = '<div class="flex space-x-1.5 justify-center">';
                 if(activeRole === 'Admin') {
-                    btnHtml += '<button type="button" onclick="editDataGen('+i+')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Edit Data"><i class="fa-solid fa-pen-to-square text-xs"></i></button>';
+                    btnHtml += '<button type="button" onclick="editDataGen('+(currentTableData.length - 1)+')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Edit Data"><i class="fa-solid fa-pen-to-square text-xs"></i></button>';
                     btnHtml += `<button type="button" onclick="delGen(${origIdx}, '${currentSheet}')" class="bg-red-100 hover:bg-red-200 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button>`;
                 } else { btnHtml += '<i class="fa-solid fa-ban text-slate-300"></i>'; }
                 btnHtml += '</div>';
                 
-                html += '<td class="py-1.5 px-3 align-middle">' + btnHtml + '</td>';
+                html += '<td class="py-2.5 px-3 align-middle">' + btnHtml + '</td>';
                 rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
             }
+            
+            if(rowsHtml.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
+            
+            tbody.style.display = 'none';
             tbody.innerHTML = rowsHtml.join('');
+            tbody.style.display = '';
         }
 
         function delSrv(idx) { 
