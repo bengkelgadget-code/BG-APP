@@ -520,8 +520,8 @@
         // ZETTBOT FIX: Mesin API Tangguh (Anti CORS Preflight & Deteksi Error Akurat)
         function gasRun(funcName, ...args) {
             return new Promise(async function(resolve, reject) {
-                if (API_URL === "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec" || !API_URL.startsWith("https://script.google.com")) {
-                    reject(new Error("URL API Belum Diisi! Silakan edit file index.html di GitHub."));
+                if (!API_URL || !API_URL.startsWith("https://script.google.com")) {
+                    reject(new Error("URL API Belum Diisi atau Tidak Valid! Silakan periksa file index.html."));
                     return;
                 }
                 
@@ -534,7 +534,6 @@
                 try {
                     const response = await fetch(API_URL, {
                         method: 'POST',
-                        // PENTING: Dilarang menggunakan parameter 'headers' apapun di sini agar browser tidak memicu blokir CORS Preflight Google
                         body: JSON.stringify({ action: funcName, args: args })
                     });
                     
@@ -1397,33 +1396,9 @@
             receiptText += "Terima Kasih\n";
             receiptText += "\n\n\n";
 
-            // Jika Mode RawBT Aktif
-            if (window.useRawBT) {
-                var receiptRawBT = "[C]<b>BENGKEL GADGET L2</b>\n";
-                receiptRawBT += "[C]Nota Servis\n";
-                receiptRawBT += "--------------------------------\n";
-                receiptRawBT += "[L]Nota : " + noNota + "\n";
-                receiptRawBT += "[L]Nama : " + nama + "\n";
-                receiptRawBT += "[L]Unit : " + unit + "\n";
-                receiptRawBT += "[L]Rusak: " + keluhan + "\n";
-                receiptRawBT += "--------------------------------\n";
-                receiptRawBT += "[L]<b>TOTAL: " + total + "</b>\n";
-                if (status) receiptRawBT += "[C]" + status + "\n";
-                receiptRawBT += "--------------------------------\n";
-                receiptRawBT += "[C]Terima Kasih\n";
-                receiptRawBT += "\n\n";
-
-                var b64 = btoa(unescape(encodeURIComponent(receiptRawBT)));
-                window.location.href = "intent:" + b64 + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
-                return;
-            }
-
-            // ZETTBOT FIX: Wajib Pakai Bluetooth Web API (Anti Print PDF)
             if (window.printerDevice && window.printerServer) {
-                // Jika sudah terkoneksi, langsung cetak
                 printToBluetooth(receiptText);
             } else {
-                // Jika belum, munculkan pop-up minta disambungkan
                 Swal.fire({
                     title: 'Printer Belum Terhubung',
                     text: 'Silakan sambungkan Printer Bluetooth Anda terlebih dahulu untuk mencetak nota ini.',
@@ -1435,9 +1410,7 @@
                     cancelButtonText: 'Batal'
                 }).then(async (result) => {
                     if (result.isConfirmed) {
-                        // Buka pencarian bluetooth, true = isSilent (tidak putuskan koneksi yang ada)
                         let isConnected = await window.connectPrinter(true);
-                        // Jika koneksi sukses, cetak otomatis tanpa klik lagi!
                         if (isConnected) {
                             printToBluetooth(receiptText);
                         }
