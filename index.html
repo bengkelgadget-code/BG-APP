@@ -521,6 +521,52 @@
 
     <!-- JAVASCRIPT SYSTEM -->
     <script>
+        // =========================================================================================
+        // 🚨 LANGKAH WAJIB: GANTI URL DI BAWAH INI DENGAN URL "WEB APP" GOOGLE APPS SCRIPT ANDA! 🚨
+        // Pastikan URL berakhiran /exec dan memiliki https://script.google.com/...
+        // =========================================================================================
+        const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
+
+        // ZETTBOT FIX: Mesin API Tangguh (Anti CORS Preflight & Deteksi Error Akurat)
+        function gasRun(funcName, ...args) {
+            return new Promise(async function(resolve, reject) {
+                if (API_URL === "TARUH_URL_WEB_APP_GOOGLE_SCRIPT_ANDA_DISINI" || !API_URL.startsWith("https://script.google.com")) {
+                    reject(new Error("URL API Belum Diisi! Silakan edit file index.html di GitHub."));
+                    return;
+                }
+                
+                // Cegah penggunaan URL /dev yang selalu ditolak oleh sistem keamanan (CORS) Google
+                if (API_URL.includes("/dev")) {
+                    reject(new Error("GAGAL: Anda menggunakan URL Test (/dev). WAJIB gunakan URL Web App resmi yang berakhiran '/exec'."));
+                    return;
+                }
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        // PENTING: Dilarang menggunakan parameter 'headers' apapun di sini agar browser tidak memicu blokir CORS Preflight Google
+                        body: JSON.stringify({ action: funcName, args: args })
+                    });
+                    
+                    const textRes = await response.text();
+                    try {
+                        const res = JSON.parse(textRes);
+                        if(res.status === 'success') {
+                            resolve(res.data);
+                        } else {
+                            reject(new Error(res.message));
+                        }
+                    } catch(parseError) {
+                        console.error("Respon Google bukan JSON:", textRes);
+                        reject(new Error("Akses Ditolak Google. Pastikan saat Deploy di Apps Script: 'Jalankan Sebagai: SAYA (Me)' dan 'Akses: SIAPA SAJA (Anyone)'."));
+                    }
+                } catch(err) {
+                    console.error("API Error:", err);
+                    reject(new Error("Koneksi API terputus (CORS). Pastikan URL berakhiran /exec dan Hak Akses diatur ke 'Siapa Saja'."));
+                }
+            });
+        }
+
         var window = window || {};
         window.BGL2_CACHE = window.BGL2_CACHE || {}; 
         window.BGL2_DROPDOWN_CACHE = window.BGL2_DROPDOWN_CACHE || null; 
