@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BENGKEL GADGET L2 - System</title>
     
+    <!-- Library JQuery & Select2 untuk Dropdown Pencarian -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -19,21 +21,34 @@
         .menu-container:hover .dropdown-content { max-height: 500px; opacity: 1; }
         .chevron-icon { transition: transform 0.3s ease; }
         .menu-container:hover .chevron-icon { transform: rotate(180deg); }
+        
+        /* ZETTBOT FIX: Scrollbar Estetik Khusus Tabel & Aplikasi */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
         #mainContainer { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .main-active-modal { transform: scale(0.97) translateY(10px); opacity: 0.4; filter: blur(2px); pointer-events: none; }
+        
         .thermal-receipt { font-family: 'Courier New', Courier, monospace; background-color: #fffdf2; border: 1px dashed #ccc; color: #000; }
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 4rem; font-weight: bold; opacity: 0.1; pointer-events: none; }
         .watermark.lunas { color: green; } .watermark.belum { color: red; }
+        
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
-        .select2-container--default .select2-selection--single { height: 42px !important; border-color: #cbd5e1 !important; border-radius: 0.5rem !important; display: flex !important; align-items: center !important; padding: 0 0.75rem !important; background-color: #ffffff !important; }
-        .select2-container--default .select2-selection--single .select2-selection__rendered { color: #1e293b !important; font-size: 0.875rem !important; line-height: 1.25rem !important; padding-left: 0 !important; }
+
+        /* Custom CSS Select2 */
+        .select2-container--default .select2-selection--single {
+            height: 42px !important; border-color: #cbd5e1 !important; border-radius: 0.5rem !important;
+            display: flex !important; align-items: center !important; padding: 0 0.75rem !important; background-color: #ffffff !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1e293b !important; font-size: 0.875rem !important; line-height: 1.25rem !important; padding-left: 0 !important;
+        }
         .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; right: 10px !important; }
         .select2-search__field { border-radius: 0.25rem !important; border-color: #cbd5e1 !important; font-size: 0.875rem !important; padding: 0.5rem !important; outline: none !important; color: #1e293b !important; }
         .select2-search__field:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
@@ -50,7 +65,7 @@
     <div id="bootScreen" style="position:fixed; inset:0; z-index:99999; background:#0f172a; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.3s ease;">
         <i class="fa-solid fa-microchip fa-spin text-5xl text-[#39ff14] mb-4"></i>
         <h2 class="text-white font-bold tracking-widest">MEMUAT BGL2SYS...</h2>
-        <p class="text-slate-400 text-xs mt-2" id="bootText">Menghubungkan ke API Server...</p>
+        <p class="text-slate-400 text-xs mt-2" id="bootText">Mempersiapkan Antarmuka...</p>
     </div>
 
     <!-- LOGIN SCREEN -->
@@ -81,7 +96,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
+    <!-- DASHBOARD VIEW (100vh Layout) -->
     <div id="dashboardView" class="hidden w-full h-full text-slate-800 bg-slate-50 relative flex overflow-hidden">
         
         <!-- SIDEBAR -->
@@ -176,6 +191,7 @@
                     </div>
                 </div>
                 <div class="flex space-x-2">
+                    <!-- ZETTBOT: Tombol Printer kini siap menangani mode RawBT dan menyala Hijau Neon -->
                     <button onclick="connectPrinter()" id="printerBtn" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white py-2 rounded-xl border border-slate-700 hover:border-slate-500 transition-all text-[10px] font-bold flex flex-col items-center justify-center group shadow-md relative overflow-hidden">
                         <div class="absolute inset-0 bg-slate-400/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <i id="printerIcon" class="fa-solid fa-print text-base mb-1 group-hover:scale-110 transition-transform relative z-10 transition-colors"></i> 
@@ -190,16 +206,19 @@
             </div>
         </aside>
 
-        <!-- MAIN VIEW -->
+        <!-- MAIN VIEW (Full Height Flex) -->
         <main class="flex-1 flex flex-col h-full relative overflow-hidden w-full bg-slate-50">
             
+            <!-- Mobile Toggle Bar (Tampil di Layar Kecil Saja) -->
             <div class="md:hidden bg-white shadow-sm border-b border-slate-200 px-4 py-3 flex justify-between items-center shrink-0 z-20">
                 <h2 class="font-black text-slate-800 text-lg uppercase tracking-wide text-blue-600" id="mobilePageTitle">Service HP</h2>
                 <button onclick="toggleSidebar()" class="text-slate-600 hover:text-blue-600 text-2xl transition-colors"><i class="fa-solid fa-bars"></i></button>
             </div>
 
+            <!-- Konten Utama (Scroll Independen) -->
             <div class="flex-1 flex flex-col h-full overflow-hidden p-2 sm:p-4 relative" id="mainContainer">
 
+                <!-- MINI DASHBOARD PROFIT HARIAN & BULANAN (Super Kompak) -->
                 <div id="miniDashboardKonterContainer" class="hidden flex-col mb-2 sm:mb-4 fade-in shrink-0">
                     <div class="flex justify-between items-center mb-1.5 px-1">
                         <h3 class="font-bold text-slate-700 text-xs sm:text-sm uppercase tracking-wider"><i class="fa-solid fa-chart-pie mr-1.5 text-blue-500"></i> Laporan</h3>
@@ -209,6 +228,7 @@
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-2 sm:gap-4">
+                        <!-- Widget 1: Transaksi Hari Ini -->
                         <div class="bg-gradient-to-br from-white to-slate-50 rounded-xl p-2.5 sm:p-4 border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
                             <div class="absolute -right-4 -top-4 w-16 h-16 sm:-right-6 sm:-top-6 sm:w-24 sm:h-24 bg-blue-50/60 rounded-full transition-transform group-hover:scale-110"></div>
                             <div class="flex items-center justify-between relative z-10">
@@ -221,6 +241,7 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Widget 2: Estimasi Profit -->
                         <div class="bg-gradient-to-br from-white to-slate-50 rounded-xl p-2.5 sm:p-4 border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
                             <div class="absolute -right-4 -top-4 w-16 h-16 sm:-right-6 sm:-top-6 sm:w-24 sm:h-24 bg-emerald-50/60 rounded-full transition-transform group-hover:scale-110"></div>
                             <div class="flex items-center justify-between relative z-10">
@@ -236,8 +257,10 @@
                     </div>
                 </div>
 
+                <!-- CARD TABEL (Flex-1 memastikan ia mengambil sisa tinggi layar dan scroll di dalamnya) -->
                 <div class="bg-white rounded-xl shadow-md border border-slate-200 flex flex-col flex-1 min-h-0 relative">
                     
+                    <!-- CONTROL BAR: Header, Tambah, Search, Refresh -->
                     <div class="p-2 sm:p-3 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2 shrink-0 bg-slate-50/50 rounded-t-xl">
                         <h3 class="font-bold text-slate-700 text-sm hidden sm:block"><i class="fa-solid fa-database mr-1 text-slate-400"></i> Data Tersimpan</h3>
                         
@@ -257,6 +280,7 @@
                         </div>
                     </div>
 
+                    <!-- AREA TABEL MURNI (Scrollabel Internal) -->
                     <div class="flex-1 overflow-y-auto w-full" id="dataTableContainer">
                         <table class="w-full text-center border-collapse whitespace-nowrap" id="dataTable">
                             <thead></thead>
@@ -466,7 +490,7 @@
         </div>
     </div>
 
-    <!-- MODAL NOTA -->
+    <!-- MODAL NOTA & ZETTBOT: Tombol Print -->
     <div id="modalNota" class="fixed inset-0 bg-slate-900/80 z-[60] hidden flex flex-col items-center justify-center p-4 text-slate-800">
         <div class="w-full max-w-sm flex justify-end mb-3">
             <button onclick="closeModal('modalNota')" class="text-white/80 hover:text-red-500 transition-colors cursor-pointer" title="Tutup">
@@ -497,46 +521,6 @@
 
     <!-- JAVASCRIPT SYSTEM -->
     <script>
-        // ==============================================================================
-        // ZETTBOT: MESIN PENGGERAK API GITHUB PAGES
-        // ==============================================================================
-        // WAJIB GANTI URL DI BAWAH INI DENGAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA!
-        const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
-
-        // Fungsi fetch pengganti google.script.run (Menembus keamanan Iframe!)
-        // ZETTBOT FIX: Mesin API Tangguh (Anti CORS Preflight & Deteksi Error Akurat)
-        function gasRun(funcName, ...args) {
-            return new Promise(async function(resolve, reject) {
-                if (API_URL === "TARUH_URL_WEB_APP_GOOGLE_SCRIPT_ANDA_DISINI" || !API_URL.startsWith("https://script.google.com")) {
-                    reject(new Error("URL API Belum Diisi! Silakan edit file index.html di GitHub."));
-                    return;
-                }
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        // PENTING: Dilarang menggunakan headers Content-Type agar tidak diblokir oleh sistem CORS Google
-                        body: JSON.stringify({ action: funcName, args: args })
-                    });
-                    
-                    const textRes = await response.text();
-                    try {
-                        const res = JSON.parse(textRes);
-                        if(res.status === 'success') {
-                            resolve(res.data);
-                        } else {
-                            reject(new Error(res.message));
-                        }
-                    } catch(parseError) {
-                        console.error("Respon Google bukan JSON:", textRes);
-                        reject(new Error("Google menolak akses. Pastikan Anda sudah memilih 'Versi Baru' saat melakukan Deploy di Apps Script!"));
-                    }
-                } catch(err) {
-                    console.error("API Error:", err);
-                    reject(new Error("Koneksi ke server API terputus. Periksa jaringan Anda."));
-                }
-            });
-        }
-
         var window = window || {};
         window.BGL2_CACHE = window.BGL2_CACHE || {}; 
         window.BGL2_DROPDOWN_CACHE = window.BGL2_DROPDOWN_CACHE || null; 
@@ -557,8 +541,7 @@
         var customerCache = [];
         var customerMap = {}; 
         var lastTrxData = null;
-        window.printerDevice = null;
-        window.printerServer = null;
+        window.useRawBT = false; // Flag untuk mode printer HP
         
         var pageConfigs = {
             'Users': { sheet: 'Users', headers: ['Username', 'Password', 'Kategori', 'Updated At', 'Aksi'], fields: [{ id: 'username', label: 'Username', type: 'text', required: true }, { id: 'password', label: 'Password', type: 'password', required: true }, { id: 'kategori', label: 'Kategori', type: 'select', options: ['Admin', 'Kasir'], required: true }] },
@@ -573,6 +556,39 @@
             'PPOB': { sheet: 'PPOB', prefix: 'PP', headers: ['ID PPOB', 'Nama PPOB', 'Updated At', 'Aksi'], idType: 'ppob', fields: [{ id: 'id_ppob', label: 'ID PPOB', type: 'text', disabled: true }, { id: 'nama_ppob', label: 'Nama PPOB', type: 'text', required: true }] },
             'ACC': { sheet: 'ACC', prefix: 'AC', headers: ['ID ACC', 'Kategori', 'Nama ACC', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'acc', fields: [{ id: 'id_acc', label: 'ID ACC', type: 'text', disabled: true }, { id: 'kategori', label: 'Kategori', type: 'text', required: true }, { id: 'nama_acc', label: 'Nama ACC', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] }
         };
+
+        function gasRun(funcName, ...args) {
+            return new Promise(function(resolve, reject) {
+                var timeoutTimer = setTimeout(function() { reject(new Error("Waktu habis (30s)! Server Google sibuk.")); }, 30000);
+                if(typeof google !== 'undefined' && google.script) {
+                    google.script.run
+                        .withSuccessHandler(function(res) { clearTimeout(timeoutTimer); resolve(res); })
+                        .withFailureHandler(function(err) { clearTimeout(timeoutTimer); reject(err); })[funcName](...args);
+                } else {
+                    clearTimeout(timeoutTimer); resolve({status: 'success'}); 
+                }
+            });
+        }
+
+        if (typeof google === 'undefined') {
+            console.warn("Menjalankan dalam mode preview.");
+            window.google = { script: { run: {
+                withSuccessHandler: function(cb) { this._s = cb; return this; },
+                withFailureHandler: function(cb) { this._f = cb; return this; },
+                getNotaService: function() { var s=this._s; setTimeout(function(){if(s) s('BG/04/26/MOCK');}, 50); },
+                saveServiceTransaction: function(p) { var s=this._s; setTimeout(function(){if(s) s({status:'success', message:'Mock Saved'});}, 50); },
+                editServiceTransaction: function(i, p) { var s=this._s; setTimeout(function(){if(s) s({status:'success', message:'DATA BERHASIL DI RUBAH'});}, 50); },
+                saveKonterTransaction: function(p) { var s=this._s; setTimeout(function(){if(s) s({status:'success', message:'Konter Saved'});}, 50); },
+                editKonterTransaction: function(i, p) { var s=this._s; setTimeout(function(){if(s) s({status:'success', message:'DATA BERHASIL DI RUBAH'});}, 50); },
+                getDropdownData: function() { var s=this._s; setTimeout(function(){if(s) s({brandData:['Apple','Samsung','Xiaomi'], providerData:['Telkomsel','XL','Indosat']});}, 50); },
+                getData: function(sh) { var s=this._s; setTimeout(function(){if(s){if(sh==='DB_service') s([["BG/04/26/001", "15/04/2026", "CUST-001", "iPhone 13", "1234", "LCD Pecah", "-", "Tidak", "-", "Rp 500.000", "Belum Lunas", "-", "Proses", "15/04/2026 10:00"]]); else if(sh==='DB_customer') s([["CUST-001", "'08125581803", "Ilmi", "1", "15/04/2026"], ["CUST-002", "'08123456789", "Budi Santoso", "1", "15/04/2026"]]); else if(sh==='DB_konter') s([["KNT-260415-001", "15/04/2026", "VOUCHER", "Voucher 10K", "Rp 10.000", "Rp 12.000", "Rp 2.000", "15/04/2026"]]); else s([["MOCK-001", "Mock Data 1", "Mock Data 2", "Mock Data 3", "15/04/2026", "5"]]);}}, 500); },
+                deleteData: function(sh, i) { var s=this._s; setTimeout(function(){if(s) s({status:'success'});}, 50); },
+                saveData: function(sh, d) { var s=this._s; setTimeout(function(){if(s) s({status:'success'});}, 50); },
+                updateData: function(sh, i, d) { var s=this._s; setTimeout(function(){if(s) s({status:'success'});}, 50); },
+                verifyLogin: function(u, p) { var s=this._s; setTimeout(function(){if(s) s({status:'success', role:'Admin'});}, 50); },
+                updateServiceStatus: function(i, st) { var s=this._s; setTimeout(function(){if(s) s({status:'success', message:'Status Mocked'});}, 50); }
+            }}};
+        }
 
         const getEl = (id) => {
             const els = document.querySelectorAll('#' + id);
@@ -602,8 +618,15 @@
 
             switchPage('ServiceHP', 'Service HP');
             
-            // Coba konek bluetooth jika pernah di GitHub Pages (karena Iframe hilang, ini akan berjalan mulus)
-            autoConnectPrinter();
+            // ZETTBOT FIX: Auto-Reconnect Printer atau Kembalikan Mode RawBT
+            try {
+                if (localStorage.getItem('bgl2_rawbt_mode') === 'true') {
+                    window.useRawBT = true;
+                    updatePrinterUI(true);
+                } else {
+                    autoConnectPrinter();
+                }
+            } catch(e) {}
 
             gasRun('getDropdownData').then(function(d) {
                 if (d && !d.error) {
@@ -613,6 +636,7 @@
             }).catch(function(e) { console.warn("Background cache sync failed", e); });
         });
 
+        // ZETTBOT: Mengatur Warna UI Bluetooth & RawBT
         window.updatePrinterUI = function(connected) {
             var icon = document.getElementById('printerIcon');
             var text = document.getElementById('printerText');
@@ -621,7 +645,7 @@
                     icon.classList.remove('text-slate-300', 'group-hover:text-white');
                     icon.classList.add('text-[#39ff14]'); 
                     icon.style.textShadow = '0 0 8px #39ff14'; 
-                    if(text) text.innerText = 'Connected';
+                    if(text) text.innerText = window.useRawBT ? 'RawBT ON' : 'Connected';
                 } else {
                     icon.classList.add('text-slate-300', 'group-hover:text-white');
                     icon.classList.remove('text-[#39ff14]');
@@ -631,10 +655,29 @@
             }
         };
 
-        // ZETTBOT: Fungsi Bluetooth kini BEBAS BLOKIRAN karena dijalankan di Github Pages
+        // ZETTBOT FIX: Solusi Cerdas "Akses Ditolak" Chrome Iframe Android
         window.connectPrinter = async function() {
+            if (window.useRawBT) {
+                Swal.fire({
+                    title: 'Mode RawBT Aktif',
+                    text: 'Ingin mematikan mode RawBT?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    confirmButtonText: 'Matikan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.useRawBT = false;
+                        localStorage.setItem('bgl2_rawbt_mode', 'false');
+                        updatePrinterUI(false);
+                    }
+                });
+                return;
+            }
+
             if (!navigator.bluetooth) {
-                Swal.fire('Info', 'Browser ini tidak mendukung Web Bluetooth.', 'error');
+                Swal.fire('Info Printer', 'Browser Anda tidak mendukung Web Bluetooth. Kami sarankan Anda menggunakan Aplikasi RawBT untuk mencetak dari HP.', 'info');
                 return;
             }
             
@@ -645,8 +688,8 @@
                     icon: 'info',
                     showCancelButton: true,
                     confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, Putuskan!'
+                    cancelButtonText: 'Batal',
+                    confirmButtonText: 'Putuskan!'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.printerDevice.gatt.disconnect();
@@ -657,45 +700,64 @@
             }
 
             try {
-                // Di Github Pages, pop-up pencarian akan muncul otomatis!
+                // Tembak pencarian Bluetooth murni tanpa terhalang Pop-up Loading agar tidak kadaluarsa
                 const device = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
                     optionalServices: [
                         '000018f0-0000-1000-8000-00805f9b34fb', 
                         'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
-                        '49535343-fe7d-4ae5-8fa9-9fafd205e455' 
+                        '49535343-fe7d-4ae5-8fa9-9fafd205e455' // Standar printer thermal POS murah
                     ]
                 });
                 
-                Swal.fire({ title: 'Menghubungkan...', text: 'Mengamankan koneksi ke ' + device.name, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                Swal.fire({ title: 'Menghubungkan...', text: 'Tunggu sebentar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
                 window.printerDevice = device;
-                
                 device.addEventListener('gattserverdisconnected', () => {
                     window.printerDevice = null;
                     window.printerServer = null;
                     updatePrinterUI(false);
-                    Swal.fire({title: 'Terputus', text: 'Koneksi dengan printer bluetooth terputus', icon: 'warning', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false});
+                    Swal.fire({title: 'Terputus', text: 'Koneksi bluetooth terputus', icon: 'warning', toast: true, position: 'top-end', timer: 3000, showConfirmButton: false});
                 });
 
                 const server = await device.gatt.connect();
                 window.printerServer = server;
                 
                 updatePrinterUI(true);
-                Swal.fire('Berhasil!', 'Printer ' + device.name + ' berhasil terhubung. Anda sudah bisa mencetak nota!', 'success');
+                Swal.fire('Berhasil!', 'Printer ' + device.name + ' terhubung.', 'success');
                 
             } catch (err) {
                 console.log("Bluetooth error:", err);
-                if(err.name === 'NotFoundError') {
-                     // Dibatalkan User
+                
+                // ZETTBOT: Deteksi khusus jika Google memblokir Iframe di Android Chrome
+                if(err.name === 'SecurityError' || err.name === 'NotAllowedError') {
+                     Swal.fire({
+                         title: 'Diblokir oleh Browser',
+                         html: 'Google memblokir Bluetooth Web karena aplikasi ini berjalan di dalam Iframe (Aturan Keamanan Android).<br><br><b>SOLUSI TERBAIK:</b> Gunakan Mode <b>RawBT</b>. Pastikan aplikasi <i>RawBT</i> terinstal gratis di HP Anda.',
+                         icon: 'warning',
+                         showCancelButton: true,
+                         confirmButtonText: 'Aktifkan Mode RawBT',
+                         confirmButtonColor: '#39ff14',
+                         cancelButtonText: 'Batal'
+                     }).then((result) => {
+                         if (result.isConfirmed) {
+                             window.useRawBT = true;
+                             localStorage.setItem('bgl2_rawbt_mode', 'true');
+                             updatePrinterUI(true);
+                             Swal.fire('Mode RawBT Aktif', 'Ikon printer menyala hijau. Struk akan otomatis dikirim ke aplikasi RawBT.', 'success');
+                         }
+                     });
+                } else if (err.name === 'NotFoundError') {
+                     // Batal milih
                 } else {
-                     Swal.fire('Koneksi Gagal', 'Pastikan bluetooth menyala, printer aktif, dan coba lagi.<br><br><small class="text-red-500">' + err.message + '</small>', 'error');
+                     Swal.fire('Koneksi Gagal', 'Pastikan bluetooth menyala dan coba lagi.<br><small>' + err.message + '</small>', 'error');
+                     updatePrinterUI(false);
                 }
-                updatePrinterUI(false);
             }
         };
 
         window.autoConnectPrinter = async function() {
+            if (window.useRawBT) return; 
             if (!navigator.bluetooth || !navigator.bluetooth.getDevices) return;
             try {
                 const devices = await navigator.bluetooth.getDevices();
@@ -713,14 +775,10 @@
                                 updatePrinterUI(false);
                             });
                             break; 
-                        } catch (e) {
-                            console.log("Auto-connect failed for", device.name, e);
-                        }
+                        } catch (e) { console.log("Auto-connect failed", e); }
                     }
                 }
-            } catch(e) {
-                console.log("Error in autoConnectPrinter:", e);
-            }
+            } catch(e) { console.log("Error autoConnectPrinter:", e); }
         };
 
         function renderMiniDashboard() {
@@ -1344,106 +1402,50 @@
             openModal('modalNota');
         }
 
-        // ZETTBOT: Proses Print yang langsung dikirim ke Bluetooth API!
+        // ZETTBOT: Integrasi Pengiriman Nota RawBT Super Kilat!
         function printNota() {
-            var noNota = getEl('prNota') ? getEl('prNota').innerText : '-';
-            var nama = getEl('prNama') ? getEl('prNama').innerText : '-';
-            var unit = getEl('prUnit') ? getEl('prUnit').innerText : '-';
-            var keluhan = getEl('prKeluhan') ? getEl('prKeluhan').innerText : '-';
-            var total = getEl('prTotal') ? getEl('prTotal').innerText : '-';
-            var status = getEl('notaWatermark') ? getEl('notaWatermark').innerText : '';
+            if (window.useRawBT) {
+                var noNota = getEl('prNota') ? getEl('prNota').innerText : '-';
+                var nama = getEl('prNama') ? getEl('prNama').innerText : '-';
+                var unit = getEl('prUnit') ? getEl('prUnit').innerText : '-';
+                var keluhan = getEl('prKeluhan') ? getEl('prKeluhan').innerText : '-';
+                var total = getEl('prTotal') ? getEl('prTotal').innerText : '-';
+                var status = getEl('notaWatermark') ? getEl('notaWatermark').innerText : '';
 
-            var receiptText = "BENGKEL GADGET L2\n";
-            receiptText += "Nota Servis\n";
-            receiptText += "--------------------------------\n";
-            receiptText += "Nota : " + noNota + "\n";
-            receiptText += "Nama : " + nama + "\n";
-            receiptText += "Unit : " + unit + "\n";
-            receiptText += "Rusak: " + keluhan + "\n";
-            receiptText += "--------------------------------\n";
-            receiptText += "TOTAL: " + total + "\n";
-            if (status) receiptText += "Status: " + status + "\n";
-            receiptText += "--------------------------------\n";
-            receiptText += "Terima Kasih\n";
-            receiptText += "\n\n\n";
+                var receipt = "[C]<b>BENGKEL GADGET L2</b>\n";
+                receipt += "[C]Nota Servis\n";
+                receipt += "--------------------------------\n";
+                receipt += "[L]Nota : " + noNota + "\n";
+                receipt += "[L]Nama : " + nama + "\n";
+                receipt += "[L]Unit : " + unit + "\n";
+                receipt += "[L]Rusak: " + keluhan + "\n";
+                receipt += "--------------------------------\n";
+                receipt += "[L]<b>TOTAL: " + total + "</b>\n";
+                if (status) receipt += "[C]" + status + "\n";
+                receipt += "--------------------------------\n";
+                receipt += "[C]Terima Kasih\n";
+                receipt += "\n\n";
 
-            if (window.printerDevice && window.printerServer) {
-                // Print menggunakan Web Bluetooth API
-                printToBluetooth(receiptText);
-            } else {
-                Swal.fire({
-                    title: 'Printer Belum Terhubung',
-                    text: 'Sambungkan Printer Bluetooth Anda di Sidebar terlebih dahulu. Ingin menggunakan Print biasa?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Print Biasa',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        var thermal = getEl('thermalReceipt');
-                        if(!thermal) return;
-                        var printContents = thermal.innerHTML;
-                        var iframe = document.createElement('iframe');
-                        iframe.style.position = 'absolute'; iframe.style.width = '0px'; iframe.style.height = '0px'; iframe.style.border = 'none';
-                        document.body.appendChild(iframe);
-                        var pri = iframe.contentWindow;
-                        pri.document.open();
-                        pri.document.write('<html><head><title>Print Nota</title>');
-                        pri.document.write('<style>@page { margin: 0; size: auto; } body { font-family: "Courier New", Courier, monospace; background-color: #fff; color: #000; padding: 15px; width: 100%; max-width: 80mm; margin: 0 auto; box-sizing: border-box; } .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 4rem; font-weight: bold; opacity: 0.1; pointer-events: none; } .watermark.lunas { color: green; } .watermark.belum { color: red; } .text-center { text-align: center; } .font-bold { font-weight: bold; } .mb-4 { margin-bottom: 1rem; } .flex { display: flex; } .justify-between { justify-content: space-between; } .text-xl { font-size: 1.25rem; } .border-b-2 { border-bottom-width: 2px; } .border-dashed { border-style: dashed; border-color: #9ca3af; padding-bottom: 1rem; } .relative { position: relative; } .z-10 { z-index: 10; } .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; } .text-xs { font-size: 0.75rem; line-height: 1rem; } .text-sm { font-size: 0.875rem; } .mt-2 { margin-top: 0.5rem; }</style>');
-                        pri.document.write('</head><body><div style="border: 1px dashed #ccc; padding: 10px;">' + printContents + '</div></body></html>');
-                        pri.document.close();
-                        pri.focus();
-                        setTimeout(function() { pri.print(); setTimeout(function() { document.body.removeChild(iframe); }, 1000); }, 250);
-                    }
-                });
+                var b64 = btoa(unescape(encodeURIComponent(receipt)));
+                window.location.href = "intent:" + b64 + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
+                return;
             }
-        }
 
-        async function printToBluetooth(text) {
-            try {
-                // Standar UUID untuk layanan komunikasi serial bluetooth
-                const serviceUuid = '49535343-fe7d-4ae5-8fa9-9fafd205e455'; 
-                const characteristicUuid = '49535343-8841-43f4-a8d4-ecbe34729bb3';
-
-                const service = await window.printerServer.getPrimaryService(serviceUuid);
-                const characteristic = await service.getCharacteristic(characteristicUuid);
-
-                const encoder = new TextEncoder();
-                const data = encoder.encode(text);
-
-                // Kirim data per chunk karena Bluetooth LE memiliki batasan ukuran per transmisi (biasanya 20 bytes)
-                const chunkSize = 20;
-                for (let i = 0; i < data.length; i += chunkSize) {
-                    const chunk = data.slice(i, i + chunkSize);
-                    await characteristic.writeValue(chunk);
-                }
-                
-                Swal.fire({title: 'Sukses', text: 'Nota sedang dicetak!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-
-            } catch (error) {
-                console.log("Print Error:", error);
-                Swal.fire('Gagal Mencetak', 'Koneksi ke printer terputus. Silakan hubungkan ulang. <br>' + error.message, 'error');
-                updatePrinterUI(false);
-                window.printerDevice = null;
-                window.printerServer = null;
-            }
-        }
-
-        function sendWAFromTable(origIdx) {
-            var payload = getPayloadFromRow(origIdx);
-            if(!payload) return;
-            var noStr = payload.noHp.replace(/^'/, '');
-            var no = noStr.startsWith('0') ? '62' + noStr.substring(1) : noStr;
-            var text = "Halo kak *" + payload.nama + "*,\n\nBerikut adalah update untuk servis HP kakak di *BENGKEL GADGET L2*:\nNo Nota: *" + payload.noNota + "*\nUnit: *" + payload.seriHp + "*\nKerusakan: *" + payload.kerusakan + "*\nTotal Biaya: *" + payload.totalBiaya + "* (" + payload.ketBayar + ")\nStatus Saat Ini: *" + payload.status + "*\n\nTerima kasih telah mempercayakan servis HP Anda kepada kami! 🙏";
-            window.open("https://wa.me/" + no + "?text=" + encodeURIComponent(text), '_blank');
-        }
-
-        function sendWA() {
-            if(!lastTrxData) return;
-            var noStr = lastTrxData.noHp.replace(/^'/, '');
-            var no = noStr.startsWith('0') ? '62' + noStr.substring(1) : noStr;
-            var text = "Halo kak *" + lastTrxData.nama + "*,\n\nBerikut adalah update untuk servis HP kakak di *BENGKEL GADGET L2*:\nNo Nota: *" + lastTrxData.noNota + "*\nUnit: *" + lastTrxData.seriHp + "*\nKerusakan: *" + lastTrxData.kerusakan + "*\nTotal Biaya: *" + lastTrxData.totalBiaya + "* (" + lastTrxData.ketBayar + ")\nStatus Saat Ini: *" + (lastTrxData.status || 'Proses') + "*\n\nTerima kasih telah mempercayakan servis HP Anda kepada kami! 🙏";
-            window.open("https://wa.me/" + no + "?text=" + encodeURIComponent(text), '_blank');
+            // Fallback ke Print Normal Browser jika bukan RawBT
+            var thermal = getEl('thermalReceipt');
+            if(!thermal) return;
+            var printContents = thermal.innerHTML;
+            var iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute'; iframe.style.width = '0px'; iframe.style.height = '0px'; iframe.style.border = 'none';
+            document.body.appendChild(iframe);
+            var pri = iframe.contentWindow;
+            pri.document.open();
+            pri.document.write('<html><head><title>Print Nota</title>');
+            pri.document.write('<style>@page { margin: 0; size: auto; } body { font-family: "Courier New", Courier, monospace; background-color: #fff; color: #000; padding: 15px; width: 100%; max-width: 80mm; margin: 0 auto; box-sizing: border-box; } .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 4rem; font-weight: bold; opacity: 0.1; pointer-events: none; } .watermark.lunas { color: green; } .watermark.belum { color: red; } .text-center { text-align: center; } .font-bold { font-weight: bold; } .mb-4 { margin-bottom: 1rem; } .flex { display: flex; } .justify-between { justify-content: space-between; } .text-xl { font-size: 1.25rem; } .border-b-2 { border-bottom-width: 2px; } .border-dashed { border-style: dashed; border-color: #9ca3af; padding-bottom: 1rem; } .relative { position: relative; } .z-10 { z-index: 10; } .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; } .text-xs { font-size: 0.75rem; line-height: 1rem; } .text-sm { font-size: 0.875rem; } .mt-2 { margin-top: 0.5rem; }</style>');
+            pri.document.write('</head><body><div style="border: 1px dashed #ccc; padding: 10px;">' + printContents + '</div></body></html>');
+            pri.document.close();
+            pri.focus();
+            setTimeout(function() { pri.print(); setTimeout(function() { document.body.removeChild(iframe); }, 1000); }, 250);
         }
 
         // ZETTBOT: Pengamanan Mutlak Edit Servis (Isolasi Form)
@@ -1905,7 +1907,7 @@
         window.openNotaFromTable = openNotaFromTable; window.sendWAFromTable = sendWAFromTable; window.sendWA = sendWA; window.printNota = printNota;
         window.editServiceData = editServiceData; window.editDataGen = editDataGen; window.initServiceForm = initServiceForm; window.initGenericForm = initGenericForm; 
         window.loadTableData = loadTableData; window.delSrv = delSrv; window.delKonter = delKonter; window.delGen = delGen; window.updateStatusAdmin = updateStatusAdmin;
-        window.renderMiniDashboard = renderMiniDashboard; window.filterTable = filterTable; window.printToBluetooth = printToBluetooth; window.connectPrinter = connectPrinter; window.autoConnectPrinter = autoConnectPrinter; window.updatePrinterUI = updatePrinterUI;
+        window.renderMiniDashboard = renderMiniDashboard; window.filterTable = filterTable;
     </script>
 </body>
 </html>
