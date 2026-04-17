@@ -520,7 +520,7 @@
         // ZETTBOT FIX: Mesin API Tangguh (Anti CORS Preflight & Deteksi Error Akurat)
         function gasRun(funcName, ...args) {
             return new Promise(async function(resolve, reject) {
-                if (API_URL === "TARUH_URL_WEB_APP_GOOGLE_SCRIPT_ANDA_DISINI" || !API_URL.startsWith("https://script.google.com")) {
+                if (API_URL === "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec" || !API_URL.startsWith("https://script.google.com")) {
                     reject(new Error("URL API Belum Diisi! Silakan edit file index.html di GitHub."));
                     return;
                 }
@@ -1376,47 +1376,74 @@
         }
 
         function printNota() {
+            var noNota = getEl('prNota') ? getEl('prNota').innerText : '-';
+            var nama = getEl('prNama') ? getEl('prNama').innerText : '-';
+            var unit = getEl('prUnit') ? getEl('prUnit').innerText : '-';
+            var keluhan = getEl('prKeluhan') ? getEl('prKeluhan').innerText : '-';
+            var total = getEl('prTotal') ? getEl('prTotal').innerText : '-';
+            var status = getEl('notaWatermark') ? getEl('notaWatermark').innerText : '';
+
+            var receiptText = "BENGKEL GADGET L2\n";
+            receiptText += "Nota Servis\n";
+            receiptText += "--------------------------------\n";
+            receiptText += "Nota : " + noNota + "\n";
+            receiptText += "Nama : " + nama + "\n";
+            receiptText += "Unit : " + unit + "\n";
+            receiptText += "Rusak: " + keluhan + "\n";
+            receiptText += "--------------------------------\n";
+            receiptText += "TOTAL: " + total + "\n";
+            if (status) receiptText += "Status: " + status + "\n";
+            receiptText += "--------------------------------\n";
+            receiptText += "Terima Kasih\n";
+            receiptText += "\n\n\n";
+
+            // Jika Mode RawBT Aktif
             if (window.useRawBT) {
-                var noNota = getEl('prNota') ? getEl('prNota').innerText : '-';
-                var nama = getEl('prNama') ? getEl('prNama').innerText : '-';
-                var unit = getEl('prUnit') ? getEl('prUnit').innerText : '-';
-                var keluhan = getEl('prKeluhan') ? getEl('prKeluhan').innerText : '-';
-                var total = getEl('prTotal') ? getEl('prTotal').innerText : '-';
-                var status = getEl('notaWatermark') ? getEl('notaWatermark').innerText : '';
+                var receiptRawBT = "[C]<b>BENGKEL GADGET L2</b>\n";
+                receiptRawBT += "[C]Nota Servis\n";
+                receiptRawBT += "--------------------------------\n";
+                receiptRawBT += "[L]Nota : " + noNota + "\n";
+                receiptRawBT += "[L]Nama : " + nama + "\n";
+                receiptRawBT += "[L]Unit : " + unit + "\n";
+                receiptRawBT += "[L]Rusak: " + keluhan + "\n";
+                receiptRawBT += "--------------------------------\n";
+                receiptRawBT += "[L]<b>TOTAL: " + total + "</b>\n";
+                if (status) receiptRawBT += "[C]" + status + "\n";
+                receiptRawBT += "--------------------------------\n";
+                receiptRawBT += "[C]Terima Kasih\n";
+                receiptRawBT += "\n\n";
 
-                var receipt = "[C]<b>BENGKEL GADGET L2</b>\n";
-                receipt += "[C]Nota Servis\n";
-                receipt += "--------------------------------\n";
-                receipt += "[L]Nota : " + noNota + "\n";
-                receipt += "[L]Nama : " + nama + "\n";
-                receipt += "[L]Unit : " + unit + "\n";
-                receipt += "[L]Rusak: " + keluhan + "\n";
-                receipt += "--------------------------------\n";
-                receipt += "[L]<b>TOTAL: " + total + "</b>\n";
-                if (status) receipt += "[C]" + status + "\n";
-                receipt += "--------------------------------\n";
-                receipt += "[C]Terima Kasih\n";
-                receipt += "\n\n";
-
-                var b64 = btoa(unescape(encodeURIComponent(receipt)));
+                var b64 = btoa(unescape(encodeURIComponent(receiptRawBT)));
                 window.location.href = "intent:" + b64 + "#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;";
                 return;
             }
 
-            var thermal = getEl('thermalReceipt');
-            if(!thermal) return;
-            var printContents = thermal.innerHTML;
-            var iframe = document.createElement('iframe');
-            iframe.style.position = 'absolute'; iframe.style.width = '0px'; iframe.style.height = '0px'; iframe.style.border = 'none';
-            document.body.appendChild(iframe);
-            var pri = iframe.contentWindow;
-            pri.document.open();
-            pri.document.write('<html><head><title>Print Nota</title>');
-            pri.document.write('<style>@page { margin: 0; size: auto; } body { font-family: "Courier New", Courier, monospace; background-color: #fff; color: #000; padding: 15px; width: 100%; max-width: 80mm; margin: 0 auto; box-sizing: border-box; } .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 4rem; font-weight: bold; opacity: 0.1; pointer-events: none; } .watermark.lunas { color: green; } .watermark.belum { color: red; } .text-center { text-align: center; } .font-bold { font-weight: bold; } .mb-4 { margin-bottom: 1rem; } .flex { display: flex; } .justify-between { justify-content: space-between; } .text-xl { font-size: 1.25rem; } .border-b-2 { border-bottom-width: 2px; } .border-dashed { border-style: dashed; border-color: #9ca3af; padding-bottom: 1rem; } .relative { position: relative; } .z-10 { z-index: 10; } .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; } .text-xs { font-size: 0.75rem; line-height: 1rem; } .text-sm { font-size: 0.875rem; } .mt-2 { margin-top: 0.5rem; }</style>');
-            pri.document.write('</head><body><div style="border: 1px dashed #ccc; padding: 10px;">' + printContents + '</div></body></html>');
-            pri.document.close();
-            pri.focus();
-            setTimeout(function() { pri.print(); setTimeout(function() { document.body.removeChild(iframe); }, 1000); }, 250);
+            // ZETTBOT FIX: Wajib Pakai Bluetooth Web API (Anti Print PDF)
+            if (window.printerDevice && window.printerServer) {
+                // Jika sudah terkoneksi, langsung cetak
+                printToBluetooth(receiptText);
+            } else {
+                // Jika belum, munculkan pop-up minta disambungkan
+                Swal.fire({
+                    title: 'Printer Belum Terhubung',
+                    text: 'Silakan sambungkan Printer Bluetooth Anda terlebih dahulu untuk mencetak nota ini.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: '<i class="fa-brands fa-bluetooth mr-1"></i> Sambungkan',
+                    cancelButtonText: 'Batal'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        // Buka pencarian bluetooth, true = isSilent (tidak putuskan koneksi yang ada)
+                        let isConnected = await window.connectPrinter(true);
+                        // Jika koneksi sukses, cetak otomatis tanpa klik lagi!
+                        if (isConnected) {
+                            printToBluetooth(receiptText);
+                        }
+                    }
+                });
+            }
         }
 
         async function printToBluetooth(text) {
