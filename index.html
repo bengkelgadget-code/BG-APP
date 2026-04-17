@@ -491,15 +491,17 @@
         <div id="thermalReceipt" class="bg-white p-5 w-full max-w-sm relative shadow-2xl mb-4 text-black font-sans leading-snug print-container">
             <div id="notaWatermark" class="watermark lunas">LUNAS</div>
             
-            <div class="text-center relative z-10 pb-4">
-                <h2 class="font-black text-[22px] tracking-[0.1em] mb-1 uppercase whitespace-nowrap overflow-hidden text-center w-full" id="printStoreName" style="transform-origin: center;">BENGKEL GADGET L2</h2>
-                <p class="font-bold text-[15px]">Alamat Konter</p>
+            <div class="text-center relative z-10 mb-6">
+                <h2 class="font-black text-[24px] mb-1 uppercase whitespace-nowrap overflow-hidden text-center w-full" id="printStoreName">BENGKEL GADGET L2</h2>
+                <p class="font-bold text-[16px]">Alamat Konter</p>
             </div>
             
             <div class="text-sm relative z-10">
-                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
-                    <span>No.Nota</span><span>:</span><span id="prNota" class="font-bold">BG/XXXXXXXX</span>
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-2">
+                    <span>No.Nota</span><span>:</span><span id="prNota" class="font-bold"></span>
                 </div>
+                
+                <div class="border-b border-dashed border-black my-2"></div>
                 
                 <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>Tanggal</span><span>:</span><span id="prTgl"></span>
@@ -524,13 +526,13 @@
                 <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>Status</span><span>:</span><span id="prStatus"></span>
                 </div>
-                <div class="grid grid-cols-[80px_10px_1fr] items-start font-black text-[17px] mt-2">
+                <div class="grid grid-cols-[80px_10px_1fr] items-start font-black text-[18px] mt-2">
                     <span>Total</span><span>:</span><span id="prTotal" class="uppercase"></span>
                 </div>
                 
-                <div class="border-b border-dashed border-black my-2"></div>
+                <div class="border-b border-dashed border-black mt-3 mb-4"></div>
                 
-                <div class="text-[9px] pt-2 space-y-1">
+                <div class="text-[7px] pt-4 space-y-1 font-semibold text-gray-800">
                     <p>- Wajib membawa nota saat pengambilan</p>
                     <p>- Komplain berlaku selama masa garansi</p>
                     <p>- Device yang tidak diambil lebih dari 1 (satu) tahun bukan tanggung jawab kami</p>
@@ -1353,9 +1355,8 @@
             setTxt('prKet', payload.ketTambahan);
             setTxt('prStatus', payload.ketBayar);
             
-            // ZETTBOT: Tambah spasi setelah Rp untuk tampilan nota
             var totalStr = payload.totalBiaya || '-';
-            totalStr = totalStr.replace(/Rp\s*/i, 'Rp.  '); 
+            totalStr = totalStr.replace(/Rp\s*\.?\s*/i, 'RP.  '); 
             setTxt('prTotal', totalStr);
             
             document.querySelectorAll('#notaWatermark').forEach(wm => {
@@ -1365,16 +1366,15 @@
             
             openModal('modalNota');
             
-            // Auto scale font size untuk nama konter agar muat 1 baris
             setTimeout(() => {
-                const storeNameEl = document.getElementById('printStoreName');
-                if(storeNameEl) {
-                    storeNameEl.style.fontSize = '22px'; // Reset default
+                const storeNameEls = document.querySelectorAll('#printStoreName');
+                storeNameEls.forEach(storeNameEl => {
+                    storeNameEl.style.fontSize = '24px'; 
                     while(storeNameEl.scrollWidth > storeNameEl.clientWidth && parseInt(window.getComputedStyle(storeNameEl).fontSize) > 10) {
                         let currentSize = parseInt(window.getComputedStyle(storeNameEl).fontSize);
                         storeNameEl.style.fontSize = (currentSize - 1) + 'px';
                     }
-                }
+                });
             }, 10);
         }
 
@@ -1389,27 +1389,15 @@
             var statusBayar = getEl('prStatus') ? getEl('prStatus').innerText : '-';
             var total = getEl('prTotal') ? getEl('prTotal').innerText : '-';
 
-            // Konstruksi teks untuk RawBT atau Bluetooth Langsung
-            var receiptText = "[C]<b>BENGKEL GADGET L2</b>\n";
-            receiptText += "[C]<b>Alamat Konter</b>\n\n";
-            receiptText += "[L]No.Nota   : " + noNota + "\n";
-            receiptText += "--------------------------------\n";
-            receiptText += "[L]Tanggal   : " + tgl + "\n";
-            receiptText += "[L]Nama      : " + nama + "\n";
-            receiptText += "[L]No HP     : " + hp + "\n\n";
-            receiptText += "[L]Unit      : " + unit + "\n";
-            receiptText += "[L]Kerusakan : " + keluhan + "\n";
-            receiptText += "[L]Keterangan: " + ket + "\n\n";
-            receiptText += "[L]Status    : " + statusBayar + "\n";
-            receiptText += "[L]<b>Total     : " + total + "</b>\n";
-            receiptText += "--------------------------------\n\n";
-            receiptText += "[L]<font size='small'>- Wajib membawa nota saat\n  pengambilan\n";
-            receiptText += "- Komplain berlaku selama masa\n  garansi\n";
-            receiptText += "- Device yang tidak diambil\n  lebih dari 1 (satu) tahun\n  bukan tanggung jawab kami</font>\n";
-            receiptText += "\n\n\n";
+            var totalStr = total.replace(/Rp\s*\.?\s*/i, 'RP.  ');
+
+            var receiptData = {
+                noNota: noNota, tgl: tgl, nama: nama, hp: hp, unit: unit,
+                keluhan: keluhan, ket: ket, statusBayar: statusBayar, total: totalStr
+            };
 
             if (window.printerDevice && window.printerServer) {
-                printToBluetooth(receiptText);
+                printToBluetooth(receiptData);
             } else {
                 Swal.fire({
                     title: 'Printer Belum Terhubung',
@@ -1424,14 +1412,15 @@
                     if (result.isConfirmed) {
                         let isConnected = await window.connectPrinter(true);
                         if (isConnected) {
-                            printToBluetooth(receiptText);
+                            printToBluetooth(receiptData);
                         }
                     }
                 });
             }
         }
 
-        async function printToBluetooth(text) {
+        // ZETTBOT: Mesin Cetak Hardware Asli (Standard ESC/POS) - Ultra Professional
+        async function printToBluetooth(receiptData) {
             try {
                 const serviceUuid = '49535343-fe7d-4ae5-8fa9-9fafd205e455'; 
                 const characteristicUuid = '49535343-8841-43f4-a8d4-ecbe34729bb3';
@@ -1439,19 +1428,59 @@
                 const service = await window.printerServer.getPrimaryService(serviceUuid);
                 const characteristic = await service.getCharacteristic(characteristicUuid);
 
-                const encoder = new TextEncoder();
-                // Replace ESC/POS style tags if raw bluetooth printing doesn't support them natively, 
-                // but since standard mini printers usually accept raw text, we just send it.
-                // Note: Real ESC/POS formatting requires hex codes, but we'll send the text for now 
-                // as many generic printers print it fine, or use RawBT format if rawbt app is used.
-                // If it's a direct connection without rawbt app, we strip the tags and just send pure text:
-                let pureText = text.replace(/\[C\]/g, '').replace(/\[L\]/g, '').replace(/<\/?b>/g, '').replace(/<\/?font[^>]*>/g, '');
+                let bytes = [];
+                const addCmd = (cmdArr) => { bytes.push(...cmdArr); };
+                const addTxt = (str) => { 
+                    let utf8Encode = new TextEncoder();
+                    let arr = utf8Encode.encode(str);
+                    bytes.push(...arr);
+                };
 
-                const data = encoder.encode(pureText);
-
-                const chunkSize = 20;
-                for (let i = 0; i < data.length; i += chunkSize) {
-                    const chunk = data.slice(i, i + chunkSize);
+                addCmd([0x1B, 0x40]); // Initialize
+                
+                // HEADER
+                addCmd([0x1B, 0x61, 0x01]); // Align Center
+                addCmd([0x1B, 0x45, 0x01]); // Bold ON
+                addCmd([0x1D, 0x21, 0x11]); // Double W & H
+                addTxt("BENGKEL GADGET L2\n");
+                
+                addCmd([0x1D, 0x21, 0x00]); // Normal Size
+                addTxt("Alamat Konter\n\n\n"); // Jarak padding (tanpa border putus-putus)
+                
+                // BODY
+                addCmd([0x1B, 0x61, 0x00]); // Align Left
+                addCmd([0x1B, 0x45, 0x00]); // Bold OFF
+                
+                addTxt("No.Nota   : " + receiptData.noNota + "\n");
+                addTxt("--------------------------------\n");
+                addTxt("Tanggal   : " + receiptData.tgl + "\n");
+                addTxt("Nama      : " + receiptData.nama + "\n");
+                addTxt("No HP     : " + receiptData.hp + "\n\n");
+                addTxt("Unit      : " + receiptData.unit + "\n");
+                addTxt("Kerusakan : " + receiptData.keluhan + "\n");
+                addTxt("Keterangan: " + receiptData.ket + "\n\n");
+                addTxt("Status    : " + receiptData.statusBayar + "\n");
+                
+                // TOTAL
+                addCmd([0x1B, 0x45, 0x01]); // Bold ON
+                addTxt("Total     : " + receiptData.total + "\n");
+                addCmd([0x1B, 0x45, 0x00]); // Bold OFF
+                
+                addTxt("--------------------------------\n\n");
+                
+                // FOOTER
+                addCmd([0x1B, 0x4D, 0x01]); // Font B (Kecil)
+                addTxt("- Wajib membawa nota saat\n  pengambilan\n");
+                addTxt("- Komplain berlaku selama masa\n  garansi\n");
+                addTxt("- Device yang tidak diambil\n  lebih dari 1 (satu) tahun\n  bukan tanggung jawab kami\n");
+                addCmd([0x1B, 0x4D, 0x00]); // Font A (Normal)
+                
+                addTxt("\n\n\n"); // Feed Kertas
+                
+                const uint8Data = new Uint8Array(bytes);
+                const chunkSize = 20; // Batas transmisi Bluetooth BLE
+                for (let i = 0; i < uint8Data.length; i += chunkSize) {
+                    const chunk = uint8Data.slice(i, i + chunkSize);
                     await characteristic.writeValue(chunk);
                 }
                 
@@ -1658,7 +1687,7 @@
             });
         }
 
-        // ZETTBOT FIX: Single Loop Optimization untuk Kecepatan Render Tabel
+        // ZETTBOT FIX: Single Loop Optimization dengan BATAS 100 BARIS (Ultra Cepat)
         function renderServiceTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
@@ -1668,10 +1697,13 @@
             
             var rowsHtml = []; 
             currentTableData = [];
+            var count = 0;
+            var maxRows = 100; // Batasi render 100 data agar tidak lambat di HP
             
             for (var k = data.length - 1; k >= 0; k--) {
                 var row = data[k]; 
                 if(!row || !Array.isArray(row) || row.length === 0 || row[0] === "") continue;
+                if (count >= maxRows) break; 
                 
                 var origIdx = k;
                 currentTableData.push({row: row, originalIndex: origIdx});
@@ -1704,17 +1736,17 @@
                 
                 html += '<td class="py-2.5 px-3 align-middle">'+statusHtml+'</td><td class="py-2.5 px-3 align-middle">'+act+'</td>';
                 rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
+                count++;
             }
             
             if(rowsHtml.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
             
-            // Render sekali jalan (Sangat cepat)
             tbody.style.display = 'none';
             tbody.innerHTML = rowsHtml.join(''); 
             tbody.style.display = '';
         }
 
-        // ZETTBOT FIX: Single Loop Optimization untuk Kecepatan Render Tabel
+        // ZETTBOT FIX: Single Loop Optimization dengan BATAS 100 BARIS (Ultra Cepat)
         function renderKonterTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
@@ -1724,10 +1756,13 @@
             
             var rowsHtml = []; 
             currentTableData = [];
+            var count = 0;
+            var maxRows = 100;
             
             for (var k = data.length - 1; k >= 0; k--) {
                 var row = data[k]; 
                 if(!row || !Array.isArray(row) || row.length === 0 || row[0] === "") continue;
+                if (count >= maxRows) break;
                 
                 var origIdx = k; 
                 currentTableData.push({row: row, originalIndex: origIdx});
@@ -1748,6 +1783,7 @@
                 
                 html += '<td class="py-2.5 px-3 align-middle">' + act + '</td>';
                 rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
+                count++;
             }
             
             if(rowsHtml.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
@@ -1757,7 +1793,7 @@
             tbody.style.display = '';
         }
 
-        // ZETTBOT FIX: Single Loop Optimization untuk Kecepatan Render Tabel
+        // ZETTBOT FIX: Single Loop Optimization dengan BATAS 100 BARIS (Ultra Cepat)
         function renderGenericTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
@@ -1767,10 +1803,13 @@
             
             var rowsHtml = []; 
             currentTableData = [];
+            var count = 0;
+            var maxRows = 100;
             
             for (var k = data.length - 1; k >= 0; k--) {
                 var row = data[k]; 
                 if(!row || !Array.isArray(row) || row.length === 0 || row[0] === "") continue;
+                if (count >= maxRows) break;
                 
                 var origIdx = k; 
                 currentTableData.push({row: row, originalIndex: origIdx});
@@ -1791,6 +1830,7 @@
                 
                 html += '<td class="py-2.5 px-3 align-middle">' + btnHtml + '</td>';
                 rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
+                count++;
             }
             
             if(rowsHtml.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
