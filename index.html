@@ -33,7 +33,6 @@
         #mainContainer { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .main-active-modal { transform: scale(0.97) translateY(10px); opacity: 0.4; filter: blur(2px); pointer-events: none; }
         
-        .thermal-receipt { font-family: 'Courier New', Courier, monospace; background-color: #fffdf2; border: 1px dashed #ccc; color: #000; }
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 4rem; font-weight: bold; opacity: 0.1; pointer-events: none; }
         .watermark.lunas { color: green; } .watermark.belum { color: red; }
         
@@ -480,7 +479,7 @@
         </div>
     </div>
 
-    <!-- MODAL NOTA -->
+    <!-- ZETTBOT FIX: Modal Nota Desain Baru Tanpa Garis Excel -->
     <div id="modalNota" class="fixed inset-0 bg-slate-900/80 z-[60] hidden flex flex-col items-center justify-center p-4 text-slate-800">
         <div class="w-full max-w-sm flex justify-end mb-3">
             <button onclick="closeModal('modalNota')" class="text-white/80 hover:text-red-500 transition-colors cursor-pointer" title="Tutup">
@@ -488,19 +487,54 @@
             </button>
         </div>
         
-        <div id="thermalReceipt" class="thermal-receipt p-6 w-full max-w-sm relative shadow-2xl mb-4">
+        <div id="thermalReceipt" class="bg-white p-5 w-full max-w-sm relative shadow-2xl mb-4 text-black font-sans leading-snug">
             <div id="notaWatermark" class="watermark lunas">LUNAS</div>
-            <div class="text-center border-b-2 border-dashed border-gray-400 pb-4 mb-4 relative z-10">
-                <h2 class="font-bold text-xl mb-1">BENGKEL GADGET L2</h2><p class="text-xs">Nota Servis</p>
+            
+            <div class="text-center relative z-10 mb-2">
+                <h2 class="font-black text-2xl mb-1 uppercase">BENGKEL GADGET L2</h2>
+                <p class="text-sm font-bold">Alamat Konter</p>
             </div>
-            <div class="text-xs space-y-1 mb-4 border-b-2 border-dashed border-gray-400 pb-4 relative z-10">
-                <div class="flex justify-between"><span>Nota:</span> <span id="prNota" class="font-bold"></span></div>
-                <div class="flex justify-between"><span>Nama:</span> <span id="prNama" class="font-bold"></span></div>
-                <div class="flex justify-between"><span>Unit:</span> <span id="prUnit" class="font-bold"></span></div>
-                <p class="mt-2">Keluhan: <span id="prKeluhan"></span></p>
-            </div>
-            <div class="text-xs mb-4 border-b-2 border-dashed border-gray-400 pb-4 relative z-10 flex justify-between font-bold text-sm">
-                <span>TOTAL:</span><span id="prTotal"></span>
+            
+            <div class="text-sm relative z-10">
+                <div class="grid grid-cols-[80px_10px_1fr] items-start">
+                    <span>No.Nota</span><span>:</span><span id="prNota" class="font-bold">BG/XXXXXXXX</span>
+                </div>
+                <div class="border-b border-dashed border-black my-2"></div>
+                
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
+                    <span>Tanggal</span><span>:</span><span id="prTgl"></span>
+                </div>
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
+                    <span>Nama</span><span>:</span><span id="prNama"></span>
+                </div>
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-2">
+                    <span>No HP</span><span>:</span><span id="prHp"></span>
+                </div>
+                
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
+                    <span>Unit</span><span>:</span><span id="prUnit"></span>
+                </div>
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
+                    <span>Kerusakan</span><span>:</span><span id="prKeluhan"></span>
+                </div>
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-2">
+                    <span>Keterangan</span><span>:</span><span id="prKet"></span>
+                </div>
+                
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
+                    <span>Status</span><span>:</span><span id="prStatus"></span>
+                </div>
+                <div class="grid grid-cols-[80px_10px_1fr] items-start font-bold text-base">
+                    <span>Total</span><span>:</span><span id="prTotal" class="uppercase"></span>
+                </div>
+                
+                <div class="border-b border-dashed border-black my-2"></div>
+                
+                <div class="text-[11px] mt-3 space-y-1">
+                    <p>- Wajib membawa nota saat pengambilan</p>
+                    <p>- Komplain berlaku selama masa garansi</p>
+                    <p>- Device yang tidak diambil lebih dari 1 (satu) tahun bukan tanggung jawab kami</p>
+                </div>
             </div>
         </div>
         
@@ -566,10 +600,10 @@
         } catch(e) {}
         
         var isSidebarOpen = false;
-        var isServiceMode = true;
-        var isKonterMode = false;
+        var isServiceMode = false; // Diubah untuk memastikan default bukan ServiceHP
+        var isKonterMode = true;
         var activeRole = '';
-        var currentSheet = 'ServiceHP';
+        var currentSheet = 'Konter';
         var currentTableData = [];
         var currentConfig = {};
         var editIndex = -1; 
@@ -619,12 +653,11 @@
                 }
             } catch(e) { console.error("Select2 Error:", e); }
 
-            switchPage('ServiceHP', 'Service HP');
+            // ZETTBOT: Jadikan halaman utama menjadi Konter HP sesuai permintaan
+            switchPage('Konter', 'Konter HP');
             
-            // Coba konek bluetooth jika pernah di GitHub Pages (karena Iframe hilang, ini akan berjalan mulus)
             autoConnectPrinter();
 
-            // ZETTBOT FIX: Beri jeda 2 detik agar load awal Tabel & Background API Dropdown tidak bertabrakan!
             setTimeout(function() {
                 gasRun('getDropdownData').then(function(d) {
                     if (d && !d.error) {
@@ -680,7 +713,6 @@
             }
 
             try {
-                // Di Github Pages, pop-up pencarian akan muncul otomatis!
                 const device = await navigator.bluetooth.requestDevice({
                     acceptAllDevices: true,
                     optionalServices: [
@@ -834,7 +866,6 @@
                 var activeSheet = isServiceMode ? 'DB_service' : (isKonterMode ? 'DB_konter' : currentConfig.sheet);
                 
                 if (isServiceMode) {
-                    // ZETTBOT FIX: Hindari Promise.all untuk mencegah Tabrakan Server Google (CORS)
                     let resultsService = await gasRun('getData', 'DB_service');
                     let resultsCustomer = await gasRun('getData', 'DB_customer');
                     window.BGL2_CACHE['DB_service'] = Array.isArray(resultsService) ? resultsService : [];
@@ -1314,57 +1345,19 @@
             };
         }
 
-        function previewServiceData(origIdx) {
-            var payload = getPayloadFromRow(origIdx);
-            if(!payload) return;
-            
-            var setTxt = (id, val) => { document.querySelectorAll('#'+id).forEach(el => el.innerText = val); };
-            setTxt('prevNota', payload.noNota || '-');
-            setTxt('prevTgl', payload.tanggal || '-');
-            setTxt('prevHp', payload.noHp || '-');
-            setTxt('prevNama', payload.nama || '-');
-            setTxt('prevUnit', payload.seriHp || '-');
-            setTxt('prevPin', payload.pinPola || '-');
-            setTxt('prevKerusakan', payload.kerusakan || '-');
-            setTxt('prevKelengkapan', payload.kelengkapan || '-');
-            setTxt('prevGaransi', payload.garansi || '-');
-            setTxt('prevKetTambahan', payload.ketTambahan || '-');
-            setTxt('prevBiaya', payload.totalBiaya || '-');
-            setTxt('prevBayar', payload.ketBayar || '-');
-            
-            var sts = payload.status || '-';
-            var stsColor = sts==='Selesai'?'text-blue-600':(sts==='Diambil'?'text-slate-600':'text-amber-600');
-            document.querySelectorAll('#prevStatus').forEach(prevStatus => {
-                prevStatus.innerText = sts; prevStatus.className = "font-bold " + stsColor;
-            });
-            
-            document.querySelectorAll('#prevFoto').forEach(imgEl => {
-                var noImgEl = imgEl.parentElement.querySelector('#prevNoFoto');
-                if(imgEl && noImgEl) {
-                    if(payload.foto && payload.foto !== '-' && payload.foto.startsWith('data:image')) {
-                        imgEl.src = payload.foto; imgEl.classList.remove('hidden'); noImgEl.classList.add('hidden');
-                    } else {
-                        imgEl.src = ''; imgEl.classList.add('hidden'); noImgEl.classList.remove('hidden');
-                    }
-                }
-            });
-            openModal('modalPreview');
-        }
-
-        function openFullscreenImage(src) {
-            document.querySelectorAll('#fullImage').forEach(fi => fi.src = src);
-            openModal('modalImageFullscreen');
-        }
-
         function openNotaFromTable(origIdx) {
             var payload = getPayloadFromRow(origIdx);
             if(!payload) return;
             
             var setTxt = (id, val) => { document.querySelectorAll('#'+id).forEach(el => el.innerText = val); };
             setTxt('prNota', payload.noNota);
+            setTxt('prTgl', payload.tanggal);
             setTxt('prNama', payload.nama);
+            setTxt('prHp', payload.noHp);
             setTxt('prUnit', payload.seriHp);
-            setTxt('prKeluhan', "- " + payload.kerusakan);
+            setTxt('prKeluhan', payload.kerusakan);
+            setTxt('prKet', payload.ketTambahan);
+            setTxt('prStatus', payload.ketBayar);
             setTxt('prTotal', payload.totalBiaya);
             
             document.querySelectorAll('#notaWatermark').forEach(wm => {
@@ -1376,24 +1369,32 @@
 
         function printNota() {
             var noNota = getEl('prNota') ? getEl('prNota').innerText : '-';
+            var tgl = getEl('prTgl') ? getEl('prTgl').innerText : '-';
             var nama = getEl('prNama') ? getEl('prNama').innerText : '-';
+            var hp = getEl('prHp') ? getEl('prHp').innerText : '-';
             var unit = getEl('prUnit') ? getEl('prUnit').innerText : '-';
             var keluhan = getEl('prKeluhan') ? getEl('prKeluhan').innerText : '-';
+            var ket = getEl('prKet') ? getEl('prKet').innerText : '-';
+            var statusBayar = getEl('prStatus') ? getEl('prStatus').innerText : '-';
             var total = getEl('prTotal') ? getEl('prTotal').innerText : '-';
-            var status = getEl('notaWatermark') ? getEl('notaWatermark').innerText : '';
 
             var receiptText = "BENGKEL GADGET L2\n";
-            receiptText += "Nota Servis\n";
+            receiptText += "Alamat Konter\n";
             receiptText += "--------------------------------\n";
-            receiptText += "Nota : " + noNota + "\n";
-            receiptText += "Nama : " + nama + "\n";
-            receiptText += "Unit : " + unit + "\n";
-            receiptText += "Rusak: " + keluhan + "\n";
+            receiptText += "No.Nota   : " + noNota + "\n";
             receiptText += "--------------------------------\n";
-            receiptText += "TOTAL: " + total + "\n";
-            if (status) receiptText += "Status: " + status + "\n";
+            receiptText += "Tanggal   : " + tgl + "\n";
+            receiptText += "Nama      : " + nama + "\n";
+            receiptText += "No HP     : " + hp + "\n\n";
+            receiptText += "Unit      : " + unit + "\n";
+            receiptText += "Kerusakan : " + keluhan + "\n";
+            receiptText += "Keterangan: " + ket + "\n\n";
+            receiptText += "Status    : " + statusBayar + "\n";
+            receiptText += "Total     : " + total + "\n";
             receiptText += "--------------------------------\n";
-            receiptText += "Terima Kasih\n";
+            receiptText += "- Wajib membawa nota saat\n  pengambilan\n";
+            receiptText += "- Komplain berlaku selama masa\n  garansi\n";
+            receiptText += "- Device yang tidak diambil\n  lebih dari 1 (satu) tahun\n  bukan tanggung jawab kami\n";
             receiptText += "\n\n\n";
 
             if (window.printerDevice && window.printerServer) {
@@ -1445,6 +1446,48 @@
                 window.printerDevice = null;
                 window.printerServer = null;
             }
+        }
+
+        function previewServiceData(origIdx) {
+            var payload = getPayloadFromRow(origIdx);
+            if(!payload) return;
+            
+            var setTxt = (id, val) => { document.querySelectorAll('#'+id).forEach(el => el.innerText = val); };
+            setTxt('prevNota', payload.noNota || '-');
+            setTxt('prevTgl', payload.tanggal || '-');
+            setTxt('prevHp', payload.noHp || '-');
+            setTxt('prevNama', payload.nama || '-');
+            setTxt('prevUnit', payload.seriHp || '-');
+            setTxt('prevPin', payload.pinPola || '-');
+            setTxt('prevKerusakan', payload.kerusakan || '-');
+            setTxt('prevKelengkapan', payload.kelengkapan || '-');
+            setTxt('prevGaransi', payload.garansi || '-');
+            setTxt('prevKetTambahan', payload.ketTambahan || '-');
+            setTxt('prevBiaya', payload.totalBiaya || '-');
+            setTxt('prevBayar', payload.ketBayar || '-');
+            
+            var sts = payload.status || '-';
+            var stsColor = sts==='Selesai'?'text-blue-600':(sts==='Diambil'?'text-slate-600':'text-amber-600');
+            document.querySelectorAll('#prevStatus').forEach(prevStatus => {
+                prevStatus.innerText = sts; prevStatus.className = "font-bold " + stsColor;
+            });
+            
+            document.querySelectorAll('#prevFoto').forEach(imgEl => {
+                var noImgEl = imgEl.parentElement.querySelector('#prevNoFoto');
+                if(imgEl && noImgEl) {
+                    if(payload.foto && payload.foto !== '-' && payload.foto.startsWith('data:image')) {
+                        imgEl.src = payload.foto; imgEl.classList.remove('hidden'); noImgEl.classList.add('hidden');
+                    } else {
+                        imgEl.src = ''; imgEl.classList.add('hidden'); noImgEl.classList.remove('hidden');
+                    }
+                }
+            });
+            openModal('modalPreview');
+        }
+
+        function openFullscreenImage(src) {
+            document.querySelectorAll('#fullImage').forEach(fi => fi.src = src);
+            openModal('modalImageFullscreen');
         }
 
         function sendWAFromTable(origIdx) {
@@ -1597,6 +1640,7 @@
             });
         }
 
+        // ... (Fungsi render tabel lainnya tetap persis sama)
         function renderServiceTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
