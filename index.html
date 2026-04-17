@@ -504,24 +504,35 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbw2TZ2_DhlAn1akG8fKICLjGKdLkMino9A_SLzHfdjGG417fVQsJ1UPYVk_nCACdyw/exec";
 
         // Fungsi fetch pengganti google.script.run (Menembus keamanan Iframe!)
+        // ZETTBOT FIX: Mesin API Tangguh (Anti CORS Preflight & Deteksi Error Akurat)
         function gasRun(funcName, ...args) {
             return new Promise(async function(resolve, reject) {
+                if (API_URL === "TARUH_URL_WEB_APP_GOOGLE_SCRIPT_ANDA_DISINI" || !API_URL.startsWith("https://script.google.com")) {
+                    reject(new Error("URL API Belum Diisi! Silakan edit file index.html di GitHub."));
+                    return;
+                }
                 try {
                     const response = await fetch(API_URL, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        // PENTING: Dilarang menggunakan headers Content-Type agar tidak diblokir oleh sistem CORS Google
                         body: JSON.stringify({ action: funcName, args: args })
                     });
                     
-                    const res = await response.json();
-                    if(res.status === 'success') {
-                        resolve(res.data);
-                    } else {
-                        reject(new Error(res.message));
+                    const textRes = await response.text();
+                    try {
+                        const res = JSON.parse(textRes);
+                        if(res.status === 'success') {
+                            resolve(res.data);
+                        } else {
+                            reject(new Error(res.message));
+                        }
+                    } catch(parseError) {
+                        console.error("Respon Google bukan JSON:", textRes);
+                        reject(new Error("Google menolak akses. Pastikan Anda sudah memilih 'Versi Baru' saat melakukan Deploy di Apps Script!"));
                     }
                 } catch(err) {
                     console.error("API Error:", err);
-                    reject(new Error("Koneksi ke server API terputus atau URL tidak valid."));
+                    reject(new Error("Koneksi ke server API terputus. Periksa jaringan Anda."));
                 }
             });
         }
