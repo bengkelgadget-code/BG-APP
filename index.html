@@ -64,7 +64,7 @@
     <div id="bootScreen" style="position:fixed; inset:0; z-index:99999; background:#0f172a; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.3s ease;">
         <i class="fa-solid fa-microchip fa-spin text-5xl text-[#39ff14] mb-4"></i>
         <h2 class="text-white font-bold tracking-widest">MEMUAT BGL2SYS...</h2>
-        <p class="text-slate-400 text-xs mt-2" id="bootText">Menghubungkan ke Database API...</p>
+        <p class="text-slate-400 text-xs mt-2" id="bootText">Mempersiapkan Antarmuka...</p>
     </div>
 
     <!-- LOGIN SCREEN -->
@@ -271,7 +271,7 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto w-full pb-24 sm:pb-6 custom-scrollbar" id="dataTableContainer">
+                    <div class="flex-1 overflow-y-auto w-full custom-scrollbar pb-16 sm:pb-6" id="dataTableContainer">
                         <table class="w-full text-center border-separate border-spacing-0 whitespace-nowrap" id="dataTable">
                             <thead></thead>
                             <tbody class="text-xs divide-y divide-slate-200 bg-white" id="dataTableBody"></tbody>
@@ -491,17 +491,15 @@
         <div id="thermalReceipt" class="bg-white p-5 w-full max-w-sm relative shadow-2xl mb-4 text-black font-sans leading-snug print-container">
             <div id="notaWatermark" class="watermark lunas">LUNAS</div>
             
-            <div class="text-center relative z-10 mb-6">
-                <h2 class="font-black text-[24px] mb-1 uppercase whitespace-nowrap overflow-hidden text-center w-full" id="printStoreName">BENGKEL GADGET L2</h2>
-                <p class="font-bold text-[16px]">Alamat Konter</p>
+            <div class="text-center relative z-10 pb-4">
+                <h2 class="font-black text-[24px] tracking-wide mb-1 uppercase whitespace-nowrap overflow-hidden text-ellipsis w-full" id="printStoreName">BENGKEL GADGET L2</h2>
+                <p class="font-bold text-[17px]">Alamat Konter</p>
             </div>
             
             <div class="text-sm relative z-10">
-                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-2">
+                <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>No.Nota</span><span>:</span><span id="prNota" class="font-bold"></span>
                 </div>
-                
-                <div class="border-b border-dashed border-black my-2"></div>
                 
                 <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>Tanggal</span><span>:</span><span id="prTgl"></span>
@@ -526,16 +524,19 @@
                 <div class="grid grid-cols-[80px_10px_1fr] items-start mb-1">
                     <span>Status</span><span>:</span><span id="prStatus"></span>
                 </div>
-                <div class="grid grid-cols-[80px_10px_1fr] items-start font-black text-[18px] mt-2">
+                
+                <div class="border-b border-dashed border-black mt-2 mb-2"></div>
+                
+                <div class="grid grid-cols-[80px_10px_1fr] items-start font-black text-[19px] mt-1 mb-1">
                     <span>Total</span><span>:</span><span id="prTotal" class="uppercase"></span>
                 </div>
                 
-                <div class="border-b border-dashed border-black mt-3 mb-4"></div>
+                <div class="border-b border-dashed border-black mt-2 mb-5"></div>
                 
-                <div class="text-[7px] pt-4 space-y-1 font-semibold text-gray-800">
-                    <p>- Wajib membawa nota saat pengambilan</p>
-                    <p>- Komplain berlaku selama masa garansi</p>
-                    <p>- Device yang tidak diambil lebih dari 1 (satu) tahun bukan tanggung jawab kami</p>
+                <div class="text-[9px] leading-tight text-justify font-semibold text-gray-800">
+                    <p class="mb-0.5">- Wajib membawa nota saat pengambilan.</p>
+                    <p class="mb-0.5">- Komplain berlaku selama masa garansi.</p>
+                    <p>- Device yang tidak diambil lebih dari 1 (satu) tahun bukan tanggung jawab kami.</p>
                 </div>
             </div>
         </div>
@@ -590,11 +591,6 @@
         window.BGL2_CACHE = window.BGL2_CACHE || {}; 
         window.BGL2_DROPDOWN_CACHE = window.BGL2_DROPDOWN_CACHE || null; 
         
-        try {
-            var savedDrop = localStorage.getItem('bgl2_dropdown_cache');
-            if (savedDrop) window.BGL2_DROPDOWN_CACHE = JSON.parse(savedDrop);
-        } catch(e) {}
-        
         var isSidebarOpen = false;
         var isServiceMode = false; 
         var isKonterMode = true;
@@ -648,6 +644,24 @@
                     $(document).on('select2:select', '#kntDetailSelect', function (e) { kntDetailChange(); });
                 }
             } catch(e) { console.error("Select2 Error:", e); }
+
+            // ZETTBOT: Load Fast Cache
+            try {
+                var cachedSrv = localStorage.getItem('bgl2_db_service');
+                if (cachedSrv) window.BGL2_CACHE['DB_service'] = JSON.parse(cachedSrv);
+                
+                var cachedKnt = localStorage.getItem('bgl2_db_konter');
+                if (cachedKnt) window.BGL2_CACHE['DB_konter'] = JSON.parse(cachedKnt);
+                
+                var cachedCust = localStorage.getItem('bgl2_db_customer');
+                if (cachedCust) {
+                    window.BGL2_CACHE['DB_customer'] = JSON.parse(cachedCust);
+                    processCustomerData(window.BGL2_CACHE['DB_customer']);
+                }
+                
+                var savedDrop = localStorage.getItem('bgl2_dropdown_cache');
+                if (savedDrop) window.BGL2_DROPDOWN_CACHE = JSON.parse(savedDrop);
+            } catch(e) {}
 
             switchPage('Konter', 'Konter HP');
             
@@ -852,6 +866,7 @@
             }
         }
 
+        // ZETTBOT FIX: Sistem Parallel Fetching (Kecepatan Meningkat 2x Lipat)
         async function refreshActiveData(showIconLoader = false) {
             var icon = document.getElementById('refreshIcon');
             if(icon && showIconLoader) icon.classList.add('fa-spin');
@@ -861,14 +876,27 @@
                 var activeSheet = isServiceMode ? 'DB_service' : (isKonterMode ? 'DB_konter' : currentConfig.sheet);
                 
                 if (isServiceMode) {
-                    let resultsService = await gasRun('getData', 'DB_service');
-                    let resultsCustomer = await gasRun('getData', 'DB_customer');
+                    // Fetch paralel agar tidak saling menunggu
+                    let [resultsService, resultsCustomer] = await Promise.all([
+                        gasRun('getData', 'DB_service'),
+                        gasRun('getData', 'DB_customer')
+                    ]);
+                    
                     window.BGL2_CACHE['DB_service'] = Array.isArray(resultsService) ? resultsService : [];
                     window.BGL2_CACHE['DB_customer'] = Array.isArray(resultsCustomer) ? resultsCustomer : [];
+                    
+                    // Simpan di LocalStorage untuk Load Super Cepat berikutnya
+                    localStorage.setItem('bgl2_db_service', JSON.stringify(window.BGL2_CACHE['DB_service']));
+                    localStorage.setItem('bgl2_db_customer', JSON.stringify(window.BGL2_CACHE['DB_customer']));
+                    
                     processCustomerData(window.BGL2_CACHE['DB_customer']);
                 } else if (activeSheet) {
                     let singleData = await gasRun('getData', activeSheet);
                     window.BGL2_CACHE[activeSheet] = Array.isArray(singleData) ? singleData : [];
+                    
+                    if(activeSheet === 'DB_konter') {
+                        localStorage.setItem('bgl2_db_konter', JSON.stringify(window.BGL2_CACHE['DB_konter']));
+                    }
                 }
                 
                 var hdrs = isServiceMode ? ['Nota', 'Tgl', 'Pelanggan', 'Unit', 'Biaya', 'Status', 'Aksi'] : 
@@ -964,13 +992,15 @@
 
                 if (forceRefresh || !window.BGL2_CACHE[sheet] || window.BGL2_CACHE[sheet].length === 0) {
                     tbody.innerHTML = '<tr><td colspan="'+hdrs.length+'" class="p-8 text-center text-blue-500 font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 block"></i><br><span class="text-sm">Memuat Data...</span></td></tr>';
-                    // Render UI first, then fetch
+                    // Render UI first, then fetch in background
                     setTimeout(() => refreshActiveData(forceRefresh), 0);
                 } else {
                     if (isServiceMode) renderServiceTable(window.BGL2_CACHE['DB_service'] || [], hdrs.length);
                     else if (isKonterMode) { renderKonterTable(window.BGL2_CACHE['DB_konter'] || [], hdrs.length); renderMiniDashboard(); }
                     else renderGenericTable(window.BGL2_CACHE[sheet] || [], hdrs.length);
                     filterTable();
+                    // ZETTBOT: Silent background sync update setelah me-render cache
+                    setTimeout(() => refreshActiveData(false), 500);
                 }
             } catch (e) { console.error("Tabel Error:", e); }
         }
@@ -1419,7 +1449,7 @@
             }
         }
 
-        // ZETTBOT: Mesin Cetak Hardware Asli (Standard ESC/POS) - Ultra Professional
+        // ZETTBOT FIX: ESC/POS Printer Commands Khusus 1 Baris Teks Lebar
         async function printToBluetooth(receiptData) {
             try {
                 const serviceUuid = '49535343-fe7d-4ae5-8fa9-9fafd205e455'; 
@@ -1438,21 +1468,20 @@
 
                 addCmd([0x1B, 0x40]); // Initialize
                 
-                // HEADER
+                // HEADER (Tinggi digandakan agar besar, tapi lebar dipertahankan agar tidak terpotong menjadi 2 baris)
                 addCmd([0x1B, 0x61, 0x01]); // Align Center
                 addCmd([0x1B, 0x45, 0x01]); // Bold ON
-                addCmd([0x1D, 0x21, 0x11]); // Double W & H
-                addTxt("BENGKEL GADGET L2\n");
+                addCmd([0x1D, 0x21, 0x01]); // Double Height saja (Tinggi digandakan)
+                addTxt("BENGKEL GADGET L2\n"); // Auto Uppercase
                 
                 addCmd([0x1D, 0x21, 0x00]); // Normal Size
-                addTxt("Alamat Konter\n\n\n"); // Jarak padding (tanpa border putus-putus)
+                addTxt("Alamat Konter\n\n"); // Jarak padding (tanpa border putus-putus)
                 
                 // BODY
                 addCmd([0x1B, 0x61, 0x00]); // Align Left
                 addCmd([0x1B, 0x45, 0x00]); // Bold OFF
                 
                 addTxt("No.Nota   : " + receiptData.noNota + "\n");
-                addTxt("--------------------------------\n");
                 addTxt("Tanggal   : " + receiptData.tgl + "\n");
                 addTxt("Nama      : " + receiptData.nama + "\n");
                 addTxt("No HP     : " + receiptData.hp + "\n\n");
@@ -1468,7 +1497,7 @@
                 
                 addTxt("--------------------------------\n\n");
                 
-                // FOOTER
+                // FOOTER (Dikecilkan ukurannya agar rapat)
                 addCmd([0x1B, 0x4D, 0x01]); // Font B (Kecil)
                 addTxt("- Wajib membawa nota saat\n  pengambilan\n");
                 addTxt("- Komplain berlaku selama masa\n  garansi\n");
