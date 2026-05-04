@@ -124,9 +124,9 @@
                             </div>
                         </button>
                         <ul class="dropdown-content bg-slate-800/30 text-xs font-medium">
-                            <li><a href="#" onclick="switchPage('Bank', 'Input Nama Bank')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">Input Nama Bank</a></li>
-                            <li><a href="#" onclick="switchPage('E_Wallet', 'Input E-Wallet')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">Input E-Wallet</a></li>
-                            <li><a href="#" onclick="switchPage('PPOB', 'Input PPOB')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">Input PPOB</a></li>
+                            <li><a href="#" onclick="switchPage('Bank', 'Input Nama Bank')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">BANK</a></li>
+                            <li><a href="#" onclick="switchPage('E_Wallet', 'Input E-Wallet')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">E-Wallet</a></li>
+                            <li><a href="#" onclick="switchPage('PPOB', 'Input PPOB')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">PPOB</a></li>
                         </ul>
                     </li>
 
@@ -138,10 +138,11 @@
                             </div>
                         </button>
                         <ul class="dropdown-content bg-slate-800/30 text-xs font-medium">
-                            <li><a href="#" onclick="switchPage('Provider', 'Input Provider')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">Input Provider</a></li>
-                            <li><a href="#" onclick="switchPage('Voucher', 'Input Voucher')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">Input Voucher</a></li>
-                            <li><a href="#" onclick="switchPage('Perdana', 'Input Perdana')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">Input Perdana</a></li>
-                            <li><a href="#" onclick="switchPage('ACC', 'Input ACC')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">Input ACC</a></li>
+                            <li><a href="#" onclick="switchPage('Voucher', 'Input Voucher')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">VOUCHER</a></li>
+                            <li><a href="#" onclick="switchPage('Perdana', 'Input Perdana')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">PERDANA</a></li>
+                            <li><a href="#" onclick="switchPage('ACC', 'Input ACC')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">ACC</a></li>
+                            <li><a href="#" onclick="switchPage('Pulsa', 'Input Pulsa')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">PULSA</a></li>
+                            <li><a href="#" onclick="switchPage('Game', 'Input Game')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">GAME</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -219,16 +220,20 @@
                         <h3 class="font-bold text-slate-700 text-sm hidden sm:block"><i class="fa-solid fa-database mr-1 text-slate-400"></i> Data Tersimpan</h3>
                         
                         <div class="flex items-center space-x-1.5 w-full sm:w-auto justify-end flex-1 sm:flex-none">
+                            <!-- ZETTBOT FIX: Tombol Paste Data Pintar -->
+                            <button id="btnOpenPaste" onclick="openSmartPasteModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm flex items-center transition-colors text-xs shrink-0 border border-emerald-700 mr-2">
+                                <i class="fa-solid fa-clipboard-list mr-1"></i> Paste Data
+                            </button>
                             <button onclick="toggleForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm flex items-center transition-colors text-xs shrink-0 border border-blue-700">
                                 <i class="fa-solid fa-plus mr-1"></i> Tambah
                             </button>
-                            <div class="relative flex-1 sm:flex-none sm:w-48">
+                            <div class="relative flex-1 sm:flex-none sm:w-48 ml-2">
                                 <span class="absolute left-2.5 top-1.5 text-slate-400">
                                     <i class="fa-solid fa-microscope text-[10px]"></i>
                                 </span>
                                 <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari data..." class="w-full pl-7 pr-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium">
                             </div>
-                            <button onclick="loadTableData(true)" class="bg-white hover:bg-slate-100 text-slate-600 transition-colors h-[28px] w-[32px] rounded-lg border border-slate-300 shadow-sm flex items-center justify-center shrink-0" title="Refresh Data">
+                            <button onclick="loadTableData(true)" class="bg-white hover:bg-slate-100 text-slate-600 transition-colors h-[28px] w-[32px] rounded-lg border border-slate-300 shadow-sm flex items-center justify-center shrink-0 ml-2" title="Refresh Data">
                                 <i class="fa-solid fa-rotate-right text-xs" id="refreshIcon"></i>
                             </button>
                         </div>
@@ -245,6 +250,34 @@
         </main>
     </div>
 
+    <!-- ZETTBOT FIX: MODAL SMART PASTE -->
+    <div id="modalSmartPaste" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+        <div id="modalSmartPasteContent" class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
+            <button type="button" onclick="closeSmartPasteModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800 pr-8"><i class="fa-solid fa-clipboard-list text-emerald-500 mr-2"></i> Ekstrak Data Web (Paste Tabel)</h3>
+            </div>
+            <form id="formSmartPaste" onsubmit="submitSmartPaste(event)" class="p-6 space-y-4">
+                <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg border border-blue-200 mb-2 leading-relaxed">
+                    <i class="fa-solid fa-circle-info mr-1"></i> <b>Cara Penggunaan:</b> Buka situs sumber (misal: orderkuota.com), blok seluruh isi tabel harganya dari atas ke bawah, <b>Copy (Ctrl+C)</b>, lalu <b>Paste (Ctrl+V)</b> ke dalam kotak di bawah ini.
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Pilih Provider</label>
+                        <select id="pasteProvider" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <!-- Diisi via JS -->
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Paste Isi Tabel Disini</label>
+                    <textarea id="pasteRawText" required rows="6" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2.5 text-xs font-mono text-slate-600 focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none" placeholder="Paste data tabel (Contoh: XLA5    XL - Axis 5.000    5.852...)"></textarea>
+                </div>
+                <button type="submit" id="btnSubmitPaste" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg shadow-md font-bold text-sm transition-colors mt-2">Ekstrak & Simpan Data</button>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL GENERIK MASTER 3D -->
     <div id="modalGeneric" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
         <div id="modalGenericContent" class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden">
@@ -255,6 +288,40 @@
             
             <form id="dynamicForm" onsubmit="handleFormSubmit(event, this)" class="p-6 space-y-5">
                 <!-- Content diisi via JavaScript -->
+            </form>
+        </div>
+    </div>
+
+    <!-- ZETTBOT FIX: MODAL ADD KATEGORI KHUSUS -->
+    <div id="modalAddKategori" class="fixed inset-0 z-[90] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+        <div id="modalAddKategoriContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
+            <button type="button" onclick="closeAddKategoriModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800 pr-8">Tambah Kategori ACC</h3>
+            </div>
+            <form id="formAddKategori" onsubmit="submitAddKategori(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Kategori</label>
+                    <input type="text" id="inputNamaKategori" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan Kategori Baru...">
+                </div>
+                <button type="submit" id="btnSubmitKategori" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg shadow-md font-bold text-sm transition-colors">Simpan Kategori</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ZETTBOT FIX: MODAL ADD PROVIDER KHUSUS -->
+    <div id="modalAddProvider" class="fixed inset-0 z-[90] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+        <div id="modalAddProviderContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
+            <button type="button" onclick="closeAddProviderModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800 pr-8">Tambah Provider Baru</h3>
+            </div>
+            <form id="formAddProvider" onsubmit="submitAddProvider(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Provider</label>
+                    <input type="text" id="inputNamaProvider" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan Provider Baru...">
+                </div>
+                <button type="submit" id="btnSubmitProvider" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg shadow-md font-bold text-sm transition-colors">Simpan Provider</button>
             </form>
         </div>
     </div>
@@ -278,6 +345,7 @@
                         <select id="kntJenis" required onchange="kntJenisChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                             <option value="">-- Pilih --</option>
                             <option value="TRANSFER">TRANSFER</option>
+                            <option value="JASA TRANSFER">JASA TRANSFER</option>
                             <option value="TARIK TUNAI">TARIK TUNAI</option>
                             <option value="E-WALLET">E-WALLET</option>
                             <option value="PPOB">PPOB</option>
@@ -285,12 +353,14 @@
                             <option value="VOUCHER">VOUCHER</option>
                             <option value="PERDANA">PERDANA</option>
                             <option value="PULSA">PULSA</option>
+                            <option value="KUOTA INTERNET">KUOTA INTERNET</option>
                             <option value="ACC">ACC</option>
+                            <option value="GAME">GAME</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="relative">
+                <div class="relative" id="kntDetailSection">
                     <div class="flex justify-between items-end mb-1">
                         <label class="block text-xs font-semibold text-slate-700">Detail Transaksi</label>
                         <div id="kntStokWrapper" class="items-center space-x-1" style="display: none;">
@@ -306,17 +376,26 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold mb-1 text-slate-700">Nominal</label>
+                    <!-- ZETTBOT FIX: Tambahan ID untuk mempermudah penggantian label Harga/Nominal -->
+                    <label id="lblKntNominal" class="block text-xs font-semibold mb-1 text-slate-700">Nominal</label>
                     <div class="relative">
                         <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold">Rp</span>
                         <input type="text" inputmode="numeric" id="kntNominal" required oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="0">
                     </div>
                 </div>
 
+                <div id="kntMarginSection" style="display: none;">
+                    <label class="block text-xs font-semibold mb-1 text-slate-700">Margin (Kosong = 5000)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold">Rp</span>
+                        <input type="text" inputmode="numeric" id="kntMarginInput" oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="5000">
+                    </div>
+                </div>
+
                 <input type="hidden" id="kntHargaBeliDB">
                 <input type="hidden" id="kntHargaJualDB">
 
-                <div class="flex justify-end pt-4 border-t border-slate-100 space-x-3">
+                <div class="flex justify-end pt-4 border-t border-slate-100 space-x-3 mt-4">
                     <button type="button" onclick="closeKonterModal()" class="px-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors shadow-sm">Batal</button>
                     <button type="submit" id="btnSubmitKonter" class="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition-colors">Simpan Transaksi</button>
                 </div>
@@ -332,7 +411,6 @@
         // WAJIB GANTI URL DI BAWAH INI DENGAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA!
         const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
 
-        // Fungsi fetch pengganti google.script.run (Menembus keamanan Iframe!)
         function gasRun(funcName, ...args) {
             return new Promise(async function(resolve, reject) {
                 if (typeof google !== 'undefined' && google.script && google.script.run) {
@@ -372,7 +450,7 @@
         } catch(e) {}
         
         var isSidebarOpen = false;
-        var isKonterMode = true; // Default page is now Konter
+        var isKonterMode = true; 
         var activeRole = '';
         var currentSheet = 'Konter';
         var currentTableData = [];
@@ -383,11 +461,13 @@
             'Users': { sheet: 'Users', headers: ['Username', 'Password', 'Kategori', 'Updated At', 'Aksi'], fields: [{ id: 'username', label: 'Username', type: 'text', required: true }, { id: 'password', label: 'Password', type: 'password', required: true }, { id: 'kategori', label: 'Kategori', type: 'select', options: ['Admin', 'Kasir'], required: true }] },
             'Bank': { sheet: 'Bank', prefix: 'BK', headers: ['ID Bank', 'Nama Bank', 'Updated At', 'Aksi'], idType: 'bank', fields: [{ id: 'id_bank', label: 'ID Bank', type: 'text', disabled: true }, { id: 'nama_bank', label: 'Nama Bank', type: 'text', required: true }] },
             'Provider': { sheet: 'Provider', prefix: 'PR', headers: ['ID Provider', 'Nama Provider', 'Updated At', 'Aksi'], idType: 'provider', fields: [{ id: 'id_provider', label: 'ID Provider', type: 'text', disabled: true }, { id: 'nama_provider', label: 'Nama Provider', type: 'text', required: true }] },
-            'Voucher': { sheet: 'Voucher', prefix: 'VC', headers: ['ID Voucher', 'Provider', 'Nama Voucher', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'voucher', fields: [{ id: 'id_voucher', label: 'ID Voucher', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic', source: 'providerData', required: true }, { id: 'nama_voucher', label: 'Nama Voucher', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
-            'Perdana': { sheet: 'Perdana', prefix: 'PD', headers: ['ID Perdana', 'Provider', 'Nama Perdana', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'perdana', fields: [{ id: 'id_perdana', label: 'ID Perdana', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic', source: 'providerData', required: true }, { id: 'nama_perdana', label: 'Nama Perdana', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
+            'Voucher': { sheet: 'Voucher', prefix: 'VC', headers: ['ID Voucher', 'Provider', 'Nama Voucher', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'voucher', fields: [{ id: 'id_voucher', label: 'ID Voucher', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_voucher', label: 'Nama Voucher', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
+            'Perdana': { sheet: 'Perdana', prefix: 'PD', headers: ['ID Perdana', 'Provider', 'Nama Perdana', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'perdana', fields: [{ id: 'id_perdana', label: 'ID Perdana', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_perdana', label: 'Nama Perdana', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
             'E_Wallet': { sheet: 'E_Wallet', prefix: 'EW', headers: ['ID E-Wallet', 'Nama E-Wallet', 'Updated At', 'Aksi'], idType: 'ewallet', fields: [{ id: 'id_ewallet', label: 'ID E-Wallet', type: 'text', disabled: true }, { id: 'nama_ewallet', label: 'Nama E-Wallet', type: 'text', required: true }] },
             'PPOB': { sheet: 'PPOB', prefix: 'PP', headers: ['ID PPOB', 'Nama PPOB', 'Updated At', 'Aksi'], idType: 'ppob', fields: [{ id: 'id_ppob', label: 'ID PPOB', type: 'text', disabled: true }, { id: 'nama_ppob', label: 'Nama PPOB', type: 'text', required: true }] },
-            'ACC': { sheet: 'ACC', prefix: 'AC', headers: ['ID ACC', 'Kategori', 'Nama ACC', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'acc', fields: [{ id: 'id_acc', label: 'ID ACC', type: 'text', disabled: true }, { id: 'kategori', label: 'Kategori', type: 'text', required: true }, { id: 'nama_acc', label: 'Nama ACC', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] }
+            'ACC': { sheet: 'ACC', prefix: 'AC', headers: ['ID ACC', 'Kategori', 'Nama ACC', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'acc', fields: [{ id: 'id_acc', label: 'ID ACC', type: 'text', disabled: true }, { id: 'kategori', label: 'Kategori', type: 'select_dynamic_add', source: 'kategoriAccData', required: true }, { id: 'nama_acc', label: 'Nama ACC', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
+            'Pulsa': { sheet: 'Pulsa', prefix: 'PL', headers: ['ID Pulsa', 'Provider', 'Nominal / Nama', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'pulsa', fields: [{ id: 'id_pulsa', label: 'ID Pulsa', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_pulsa', label: 'Nominal / Nama', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
+            'Game': { sheet: 'Game', prefix: 'GM', headers: ['ID Game', 'Provider / Game', 'Item / Nominal', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'game', fields: [{ id: 'id_game', label: 'ID Game', type: 'text', disabled: true }, { id: 'provider', label: 'Provider / Game', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_item', label: 'Item / Nominal', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] }
         };
 
         const getEl = (id) => {
@@ -552,6 +632,15 @@
                 var searchInput = document.getElementById('searchInput');
                 if(searchInput) searchInput.value = '';
                 
+                var btnPaste = document.getElementById('btnOpenPaste');
+                if (btnPaste) {
+                    if (['Pulsa', 'Game'].includes(key)) {
+                        btnPaste.classList.remove('hidden');
+                    } else {
+                        btnPaste.classList.add('hidden');
+                    }
+                }
+
                 closeGenericModal();
                 closeKonterModal();
                 
@@ -616,7 +705,13 @@
             else {
                 var mGen = getEl('modalGeneric');
                 if (forceShow === true || (mGen && mGen.classList.contains('opacity-0'))) {
-                    if (!window.BGL2_DROPDOWN_CACHE || Object.keys(window.BGL2_DROPDOWN_CACHE).length === 0) {
+                    
+                    var requireServerData = false;
+                    if (currentConfig && currentConfig.fields) {
+                        requireServerData = currentConfig.fields.some(f => f.type === 'select_dynamic' || f.type === 'select_dynamic_add');
+                    }
+
+                    if (requireServerData && (!window.BGL2_DROPDOWN_CACHE || Object.keys(window.BGL2_DROPDOWN_CACHE).length === 0)) {
                         Swal.fire({ title: 'Memuat Form...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
                         try {
                             var db = await gasRun('getDropdownData');
@@ -658,6 +753,217 @@
             document.querySelectorAll('#mainContainer').forEach(main => main.classList.remove('main-active-modal'));
         }
 
+        async function openSmartPasteModal() {
+            var m = document.getElementById('modalSmartPaste');
+            var mc = document.getElementById('modalSmartPasteContent');
+            
+            var sel = document.getElementById('pasteProvider');
+            sel.innerHTML = '<option value="">Memuat...</option>';
+            
+            if (!window.BGL2_DROPDOWN_CACHE || !window.BGL2_DROPDOWN_CACHE.providerData) {
+                Swal.fire({ title: 'Memuat Provider...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
+                try {
+                    window.BGL2_DROPDOWN_CACHE = await gasRun('getDropdownData');
+                    localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(window.BGL2_DROPDOWN_CACHE));
+                    Swal.close();
+                } catch(e) {
+                    Swal.fire('Error', 'Gagal memuat provider', 'error');
+                    return;
+                }
+            }
+            
+            var provs = window.BGL2_DROPDOWN_CACHE.providerData || [];
+            var opts = '<option value="">-- Pilih Provider --</option>';
+            provs.forEach(p => opts += `<option value="${p}">${p}</option>`);
+            sel.innerHTML = opts;
+            
+            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
+            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
+        }
+
+        function closeSmartPasteModal() {
+            var m = document.getElementById('modalSmartPaste');
+            var mc = document.getElementById('modalSmartPasteContent');
+            document.getElementById('formSmartPaste').reset();
+            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
+            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
+        }
+
+        async function submitSmartPaste(e) {
+            e.preventDefault();
+            var btn = document.getElementById('btnSubmitPaste');
+            var provider = document.getElementById('pasteProvider').value;
+            var rawText = document.getElementById('pasteRawText').value;
+            
+            if (!provider) return Swal.fire('Oops', 'Pilih provider terlebih dahulu!', 'warning');
+            if (!rawText.trim()) return Swal.fire('Oops', 'Teks data masih kosong!', 'warning');
+
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses Data...';
+            
+            Swal.fire({
+                title: 'Mengekstrak Data...',
+                text: 'Memproses teks yang di-paste, mohon tunggu.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                let payload = [];
+                let lines = rawText.trim().split('\n');
+                
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line) continue;
+
+                    let cols = line.split('\t');
+                    if (cols.length >= 3) {
+                       let nama = cols[1].trim();
+                       let hargaBeliStr = cols[2].replace(/[^0-9]/g, '');
+                       let hargaBeli = parseInt(hargaBeliStr) || 0;
+
+                       if (hargaBeli > 0 && nama !== "" && nama.toLowerCase() !== "produk") {
+                           let nominalMatch = nama.match(/(\d{1,3}(?:\.\d{3})+|\d{4,})/g);
+                           let nominal = 0;
+                           if (nominalMatch && nominalMatch.length > 0) {
+                               nominal = parseInt(nominalMatch[nominalMatch.length - 1].replace(/\./g, ''));
+                           } else {
+                               nominal = Math.round(hargaBeli / 5000) * 5000;
+                           }
+
+                           nama = nama.replace(/\.000/g, '').replace(/000\b/g, '').trim();
+
+                           let hargaJual = nominal >= 100000 ? nominal + 5000 : nominal + 3000;
+                           
+                           payload.push({ provider: provider, nama: nama, beli: hargaBeli, jual: hargaJual });
+                       }
+                    }
+                }
+
+                if(payload.length === 0) {
+                    throw new Error("Tidak ada data valid yang bisa diekstrak. Pastikan Anda memblok tabelnya (mulai dari XLA5 dst) dan tekan Ctrl+C sebelum mem-paste kesini.");
+                }
+
+                var res = await gasRun('batchSaveScrapedData', currentSheet, payload);
+                if(res && res.status === 'error') throw new Error(res.message);
+
+                closeSmartPasteModal();
+                Swal.fire({
+                    title: 'Sukses Di-Ekstrak!',
+                    html: `Menambahkan <b>${res.added}</b> produk baru.<br>Memperbarui <b>${res.updated}</b> harga produk lama.`,
+                    icon: 'success'
+                });
+                refreshActiveData(true); 
+            } catch(err) {
+                Swal.fire('Error', String(err), 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = "Ekstrak & Simpan Data";
+            }
+        }
+
+        function openAddKategoriModal() {
+            var m = document.getElementById('modalAddKategori');
+            var mc = document.getElementById('modalAddKategoriContent');
+            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
+            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
+            setTimeout(() => document.getElementById('inputNamaKategori').focus(), 100); 
+        }
+
+        function closeAddKategoriModal() {
+            var m = document.getElementById('modalAddKategori');
+            var mc = document.getElementById('modalAddKategoriContent');
+            document.getElementById('formAddKategori').reset();
+            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
+            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
+        }
+
+        async function submitAddKategori(e) {
+            e.preventDefault();
+            var btn = document.getElementById('btnSubmitKategori');
+            var namaKat = document.getElementById('inputNamaKategori').value;
+            btn.disabled = true; btn.innerText = "Menyimpan...";
+            
+            try {
+                var res = await gasRun('saveData', 'KategoriACC', ["", namaKat]);
+                if(res && res.status === 'error') throw new Error(res.message);
+                
+                window.BGL2_DROPDOWN_CACHE = null;
+                localStorage.removeItem('bgl2_dropdown_cache');
+                var db = await gasRun('getDropdownData');
+                window.BGL2_DROPDOWN_CACHE = db;
+                localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
+                
+                var sel = document.getElementById('kategori');
+                if(sel) {
+                    var option = new Option(namaKat, namaKat, true, true);
+                    if(window.jQuery) {
+                        $(sel).append(option).trigger('change');
+                    } else {
+                        sel.add(option);
+                        sel.value = namaKat;
+                    }
+                }
+                
+                closeAddKategoriModal();
+                Swal.fire({title: 'Sukses', text: 'Kategori berhasil ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+            } catch(err) {
+                Swal.fire('Error', String(err), 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = "Simpan Kategori";
+            }
+        }
+
+        function openAddProviderModal() {
+            var m = document.getElementById('modalAddProvider');
+            var mc = document.getElementById('modalAddProviderContent');
+            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
+            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
+            setTimeout(() => document.getElementById('inputNamaProvider').focus(), 100);
+        }
+
+        function closeAddProviderModal() {
+            var m = document.getElementById('modalAddProvider');
+            var mc = document.getElementById('modalAddProviderContent');
+            document.getElementById('formAddProvider').reset();
+            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
+            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
+        }
+
+        async function submitAddProvider(e) {
+            e.preventDefault();
+            var btn = document.getElementById('btnSubmitProvider');
+            var namaProv = document.getElementById('inputNamaProvider').value;
+            btn.disabled = true; btn.innerText = "Menyimpan...";
+            
+            try {
+                var res = await gasRun('saveData', 'Provider', ["", namaProv]);
+                if(res && res.status === 'error') throw new Error(res.message);
+                
+                window.BGL2_DROPDOWN_CACHE = null;
+                localStorage.removeItem('bgl2_dropdown_cache');
+                var db = await gasRun('getDropdownData');
+                window.BGL2_DROPDOWN_CACHE = db;
+                localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
+                
+                var sel = document.getElementById('provider');
+                if(sel) {
+                    var option = new Option(namaProv, namaProv, true, true);
+                    if(window.jQuery) {
+                        $(sel).append(option).trigger('change');
+                    } else {
+                        sel.add(option);
+                        sel.value = namaProv;
+                    }
+                }
+                
+                closeAddProviderModal();
+                Swal.fire({title: 'Sukses', text: 'Provider berhasil ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+            } catch(err) {
+                Swal.fire('Error', String(err), 'error');
+            } finally {
+                btn.disabled = false; btn.innerText = "Simpan Provider";
+            }
+        }
+
         function openKonterModal() {
             document.querySelectorAll('#modalKonter').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
             document.querySelectorAll('#modalKonterContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
@@ -671,6 +977,10 @@
             document.querySelectorAll('#btnSubmitKonter').forEach(btn => btn.innerText = 'Simpan Transaksi');
             
             if(window.jQuery) $('select#kntJenis').val('').trigger('change.select2');
+
+            document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'none'); 
+            document.querySelectorAll('#kntMarginInput').forEach(m => m.value = ''); 
 
             document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
                 container.innerHTML = '<select id="kntDetailSelect" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-400 outline-none" disabled><option>-- Pilih Jenis Dulu --</option></select>';
@@ -697,6 +1007,16 @@
             document.querySelectorAll('#kntNominal').forEach(n => { n.value = ''; n.readOnly = false; });
             document.querySelectorAll('#kntHargaBeliDB').forEach(b => b.value = '');
             document.querySelectorAll('#kntHargaJualDB').forEach(j => j.value = '');
+            
+            document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'none'); 
+            document.querySelectorAll('#kntMarginInput').forEach(m => m.value = ''); 
+
+            // ZETTBOT FIX: Ubah label Nominal menjadi Harga untuk produk database
+            var lblNominal = document.getElementById('lblKntNominal');
+            if (lblNominal) {
+                lblNominal.innerText = ['VOUCHER', 'PERDANA', 'ACC', 'PULSA', 'GAME'].includes(jenis) ? 'Harga' : 'Nominal';
+            }
 
             if(jenis === '') {
                 document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
@@ -706,10 +1026,33 @@
                 return;
             }
 
-            if(jenis === 'TOKEN PLN' || jenis === 'PULSA') {
+            if(jenis === 'JASA TRANSFER') {
+                document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    var placeholderTxt = jenis === 'TOKEN PLN' ? 'Masukkan No Meter...' : 'Masukkan No HP...';
-                    container.innerHTML = '<input type="text" id="kntDetailInput" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="' + placeholderTxt + '">';
+                    container.innerHTML = '<input type="hidden" id="kntDetailInput" value="-">';
+                });
+                return;
+            }
+
+            if(jenis === 'KUOTA INTERNET') {
+                document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
+                    container.innerHTML = '<input type="hidden" id="kntDetailInput" value="-">';
+                });
+                document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'block');
+                return;
+            }
+
+            if(jenis === 'GAME') {
+                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
+                    container.innerHTML = '<input type="text" id="kntDetailInput" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-500 outline-none" placeholder="Form Game Segera Hadir..." disabled>';
+                });
+                return;
+            }
+
+            if(jenis === 'TOKEN PLN') {
+                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
+                    container.innerHTML = '<input type="text" id="kntDetailInput" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Masukkan No Meter...">';
                 });
                 return; 
             } 
@@ -721,7 +1064,7 @@
 
             try {
                 var db = window.BGL2_DROPDOWN_CACHE;
-                if(!db || !db.providerData) { 
+                if(!db || !db.providerData || typeof db.pulsaData === 'undefined') { 
                     Swal.fire({ title: 'Memuat Opsi...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
                     db = await gasRun('getDropdownData');
                     window.BGL2_DROPDOWN_CACHE = db;
@@ -737,6 +1080,7 @@
                 else if(jenis === 'VOUCHER') opts = (db.voucherData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.provider})</option>`);
                 else if(jenis === 'PERDANA') opts = (db.perdanaData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.provider})</option>`);
                 else if(jenis === 'ACC') opts = (db.accData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.kategori})</option>`);
+                else if(jenis === 'PULSA') opts = (db.pulsaData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}">${v.nama} (${v.provider})</option>`);
                 
                 document.querySelectorAll('#kntDetailSelect').forEach(sel => {
                     sel.innerHTML = '<option value="">-- Pilih Detail --</option>' + opts.join('');
@@ -764,8 +1108,13 @@
                 });
                 document.querySelectorAll('#kntHargaBeliDB').forEach(el => el.value = opt.getAttribute('data-b'));
                 document.querySelectorAll('#kntHargaJualDB').forEach(el => el.value = opt.getAttribute('data-j'));
-                document.querySelectorAll('#kntStokLabel').forEach(el => el.innerText = opt.getAttribute('data-s'));
-                document.querySelectorAll('#kntStokWrapper').forEach(el => el.style.display = 'flex'); 
+                
+                if (opt.hasAttribute('data-s') && opt.getAttribute('data-s') !== "undefined" && opt.getAttribute('data-s') !== null) {
+                    document.querySelectorAll('#kntStokLabel').forEach(el => el.innerText = opt.getAttribute('data-s'));
+                    document.querySelectorAll('#kntStokWrapper').forEach(el => el.style.display = 'flex'); 
+                } else {
+                    document.querySelectorAll('#kntStokWrapper').forEach(el => el.style.display = 'none'); 
+                }
             } else {
                 document.querySelectorAll('#kntNominal').forEach(nom => { nom.readOnly = false; nom.value = ''; });
                 document.querySelectorAll('#kntHargaBeliDB').forEach(el => el.value = '');
@@ -781,19 +1130,39 @@
             window.isSubmittingKonter = true;
             
             var getVal = (selector) => { var el = formEl.querySelector(selector); return el ? el.value : ''; };
+            var jenisVal = getVal('#kntJenis');
+
             var sel = formEl.querySelector('#kntDetailSelect');
             var inp = formEl.querySelector('#kntDetailInput');
             var detailVal = '';
+            
             if (sel && !sel.disabled && !sel.classList.contains('hidden')) detailVal = sel.value;
             else if (inp) detailVal = inp.value;
 
+            var nomVal = getVal('#kntNominal');
+            var marginVal = getVal('#kntMarginInput'); 
+            var hBeli = getVal('#kntHargaBeliDB');
+            var hJual = getVal('#kntHargaJualDB');
+
+            if (jenisVal === 'JASA TRANSFER') {
+                var nInt = parseInt(nomVal.replace(/[^0-9]/g, '')) || 0;
+                hBeli = nInt;
+                hJual = nInt + 5000;
+            } else if (jenisVal === 'KUOTA INTERNET') {
+                var nInt = parseInt(nomVal.replace(/[^0-9]/g, '')) || 0;
+                var mInt = parseInt(marginVal.replace(/[^0-9]/g, ''));
+                if (isNaN(mInt)) mInt = 5000; 
+                hBeli = nInt;
+                hJual = nInt + mInt;
+            }
+
             var payload = {
                 tanggal: getVal('#kntTanggal'),
-                jenis: getVal('#kntJenis'),
+                jenis: jenisVal,
                 detail: detailVal,
-                nominal: getVal('#kntNominal'),
-                hargaBeliDB: getVal('#kntHargaBeliDB'),
-                hargaJualDB: getVal('#kntHargaJualDB')
+                nominal: nomVal,
+                hargaBeliDB: hBeli,
+                hargaJualDB: hJual
             };
 
             var currentIndex = editIndex; 
@@ -843,13 +1212,23 @@
                 });
                 document.querySelectorAll('#kntDetailInput').forEach(inp => { inp.value = rowData[3]; });
 
-                var autoCalcTypes = ['TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'PULSA'];
+                var autoCalcTypes = ['TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'PULSA', 'JASA TRANSFER', 'KUOTA INTERNET'];
                 if(autoCalcTypes.includes(jenis)) {
                     var nomStr = String(rowData[4]).replace(/[^0-9]/g, ''); 
                     document.querySelectorAll('#kntNominal').forEach(nom => {
                         nom.value = nomStr;
                         window.formatRupiahUI(nom);
                     });
+                    
+                    if (jenis === 'KUOTA INTERNET') {
+                        var hBeliInt = parseInt(String(rowData[4]).replace(/[^0-9]/g, '')) || 0;
+                        var hJualInt = parseInt(String(rowData[5]).replace(/[^0-9]/g, '')) || 0;
+                        var marginInt = hJualInt - hBeliInt;
+                        document.querySelectorAll('#kntMarginInput').forEach(m => {
+                            m.value = marginInt;
+                            window.formatRupiahUI(m);
+                        });
+                    }
                 }
                 openKonterModal();
             } catch(err) {
@@ -877,7 +1256,7 @@
                             val = val.replace(/Rp /g, '').replace(/\./g, '');
                             el.value = val; window.formatRupiahUI(el); 
                         } else { el.value = val; }
-                        if ((f.type === 'select' || f.type === 'select_dynamic') && window.jQuery) { $(el).trigger('change.select2'); }
+                        if ((f.type === 'select' || f.type === 'select_dynamic' || f.type === 'select_dynamic_add') && window.jQuery) { $(el).trigger('change.select2'); }
                     });
                 }
             } catch(err) { console.error("Error edit Master:", err); Swal.fire('Error', 'Gagal memuat form edit.', 'error'); }
@@ -910,11 +1289,23 @@
             for(var i=0; i<currentConfig.fields.length; i++) {
                 var f = currentConfig.fields[i];
                 var inputHtml = '';
-                if(f.type === 'select' || f.type === 'select_dynamic') {
+                
+                if(f.type === 'select' || f.type === 'select_dynamic' || f.type === 'select_dynamic_add') {
                     var opts = '<option value="">-- Pilih --</option>';
                     var src = f.options || data[f.source] || [];
                     for(var j=0; j<src.length; j++) opts += '<option value="'+src[j]+'">'+src[j]+'</option>';
-                    inputHtml = '<select id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" '+(f.required?'required':'')+'>'+opts+'</select>';
+                    
+                    if (f.type === 'select_dynamic_add') {
+                        var modalFunc = (f.id === 'provider') ? 'openAddProviderModal()' : 'openAddKategoriModal()';
+                        var modalTitle = (f.id === 'provider') ? 'Tambah Provider Baru' : 'Tambah Kategori Baru';
+                        
+                        inputHtml = '<div class="flex items-center space-x-2">';
+                        inputHtml += '<select id="'+f.id+'" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" '+(f.required?'required':'')+'>'+opts+'</select>';
+                        inputHtml += '<button type="button" onclick="'+modalFunc+'" class="w-10 h-[42px] bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 rounded-lg flex items-center justify-center transition-colors shadow-sm shrink-0" title="'+modalTitle+'"><i class="fa-solid fa-plus"></i></button>';
+                        inputHtml += '</div>';
+                    } else {
+                        inputHtml = '<select id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" '+(f.required?'required':'')+'>'+opts+'</select>';
+                    }
                 } else if (f.type === 'rupiah') {
                     inputHtml = '<div class="relative"><span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold">Rp</span><input type="text" id="'+f.id+'" oninput="window.formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" '+(f.required?'required':'')+'></div>';
                 } else {
@@ -933,6 +1324,7 @@
             });
         }
 
+        // ... existing function renderKonterTable, renderGenericTable, delKonter, delGen, dll tidak disentuh ...
         function renderKonterTable(data, colCount) {
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
@@ -1094,6 +1486,9 @@
         window.editDataGen = editDataGen; window.initGenericForm = initGenericForm; 
         window.loadTableData = loadTableData; window.delKonter = delKonter; window.delGen = delGen;
         window.renderMiniDashboard = renderMiniDashboard; window.filterTable = filterTable;
+        window.openAddKategoriModal = openAddKategoriModal; window.closeAddKategoriModal = closeAddKategoriModal; window.submitAddKategori = submitAddKategori;
+        window.openAddProviderModal = openAddProviderModal; window.closeAddProviderModal = closeAddProviderModal; window.submitAddProvider = submitAddProvider;
+        window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
     </script>
 </body>
 </html>
