@@ -1,4 +1,3 @@
-<style>
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; margin: 0; padding: 0; overflow: hidden; height: 100vh; }
     .dropdown-content { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out; }
     .menu-container:hover .dropdown-content { max-height: 500px; opacity: 1; }
@@ -35,4 +34,4 @@
     .select2-results__option { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; color: #1e293b !important; }
     .select2-dropdown { background-color: #ffffff !important; border-color: #cbd5e1 !important; }
     .select2-container--open { z-index: 99999 !important; }
-</style>
+
