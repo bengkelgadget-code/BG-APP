@@ -6,9 +6,25 @@ function gasRun(funcName, ...args) {
         return runHybridDatabase(funcName, ...args);
     }
 
+    return executeGoogleSheets(funcName, args);
+}
+
+// Fungsi murni untuk eksekusi ke Google Sheets (Dipisah agar bisa dipakai untuk Fallback)
+function executeGoogleSheets(funcName, args) {
     return new Promise(async function(resolve, reject) {
         if (typeof google !== 'undefined' && google.script && google.script.run) {
-<!-- ... existing code ... -->
+            google.script.run
+                .withSuccessHandler(resolve)
+                .withFailureHandler(reject)
+                [funcName](...args);
+        } else {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: funcName, args: args })
+                });
+                
                 const res = await response.json();
                 if(res.status === 'success') {
                     resolve(res.data);
@@ -23,31 +39,95 @@ function gasRun(funcName, ...args) {
     });
 }
 
-// ZETTBOT: Kerangka Kerja Hybrid Database
+// ============================================================================
+// 🤖 ZETTBOT: MESIN HYBRID DATABASE (FIREBASE -> GOOGLE SHEETS)
+// ============================================================================
 async function runHybridDatabase(funcName, ...args) {
+    const db = window.firebaseDB;
+    const col = window.fbCollection;
+    const getDocs = window.fbGetDocs;
+    const addDoc = window.fbAddDoc;
+
     try {
-        console.log(`🔥 Rute Firebase Aktif: Menjalankan eksekusi ${funcName}`);
+        console.log(`🔥 Rute Firebase Aktif: Menjalankan eksekusi [${funcName}]`);
         let result;
 
-        // TODO: Nanti kita buatkan pemetaan operasi CRUD Firebase di sini
-        throw new Error("Modul CRUD Firebase sedang dalam tahap pembangunan (Pending API Keys).");
+        // 1. PEMETAAN FUNGSI BACA (READ)
+        if (funcName === 'getData') {
+            let sheetName = args[0];
+            let snapshot = await getDocs(col(db, sheetName));
+            let dataArray = [];
+            
+            snapshot.forEach(doc => {
+                let d = doc.data();
+                // Mengembalikan format JSON Firebase menjadi Array agar Frontend HTML tidak error
+                if(d.rowArray) dataArray.push(d.rowArray); 
+            });
 
-        /* // -------------------------------------------------------------
-        // KERANGKA BACKUP OTOMATIS KE GOOGLE SHEETS
-        // Sengaja tidak di-await agar UI tidak nge-lag/freeze. 
-        // Backup akan dikirim diam-diam di background.
-        // -------------------------------------------------------------
-        fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: funcName, args: args })
-        }).catch(e => console.error("Backup Google Sheets Gagal:", e));
-        */
+            // Jika Firebase masih kosong, paksa Fallback ke GS agar UI tidak blank
+            if (dataArray.length === 0) {
+                throw new Error("Data di Firebase masih kosong, beralih membaca dari Google Sheets.");
+            }
+            result = dataArray;
+        } 
+        // Pemetaan Read yang kompleks (Bisa kita sinkronkan perlahan)
+        else if (funcName === 'getDropdownData') {
+            throw new Error("Fallback ke GS untuk Dropdown selama masa transisi.");
+        } 
+        
+        // 2. PEMETAAN FUNGSI TULIS (WRITE / CREATE)
+        else if (funcName === 'saveData') {
+            let sheetName = args[0];
+            let rowData = args[1];
+            await addDoc(col(db, sheetName), {
+                rowArray: rowData,
+                timestamp: new Date().getTime()
+            });
+            result = { status: 'success', message: 'Data tersimpan di Firebase & GS' };
+        } 
+        else if (funcName === 'saveKonterTransaction') {
+            let payload = args[0];
+            // Format data mengikuti skema kolom tabel Google Sheets
+            let row = [
+                "KNT-FB-" + new Date().getTime(), // ID Generator Firebase Sementara
+                payload.tanggal,
+                payload.jenis,
+                payload.detail,
+                "Rp " + payload.hargaBeliDB,
+                "Rp " + payload.hargaJualDB,
+                "Rp " + (payload.hargaJualDB - payload.hargaBeliDB),
+                new Date().toLocaleDateString('id-ID')
+            ];
+            await addDoc(col(db, 'DB_konter'), { 
+                rowArray: row, 
+                timestamp: new Date().getTime() 
+            });
+            result = { status: 'success', message: 'Transaksi Konter Disimpan di Firebase & GS' };
+        } 
+        // 3. JIKA FUNGSI BELUM DIBUAT (Update & Delete perlu logic khusus ID Firebase)
+        else {
+             throw new Error(`Fungsi [${funcName}] belum di-mapping di Firebase.`);
+        }
 
-        // return result;
+        // =============================================================
+        // 🚀 ZETTBOT AUTO-BACKUP KE GOOGLE SHEETS
+        // Backup dieksekusi di background tanpa memblokir UI (No await)
+        // =============================================================
+        const writeActions = ['saveData', 'updateData', 'deleteData', 'saveKonterTransaction', 'editKonterTransaction', 'batchSaveScrapedData'];
+        if (writeActions.includes(funcName)) {
+            console.log("Mem-backup data ke Google Sheets di background...");
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: funcName, args: args })
+            }).catch(e => console.error("Backup GS Gagal:", e));
+        }
+
+        return result;
+
     } catch(error) {
-        console.warn("⚠️ Fallback ke Google Sheets:", error.message);
-        window.USE_FIREBASE = false; // Matikan Firebase otomatis agar UI tidak error
-        return gasRun(funcName, ...args); // Lempar kembali instruksi ke Google Sheets (Aman)
+        console.warn(`⚠️ Fallback ke Google Sheets:`, error.message);
+        // Jika Firebase gagal/kosong/belum di-mapping, instruksi dilempar kembali ke sistem lama
+        return executeGoogleSheets(funcName, args); 
     }
 }
