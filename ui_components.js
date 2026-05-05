@@ -546,7 +546,8 @@ function renderKonterTable(data, colCount) {
         tbody.innerHTML = rowsHtml.join('');
     }
 
-    var container = document.getElementById('dataTableContainer');
+    // ZETTBOT FIX: Memindahkan navigasi ke mainTableWrapper agar tetap di tengah (tidak terpengaruh scroll horizontal tabel)
+    var wrapper = document.getElementById('mainTableWrapper');
     var existingPag = document.getElementById('datePaginationWrap');
     if (existingPag) existingPag.remove();
 
@@ -558,24 +559,25 @@ function renderKonterTable(data, colCount) {
     var options = { day: 'numeric', month: 'short', year: 'numeric' };
     var displayStr = targetDate.toLocaleDateString('id-ID', options);
 
+    // ZETTBOT FIX: Menambahkan trigger showPicker() agar pop-up kalender selalu muncul saat ditekan di browser mana pun
     var pagHtml = `
-    <div id="datePaginationWrap" class="flex justify-center items-center p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white w-full sticky bottom-0 z-10 mt-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center">
+    <div id="datePaginationWrap" class="flex justify-center items-center p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white w-full shrink-0 z-10 rounded-b-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm">
             <i class="fa-solid fa-chevron-left sm:mr-1.5"></i> <span class="hidden sm:inline">Prev</span>
         </button>
-        <div class="relative flex items-center cursor-pointer bg-blue-50 border border-blue-200 rounded-lg px-4 py-1.5 hover:bg-blue-100 transition-colors" title="Pilih Tanggal">
-            <input type="date" id="konterDatePicker" value="${dateInputVal}" onchange="setFilterDate(this.value)" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-20">
+        <div class="relative flex items-center cursor-pointer bg-blue-50 border border-blue-200 rounded-lg px-4 py-1.5 hover:bg-blue-100 transition-colors shadow-sm" title="Pilih Tanggal" onclick="try{document.getElementById('konterDatePicker').showPicker();}catch(e){}">
+            <input type="date" id="konterDatePicker" value="${dateInputVal}" onchange="setFilterDate(this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
             <div class="flex items-center gap-2 font-bold text-blue-700 pointer-events-none text-xs">
                 <i class="fa-solid fa-calendar-days"></i>
                 <span id="dateDisplayLabel">${displayStr}</span>
             </div>
         </div>
-        <button type="button" onclick="changeFilterDate(1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center">
+        <button type="button" onclick="changeFilterDate(1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm">
             <span class="hidden sm:inline">Next</span> <i class="fa-solid fa-chevron-right sm:ml-1.5"></i>
         </button>
     </div>`;
 
-    container.insertAdjacentHTML('beforeend', pagHtml);
+    if(wrapper) wrapper.insertAdjacentHTML('beforeend', pagHtml);
 }
 
 function renderGenericTable(data, colCount) {
@@ -631,13 +633,16 @@ window.changeFilterDate = function(offset) {
     loadTableData(false); 
 };
 
+// ZETTBOT FIX: Mengubah metode parsing string tanggal untuk mencegah bug zona waktu yang memundurkan hari (-1 day) di kalender
 window.setFilterDate = function(val) {
     if(!val) return;
-    window.currentFilterDate = new Date(val);
-    loadTableData(false); 
+    var parts = val.split('-');
+    if(parts.length === 3) {
+        window.currentFilterDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        loadTableData(false); 
+    }
 };
 
-// ZETTBOT FIX: Update UI Toggle Field - Sembunyikan Margin untuk Persentase
 window.toggleMarginFields = function(el) {
     var val = el ? el.value : (document.getElementById('tipe_margin') ? document.getElementById('tipe_margin').value : 'Range Nominal');
     
@@ -654,17 +659,17 @@ window.toggleMarginFields = function(el) {
         if(cMin) cMin.style.display = 'block'; 
         if(cMax) cMax.style.display = 'none';
         if(cPct) cPct.style.display = 'block';
-        if(cMarg) cMarg.style.display = 'none'; // Sembunyikan field Margin Minimum secara total
+        if(cMarg) cMarg.style.display = 'none'; 
 
         if(iMin) iMin.required = true;
         if(iPct) iPct.required = true;
-        if(iMarg) iMarg.required = false; // Hilangkan required
+        if(iMarg) iMarg.required = false; 
 
     } else {
         if(cMin) cMin.style.display = 'block';
         if(cMax) cMax.style.display = 'block';
         if(cPct) cPct.style.display = 'none';
-        if(cMarg) cMarg.style.display = 'block'; // Tampilkan kembali untuk mode Range
+        if(cMarg) cMarg.style.display = 'block'; 
 
         if(iMin) iMin.required = true;
         if(iPct) iPct.required = false;
