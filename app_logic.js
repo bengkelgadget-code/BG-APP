@@ -521,6 +521,35 @@ async function editKonterData(origIdx) {
             }
         });
         document.querySelectorAll('#kntDetailInput').forEach(inp => { inp.value = rowData[3]; });
+        
+        // ZETTBOT FIX: Memastikan Field Nominal dan Harga DB Terisi Saat Mengedit Transaksi Non-Product (Transfer/E-Wallet)
+        setTimeout(() => {
+            let hb = String(rowData[4] || '').replace(/[^0-9]/g, '');
+            let hj = String(rowData[5] || '').replace(/[^0-9]/g, '');
+            
+            if (['TRANSFER', 'JASA TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'KUOTA INTERNET'].includes(jenis)) {
+                document.querySelectorAll('#kntNominal').forEach(nom => {
+                    nom.value = hb;
+                    window.formatRupiahUI(nom);
+                });
+                if (jenis === 'KUOTA INTERNET') {
+                    let mrg = parseInt(hj) - parseInt(hb);
+                    document.querySelectorAll('#kntMarginInput').forEach(m => {
+                        m.value = mrg;
+                        window.formatRupiahUI(m);
+                    });
+                }
+            } else {
+                document.querySelectorAll('#kntNominal').forEach(nom => {
+                    nom.value = hj;
+                    window.formatRupiahUI(nom);
+                });
+            }
+            
+            document.querySelectorAll('#kntHargaBeliDB').forEach(el => el.value = hb);
+            document.querySelectorAll('#kntHargaJualDB').forEach(el => el.value = hj);
+        }, 100);
+
         openKonterModal();
     } catch(err) { console.error(err); }
 }
@@ -568,7 +597,6 @@ async function editDataGen(displayIndex) {
                          window.formatRupiahUI(eMin);
                          document.getElementById('persentase_val').value = p2.replace('%', '');
                      }
-                     // Kosongkan margin di form untuk menjamin kebersihan data
                      let eMarg = document.getElementById('val_margin');
                      if(eMarg) eMarg.value = '';
                  } else {
@@ -687,7 +715,6 @@ async function handleFormSubmit(e, formEl) {
     
     var arr = [];
 
-    // ZETTBOT FIX: Update Parsing Form Margin tanpa Menyimpan Nilai Margin saat Persentase dipilih
     if (currentConfig.sheet === 'Pengaturan_Margin') {
         let tipe = document.getElementById('tipe_margin').value;
         let id = document.getElementById('id_margin').value;
@@ -705,7 +732,6 @@ async function handleFormSubmit(e, formEl) {
         if (tipe === 'Persentase') {
             let pctVal = document.getElementById('persentase_val').value;
             let pct = pctVal ? pctVal + "%" : "0%";
-            // Simpan karakter '-' sebagai placeholder agar struktur database tetap seimbang 6 kolom
             arr = [id, tipe, layanan, min, pct, "-"];
         } else {
             let maxVal = document.getElementById('max_nom').value;
