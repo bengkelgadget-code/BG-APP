@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     switchPage('Konter', 'Transaksi Konter');
 });
 
+// ZETTBOT FIX: Update Kalkulator Margin Murni Persentase
 function calculateDynamicMargin(layananName, nominal) {
     var marginData = window.BGL2_CACHE['Pengaturan_Margin'] || [];
     for (var i = 0; i < marginData.length; i++) {
@@ -70,10 +71,9 @@ function calculateDynamicMargin(layananName, nominal) {
                 }
 
                 if (nominal >= minNom) {
-                    var minMargin = parseInt(marginStr.replace(/[^0-9]/g, '')) || 0;
+                    // Murni perkalian persentase (tanpa membandingkan dengan batas minimum)
                     var calculatedMargin = Math.floor(nominal * (pct / 100));
-                    
-                    return calculatedMargin > minMargin ? calculatedMargin : minMargin;
+                    return calculatedMargin;
                 }
             }
         }
@@ -474,7 +474,6 @@ async function submitKonterForm(e, formEl) {
         }
     }
 
-    // ZETTBOT FIX: Mendapatkan ID Firebase untuk Edit Konter
     var currentIndex = parseInt(editIndex, 10); 
     var itemId = null;
     if (currentIndex !== -1 && window.BGL2_CACHE['DB_konter'] && window.BGL2_CACHE['DB_konter'][currentIndex]) {
@@ -569,6 +568,9 @@ async function editDataGen(displayIndex) {
                          window.formatRupiahUI(eMin);
                          document.getElementById('persentase_val').value = p2.replace('%', '');
                      }
+                     // Kosongkan margin di form untuk menjamin kebersihan data
+                     let eMarg = document.getElementById('val_margin');
+                     if(eMarg) eMarg.value = '';
                  } else {
                      let eMin = document.getElementById('min_nom');
                      eMin.value = p1.replace(/Rp /g, '').replace(/\./g, '');
@@ -577,11 +579,11 @@ async function editDataGen(displayIndex) {
                      let eMax = document.getElementById('max_nom');
                      eMax.value = p2.replace(/Rp /g, '').replace(/\./g, '');
                      window.formatRupiahUI(eMax);
+                     
+                     let eMarg = document.getElementById('val_margin');
+                     eMarg.value = marg.replace(/Rp /g, '').replace(/\./g, '');
+                     window.formatRupiahUI(eMarg);
                  }
-
-                 let eMarg = document.getElementById('val_margin');
-                 eMarg.value = marg.replace(/Rp /g, '').replace(/\./g, '');
-                 window.formatRupiahUI(eMarg);
              }, 100);
              return; 
         }
@@ -639,7 +641,6 @@ function delKonter(idx) {
             try { 
                 var safeIdx = parseInt(idx, 10);
                 
-                // ZETTBOT FIX: Mengambil ID Unik untuk dikirim ke Firebase
                 var itemId = null;
                 if (window.BGL2_CACHE['DB_konter'] && window.BGL2_CACHE['DB_konter'][safeIdx]) {
                     itemId = window.BGL2_CACHE['DB_konter'][safeIdx][0];
@@ -661,7 +662,6 @@ function delGen(idx, sheetKey) {
                 var safeIdx = parseInt(idx, 10);
                 var actualSheet = (currentConfig && currentConfig.sheet) ? currentConfig.sheet : (pageConfigs[sheetKey] ? pageConfigs[sheetKey].sheet : sheetKey);
                 
-                // ZETTBOT FIX: Mengambil ID Unik untuk dikirim ke Firebase
                 var itemId = null;
                 if (window.BGL2_CACHE[actualSheet] && window.BGL2_CACHE[actualSheet][safeIdx]) {
                     itemId = window.BGL2_CACHE[actualSheet][safeIdx][0];
@@ -687,12 +687,11 @@ async function handleFormSubmit(e, formEl) {
     
     var arr = [];
 
+    // ZETTBOT FIX: Update Parsing Form Margin tanpa Menyimpan Nilai Margin saat Persentase dipilih
     if (currentConfig.sheet === 'Pengaturan_Margin') {
         let tipe = document.getElementById('tipe_margin').value;
         let id = document.getElementById('id_margin').value;
         let layanan = window.jQuery ? $('#layanan_margin').val().join(', ') : '';
-        let marginValStr = document.getElementById('val_margin').value;
-        let margin = marginValStr ? "Rp " + marginValStr : "Rp 0";
         
         let minVal = document.getElementById('min_nom').value;
         let min = minVal ? "Rp " + minVal : "Rp 0";
@@ -706,10 +705,15 @@ async function handleFormSubmit(e, formEl) {
         if (tipe === 'Persentase') {
             let pctVal = document.getElementById('persentase_val').value;
             let pct = pctVal ? pctVal + "%" : "0%";
-            arr = [id, tipe, layanan, min, pct, margin];
+            // Simpan karakter '-' sebagai placeholder agar struktur database tetap seimbang 6 kolom
+            arr = [id, tipe, layanan, min, pct, "-"];
         } else {
             let maxVal = document.getElementById('max_nom').value;
             let max = maxVal ? ("Rp " + maxVal) : "";
+            
+            let marginValStr = document.getElementById('val_margin').value;
+            let margin = marginValStr ? "Rp " + marginValStr : "Rp 0";
+            
             arr = [id, tipe, layanan, min, max, margin];
         }
     } 
@@ -752,7 +756,6 @@ async function handleFormSubmit(e, formEl) {
         if(currentIndex === -1) {
             await gasRun('saveData', currentConfig.sheet, arr);
         } else {
-            // ZETTBOT FIX: UpdateData secara otomatis mengirimkan Array di mana arr[0] adalah ID Unik
             await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
         }
         window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache');
