@@ -45,10 +45,15 @@ async function runHybridDatabase(funcName, ...args) {
     const col = window.fbCollection;
     const getDocs = window.fbGetDocs;
     const addDoc = window.fbAddDoc;
-    // ZETTBOT FIX: Menambahkan modul Firebase untuk Edit & Hapus
     const updateDoc = window.fbUpdateDoc;
     const deleteDoc = window.fbDeleteDoc;
     const docRef = window.fbDoc;
+
+    // ZETTBOT FIX: Helper untuk format Rupiah di Client Side sebelum dikirim ke Firebase
+    const fRupiah = (angka) => {
+        let num = parseInt(angka, 10) || 0;
+        return "Rp " + num.toLocaleString('id-ID').replace(/,/g, '.');
+    };
 
     try {
         console.log(`🔥 Rute Firebase Aktif: Menjalankan eksekusi [${funcName}]`);
@@ -83,14 +88,16 @@ async function runHybridDatabase(funcName, ...args) {
         } 
         else if (funcName === 'saveKonterTransaction') {
             let payload = args[0];
+            
+            // ZETTBOT FIX: Menerapkan format Rupiah yang benar untuk Harga Beli, Jual, dan Profit
             let row = [
                 "KNT-FB-" + new Date().getTime(), 
                 payload.tanggal,
                 payload.jenis,
                 payload.detail,
-                "Rp " + payload.hargaBeliDB,
-                "Rp " + payload.hargaJualDB,
-                "Rp " + (payload.hargaJualDB - payload.hargaBeliDB),
+                fRupiah(payload.hargaBeliDB),
+                fRupiah(payload.hargaJualDB),
+                fRupiah(payload.hargaJualDB - payload.hargaBeliDB),
                 new Date().toLocaleDateString('id-ID')
             ];
             await addDoc(col(db, 'DB_konter'), { 
@@ -99,16 +106,14 @@ async function runHybridDatabase(funcName, ...args) {
             });
             result = { status: 'success', message: 'Transaksi Konter Disimpan di Firebase & GS' };
         } 
-        // ZETTBOT FIX: FULL FIREBASE MAPPING UNTUK DELETE & UPDATE
         else if (funcName === 'deleteData') {
             let sheetName = args[0];
-            let itemId = args[2]; // ID Unik hasil ekstrak dari app_logic.js
+            let itemId = args[2]; 
 
             if (itemId) {
                 let snapshot = await getDocs(col(db, sheetName));
                 let targetDocId = null;
                 
-                // Cari dokumen Firebase yang memiliki ID yang sama dengan tabel
                 snapshot.forEach(doc => {
                     let d = doc.data();
                     if (d.rowArray && d.rowArray[0] === itemId) {
@@ -127,7 +132,7 @@ async function runHybridDatabase(funcName, ...args) {
         else if (funcName === 'updateData') {
             let sheetName = args[0];
             let rowData = args[2];
-            let itemId = rowData[0]; // ID selalu berada di urutan pertama array
+            let itemId = rowData[0]; 
 
             if (itemId) {
                 let snapshot = await getDocs(col(db, sheetName));
@@ -145,7 +150,6 @@ async function runHybridDatabase(funcName, ...args) {
                         timestamp: new Date().getTime()
                     });
                 } else {
-                    // Jika data belum ada di Firebase, tambahkan sebagai data baru
                     await addDoc(col(db, sheetName), {
                         rowArray: rowData,
                         timestamp: new Date().getTime()
@@ -156,7 +160,7 @@ async function runHybridDatabase(funcName, ...args) {
         }
         else if (funcName === 'editKonterTransaction') {
             let payload = args[1];
-            let itemId = payload.id; // Diambil dari modifikasi submitKonterForm
+            let itemId = payload.id; 
 
             if (itemId) {
                 let snapshot = await getDocs(col(db, 'DB_konter'));
@@ -168,14 +172,15 @@ async function runHybridDatabase(funcName, ...args) {
                     }
                 });
 
+                // ZETTBOT FIX: Menerapkan format Rupiah yang benar untuk Harga Beli, Jual, dan Profit
                 let row = [
                     itemId,
                     payload.tanggal,
                     payload.jenis,
                     payload.detail,
-                    "Rp " + payload.hargaBeliDB,
-                    "Rp " + payload.hargaJualDB,
-                    "Rp " + (payload.hargaJualDB - payload.hargaBeliDB),
+                    fRupiah(payload.hargaBeliDB),
+                    fRupiah(payload.hargaJualDB),
+                    fRupiah(payload.hargaJualDB - payload.hargaBeliDB),
                     new Date().toLocaleDateString('id-ID')
                 ];
 
