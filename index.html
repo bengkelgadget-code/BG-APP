@@ -29,9 +29,22 @@
         .main-active-modal { transform: scale(0.97) translateY(10px); opacity: 0.4; filter: blur(2px); pointer-events: none; }
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
+        
         .select2-container--default .select2-selection--single { height: 42px !important; border-color: #cbd5e1 !important; border-radius: 0.5rem !important; display: flex !important; align-items: center !important; padding: 0 0.75rem !important; background-color: #ffffff !important; }
         .select2-container--default .select2-selection--single .select2-selection__rendered { color: #1e293b !important; font-size: 0.875rem !important; line-height: 1.25rem !important; padding-left: 0 !important; }
         .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; right: 10px !important; }
+        
+        /* ZETTBOT FIX: Styling Select Multiple yang Super Rapi dan Modern */
+        .select2-container--default .select2-selection--multiple { border-color: #cbd5e1 !important; border-radius: 0.5rem !important; min-height: 42px !important; padding: 4px 8px !important; background-color: #ffffff !important; display: flex !important; align-items: center !important; }
+        .select2-container--default.select2-container--focus .select2-selection--multiple { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered { display: flex !important; flex-wrap: wrap !important; width: 100% !important; margin: 0 !important; padding: 0 !important; align-items: center !important; gap: 6px !important; }
+        .select2-container--default .select2-search--inline .select2-search__field { margin-top: 0 !important; font-family: inherit !important; font-size: 0.875rem !important; color: #475569 !important; line-height: 1.5 !important; }
+        
+        .select2-container--default .select2-selection--multiple .select2-selection__choice { background-color: #f8fafc !important; border: 1px solid #cbd5e1 !important; border-radius: 9999px !important; padding: 4px 8px 4px 12px !important; margin: 0 !important; font-size: 0.75rem !important; font-weight: 700 !important; color: #334155 !important; display: flex !important; flex-direction: row-reverse !important; align-items: center !important; gap: 8px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: #ffffff !important; background-color: #ef4444 !important; border: none !important; border-radius: 50% !important; width: 18px !important; height: 18px !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: bold !important; font-size: 13px !important; line-height: 1 !important; padding: 0 !important; margin: 0 !important; cursor: pointer !important; transition: all 0.2s ease !important; position: relative !important; }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #dc2626 !important; transform: scale(1.1); }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__display { padding: 0 !important; margin: 0 !important; }
+        
         .select2-search__field { border-radius: 0.25rem !important; border-color: #cbd5e1 !important; font-size: 0.875rem !important; padding: 0.5rem !important; outline: none !important; color: #1e293b !important; }
         .select2-search__field:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
         .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable { background-color: #eff6ff !important; color: #1d4ed8 !important; }
@@ -43,14 +56,12 @@
 
 <body style="background-color: #0f172a; display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
 
-    <!-- DEBUGGER LAYAR AWAL -->
     <div id="bootScreen" style="position:fixed; inset:0; z-index:99999; background:#0f172a; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.3s ease;">
         <i class="fa-solid fa-microchip fa-spin text-5xl text-[#39ff14] mb-4"></i>
         <h2 class="text-white font-bold tracking-widest">MEMUAT BGL2SYS...</h2>
         <p class="text-slate-400 text-xs mt-2" id="bootText">Menghubungkan ke API Server...</p>
     </div>
 
-    <!-- LOGIN SCREEN -->
     <div id="loginView" class="hidden flex h-full w-full items-center justify-center relative z-50 absolute inset-0 bg-[#0f172a]">
         <div class="absolute top-[-15%] left-[-10%] w-96 h-96 bg-[#39ff14] rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
         <div class="absolute bottom-[-15%] right-[-10%] w-96 h-96 bg-[#ffff00] rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
@@ -78,10 +89,8 @@
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
     <div id="dashboardView" class="hidden w-full h-full text-slate-800 bg-slate-50 relative flex overflow-hidden">
         
-        <!-- SIDEBAR -->
         <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden" onclick="toggleSidebar()"></div>
         <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 w-64 bg-slate-900 text-white flex flex-col h-full shadow-2xl z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
             <div class="p-5 flex items-center justify-center border-b border-slate-800 relative bg-slate-900/80">
@@ -145,6 +154,18 @@
                             <li><a href="#" onclick="switchPage('Game', 'Input Game')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">GAME</a></li>
                         </ul>
                     </li>
+
+                    <li class="mt-4 mb-1 px-6 text-[10px] font-black text-slate-600 uppercase tracking-widest">Pengaturan</li>
+                    <li>
+                        <a href="#" onclick="switchPage('Umum', 'Pengaturan Umum')" class="block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors border-l-4 border-transparent hover:border-teal-400">
+                            <div class="flex items-center"><i class="fa-solid fa-sliders w-5 text-teal-400"></i> <span class="text-sm font-semibold">Umum</span></div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="switchPage('Margin', 'Pengaturan Margin')" class="block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors border-l-4 border-transparent hover:border-indigo-400">
+                            <div class="flex items-center"><i class="fa-solid fa-percent w-5 text-indigo-400"></i> <span class="text-sm font-semibold">Margin</span></div>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             
@@ -168,7 +189,6 @@
             </div>
         </aside>
 
-        <!-- MAIN VIEW -->
         <main class="flex-1 flex flex-col h-full relative overflow-hidden w-full bg-slate-50">
             
             <div class="md:hidden bg-white shadow-sm border-b border-slate-200 px-4 py-3 flex justify-between items-center shrink-0 z-20">
@@ -214,17 +234,16 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-md border border-slate-200 flex flex-col flex-1 min-h-0 relative">
+                <div id="mainTableWrapper" class="bg-white rounded-xl shadow-md border border-slate-200 flex flex-col flex-1 min-h-0 relative">
                     
                     <div class="p-2 sm:p-3 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2 shrink-0 bg-slate-50/50 rounded-t-xl">
                         <h3 class="font-bold text-slate-700 text-sm hidden sm:block"><i class="fa-solid fa-database mr-1 text-slate-400"></i> Data Tersimpan</h3>
                         
                         <div class="flex items-center space-x-1.5 w-full sm:w-auto justify-end flex-1 sm:flex-none">
-                            <!-- ZETTBOT FIX: Tombol Paste Data Pintar -->
                             <button id="btnOpenPaste" onclick="openSmartPasteModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm flex items-center transition-colors text-xs shrink-0 border border-emerald-700 mr-2">
                                 <i class="fa-solid fa-clipboard-list mr-1"></i> Paste Data
                             </button>
-                            <button onclick="toggleForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm flex items-center transition-colors text-xs shrink-0 border border-blue-700">
+                            <button id="btnTambahData" onclick="toggleForm()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm flex items-center transition-colors text-xs shrink-0 border border-blue-700">
                                 <i class="fa-solid fa-plus mr-1"></i> Tambah
                             </button>
                             <div class="relative flex-1 sm:flex-none sm:w-48 ml-2">
@@ -246,11 +265,61 @@
                         </table>
                     </div>
                 </div>
+
+                <div id="umumSettingsContainer" class="hidden flex-col items-center justify-start pt-6 sm:pt-12 flex-1 min-h-0 overflow-y-auto w-full fade-in">
+                    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8 w-full max-w-md relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-blue-500"></div>
+                        <h3 class="font-black text-xl text-slate-800 mb-6 flex items-center"><i class="fa-solid fa-store text-blue-500 mr-2.5"></i> Identitas Konter</h3>
+                        
+                        <form id="formPengaturanUmum" onsubmit="submitPengaturanUmum(event)" class="space-y-5">
+                            <input type="hidden" id="umumIdPengaturan">
+                            <input type="hidden" id="umumEditIndex" value="-1">
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Nama Konter / Toko</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2.5 text-slate-400"><i class="fa-solid fa-shop"></i></span>
+                                    <input type="text" id="umumNamaKonter" required class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-colors" placeholder="Cth: Bengkel Gadget L2">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Alamat Lengkap</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-3 text-slate-400"><i class="fa-solid fa-map-location-dot"></i></span>
+                                    <textarea id="umumAlamatKonter" required rows="3" class="w-full bg-slate-50 border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-colors" placeholder="Masukkan alamat lengkap..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wide">Logo Toko (Struk/Nota)</label>
+                                <div class="flex items-center space-x-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                                    <div class="w-16 h-16 rounded-xl border border-slate-300 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm relative group">
+                                        <img id="umumLogoPreview" src="" alt="Logo" class="w-full h-full object-contain hidden">
+                                        <i id="umumLogoIcon" class="fa-solid fa-image text-slate-300 text-2xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="file" id="umumLogoFile" accept="image/png, image/jpeg, image/jpg" class="hidden" onchange="previewUmumLogo(this)">
+                                        <button type="button" onclick="document.getElementById('umumLogoFile').click()" class="bg-white hover:bg-slate-100 text-blue-600 border border-blue-200 shadow-sm text-xs font-bold py-2 px-3 rounded-lg transition-colors flex items-center">
+                                            <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Unggah Gambar
+                                        </button>
+                                        <input type="hidden" id="umumLogoBase64">
+                                        <p class="text-[10px] font-semibold text-slate-400 mt-1.5">Otomatis di-resize (Maks. 2MB)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" id="btnSubmitUmum" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all transform hover:-translate-y-0.5 mt-2 flex items-center justify-center">
+                                <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan & Update Pengaturan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
 
-    <!-- ZETTBOT FIX: MODAL SMART PASTE -->
     <div id="modalSmartPaste" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
         <div id="modalSmartPasteContent" class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
             <button type="button" onclick="closeSmartPasteModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -259,26 +328,29 @@
             </div>
             <form id="formSmartPaste" onsubmit="submitSmartPaste(event)" class="p-6 space-y-4">
                 <div class="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg border border-blue-200 mb-2 leading-relaxed">
-                    <i class="fa-solid fa-circle-info mr-1"></i> <b>Cara Penggunaan:</b> Buka situs sumber (misal: orderkuota.com), blok seluruh isi tabel harganya dari atas ke bawah, <b>Copy (Ctrl+C)</b>, lalu <b>Paste (Ctrl+V)</b> ke dalam kotak di bawah ini.
+                    <i class="fa-solid fa-circle-info mr-1"></i> <b>Cara Penggunaan:</b> Buka situs sumber, blok tabel harganya dari atas ke bawah, <b>Copy (Ctrl+C)</b>, lalu <b>Paste (Ctrl+V)</b> ke dalam kotak di bawah ini.
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Pilih Provider</label>
-                        <select id="pasteProvider" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none">
-                            <!-- Diisi via JS -->
-                        </select>
+                        <label id="lblPasteProvider" class="block text-xs font-semibold text-slate-700 mb-1.5">Pilih Provider</label>
+                        <div class="flex items-center space-x-2">
+                            <select id="pasteProvider" required class="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </select>
+                            <button type="button" id="btnPasteAdd" class="w-10 h-[42px] bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border border-emerald-200 rounded-lg flex items-center justify-center transition-colors shadow-sm shrink-0" title="Tambah Baru">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">Paste Isi Tabel Disini</label>
-                    <textarea id="pasteRawText" required rows="6" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2.5 text-xs font-mono text-slate-600 focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none" placeholder="Paste data tabel (Contoh: XLA5    XL - Axis 5.000    5.852...)"></textarea>
+                    <textarea id="pasteRawText" required rows="6" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2.5 text-xs font-mono text-slate-600 focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none" placeholder="Paste data tabel disini..."></textarea>
                 </div>
                 <button type="submit" id="btnSubmitPaste" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg shadow-md font-bold text-sm transition-colors mt-2">Ekstrak & Simpan Data</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL GENERIK MASTER 3D -->
     <div id="modalGeneric" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
         <div id="modalGenericContent" class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -287,12 +359,10 @@
             </div>
             
             <form id="dynamicForm" onsubmit="handleFormSubmit(event, this)" class="p-6 space-y-5">
-                <!-- Content diisi via JavaScript -->
             </form>
         </div>
     </div>
 
-    <!-- ZETTBOT FIX: MODAL ADD KATEGORI KHUSUS -->
     <div id="modalAddKategori" class="fixed inset-0 z-[90] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
         <div id="modalAddKategoriContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
             <button type="button" onclick="closeAddKategoriModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -309,7 +379,6 @@
         </div>
     </div>
 
-    <!-- ZETTBOT FIX: MODAL ADD PROVIDER KHUSUS -->
     <div id="modalAddProvider" class="fixed inset-0 z-[90] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
         <div id="modalAddProviderContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
             <button type="button" onclick="closeAddProviderModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -326,7 +395,22 @@
         </div>
     </div>
 
-    <!-- MODAL KONTER 3D -->
+    <div id="modalAddKategoriGame" class="fixed inset-0 z-[90] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+        <div id="modalAddKategoriGameContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
+            <button type="button" onclick="closeAddKategoriGameModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800 pr-8">Tambah Game Baru</h3>
+            </div>
+            <form id="formAddKategoriGame" onsubmit="submitAddKategoriGame(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Game</label>
+                    <input type="text" id="inputNamaKategoriGame" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan Game Baru...">
+                </div>
+                <button type="submit" id="btnSubmitKategoriGame" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg shadow-md font-bold text-sm transition-colors">Simpan Game</button>
+            </form>
+        </div>
+    </div>
+
     <div id="modalKonter" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
         <div id="modalKonterContent" class="bg-white rounded-2xl w-full max-w-lg shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -376,19 +460,18 @@
                 </div>
 
                 <div>
-                    <!-- ZETTBOT FIX: Tambahan ID untuk mempermudah penggantian label Harga/Nominal -->
                     <label id="lblKntNominal" class="block text-xs font-semibold mb-1 text-slate-700">Nominal</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold">Rp</span>
-                        <input type="text" inputmode="numeric" id="kntNominal" required oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="0">
+                        <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
+                        <input type="tel" autocomplete="off" id="kntNominal" required oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="0">
                     </div>
                 </div>
 
                 <div id="kntMarginSection" style="display: none;">
                     <label class="block text-xs font-semibold mb-1 text-slate-700">Margin (Kosong = 5000)</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold">Rp</span>
-                        <input type="text" inputmode="numeric" id="kntMarginInput" oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="5000">
+                        <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
+                        <input type="tel" autocomplete="off" id="kntMarginInput" oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="5000">
                     </div>
                 </div>
 
@@ -403,12 +486,10 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT SYSTEM -->
     <script>
         // ==============================================================================
         // ZETTBOT: MESIN PENGGERAK API GITHUB PAGES
         // ==============================================================================
-        // WAJIB GANTI URL DI BAWAH INI DENGAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA!
         const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
 
         function gasRun(funcName, ...args) {
@@ -467,7 +548,9 @@
             'PPOB': { sheet: 'PPOB', prefix: 'PP', headers: ['ID PPOB', 'Nama PPOB', 'Updated At', 'Aksi'], idType: 'ppob', fields: [{ id: 'id_ppob', label: 'ID PPOB', type: 'text', disabled: true }, { id: 'nama_ppob', label: 'Nama PPOB', type: 'text', required: true }] },
             'ACC': { sheet: 'ACC', prefix: 'AC', headers: ['ID ACC', 'Kategori', 'Nama ACC', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'acc', fields: [{ id: 'id_acc', label: 'ID ACC', type: 'text', disabled: true }, { id: 'kategori', label: 'Kategori', type: 'select_dynamic_add', source: 'kategoriAccData', required: true }, { id: 'nama_acc', label: 'Nama ACC', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
             'Pulsa': { sheet: 'Pulsa', prefix: 'PL', headers: ['ID Pulsa', 'Provider', 'Nominal / Nama', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'pulsa', fields: [{ id: 'id_pulsa', label: 'ID Pulsa', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_pulsa', label: 'Nominal / Nama', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
-            'Game': { sheet: 'Game', prefix: 'GM', headers: ['ID Game', 'Provider / Game', 'Item / Nominal', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'game', fields: [{ id: 'id_game', label: 'ID Game', type: 'text', disabled: true }, { id: 'provider', label: 'Provider / Game', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_item', label: 'Item / Nominal', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] }
+            'Game': { sheet: 'Game', prefix: 'GM', headers: ['ID Game', 'Nama Game', 'Item / Nominal', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'game', fields: [{ id: 'id_game', label: 'ID Game', type: 'text', disabled: true }, { id: 'kategori_game', label: 'Nama Game', type: 'select_dynamic_add', source: 'kategoriGameData', required: true }, { id: 'nama_item', label: 'Item / Nominal', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
+            'Umum': { sheet: 'Pengaturan_Umum', prefix: 'PU' },
+            'Margin': { sheet: 'Pengaturan_Margin', prefix: 'PM', headers: ['ID', 'Layanan Terkait', 'Nominal Awal', 'Nominal Akhir', 'Margin', 'Aksi'], fields: [{ id: 'id_margin', label: 'ID Margin', type: 'text', disabled: true }, { id: 'layanan_margin', label: 'Layanan Terkait', type: 'select_multiple', options: ['TRANSFER', 'JASA TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'VOUCHER', 'PERDANA', 'PULSA', 'KUOTA INTERNET', 'ACC', 'GAME'], required: true }, { id: 'min_nom', label: 'Nominal Awal (>=)', type: 'rupiah', required: true }, { id: 'max_nom', label: 'Nominal Akhir (<) (Boleh kosong)', type: 'rupiah', required: false }, { id: 'val_margin', label: 'Margin / Keuntungan (IDR)', type: 'rupiah', required: true }] }
         };
 
         const getEl = (id) => {
@@ -497,6 +580,26 @@
 
             switchPage('Konter', 'Konter HP');
         });
+
+        function calculateDynamicMargin(layananName, nominal) {
+            var marginData = window.BGL2_CACHE['Pengaturan_Margin'] || [];
+            for (var i = 0; i < marginData.length; i++) {
+                var row = marginData[i];
+                if (!row || row[0] === "") continue;
+                
+                var layanans = (row[1] || '').split(',').map(s => s.trim().toUpperCase());
+                if (layanans.includes(layananName.toUpperCase())) {
+                    var minNom = parseInt(String(row[2]).replace(/[^0-9]/g, '')) || 0;
+                    var maxNomStr = String(row[3]).replace(/[^0-9]/g, '');
+                    var maxNom = maxNomStr ? parseInt(maxNomStr) : Infinity; 
+                    
+                    if (nominal >= minNom && nominal < maxNom) {
+                        return parseInt(String(row[4]).replace(/[^0-9]/g, '')) || 0;
+                    }
+                }
+            }
+            return null; 
+        }
 
         function renderMiniDashboard() {
             var dash = document.getElementById('miniDashboardKonterContainer');
@@ -587,6 +690,10 @@
                     let singleData = await gasRun('getData', activeSheet);
                     window.BGL2_CACHE[activeSheet] = Array.isArray(singleData) ? singleData : [];
                 }
+
+                if (!window.BGL2_CACHE['Pengaturan_Margin'] && currentSheet !== 'Margin') {
+                    window.BGL2_CACHE['Pengaturan_Margin'] = await gasRun('getData', 'Pengaturan_Margin') || [];
+                }
                 
                 var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig.headers || []);
                            
@@ -594,7 +701,12 @@
                     renderKonterTable(window.BGL2_CACHE['DB_konter'], hdrs.length);
                     renderMiniDashboard();
                 }
-                else if (activeSheet) renderGenericTable(window.BGL2_CACHE[activeSheet], hdrs.length);
+                else if (currentSheet === 'Umum') {
+                    populateUmumSettings(window.BGL2_CACHE['Pengaturan_Umum'] || []);
+                }
+                else if (activeSheet) {
+                    renderGenericTable(window.BGL2_CACHE[activeSheet], hdrs.length);
+                }
                 
                 filterTable();
             } catch(err) {
@@ -644,12 +756,22 @@
                 closeGenericModal();
                 closeKonterModal();
                 
-                if(isKonterMode) {
-                    var dash = document.getElementById('miniDashboardKonterContainer');
-                    if (dash) { dash.classList.remove('hidden'); dash.classList.add('flex'); }
+                var tableWrapper = document.getElementById('mainTableWrapper');
+                var umumSettings = document.getElementById('umumSettingsContainer');
+                var dash = document.getElementById('miniDashboardKonterContainer');
+
+                if (key === 'Umum') {
+                    if(tableWrapper) { tableWrapper.classList.add('hidden'); tableWrapper.classList.remove('flex'); }
+                    if(umumSettings) { umumSettings.classList.remove('hidden'); umumSettings.classList.add('flex'); }
+                    if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
+                } else if(isKonterMode) {
+                    if(tableWrapper) { tableWrapper.classList.remove('hidden'); tableWrapper.classList.add('flex'); }
+                    if(umumSettings) { umumSettings.classList.add('hidden'); umumSettings.classList.remove('flex'); }
+                    if(dash) { dash.classList.remove('hidden'); dash.classList.add('flex'); }
                 } else {
-                    var dash = document.getElementById('miniDashboardKonterContainer');
-                    if (dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
+                    if(tableWrapper) { tableWrapper.classList.remove('hidden'); tableWrapper.classList.add('flex'); }
+                    if(umumSettings) { umumSettings.classList.add('hidden'); umumSettings.classList.remove('flex'); }
+                    if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
                 }
                 
                 loadTableData(false); 
@@ -661,9 +783,18 @@
         function loadTableData(forceRefresh = false) {
             try {
                 var tableContainer = document.getElementById('dataTableContainer');
-                if(!tableContainer) return;
-                
                 var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+                
+                if (currentSheet === 'Umum') {
+                    if (forceRefresh || !window.BGL2_CACHE[sheet] || window.BGL2_CACHE[sheet].length === 0) {
+                        refreshActiveData(forceRefresh);
+                    } else {
+                        populateUmumSettings(window.BGL2_CACHE[sheet]);
+                    }
+                    return;
+                }
+
+                if(!tableContainer) return;
                 var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers : []);
                 
                 if (!hdrs || hdrs.length === 0) {
@@ -746,7 +877,9 @@
             document.querySelectorAll('#genFormTitle').forEach(title => title.innerText = 'Form Input');
             document.querySelectorAll('#btnSubmitGen').forEach(btn => btn.innerText = 'Simpan Data');
             
-            if(window.jQuery) $('#dynamicForm select').val('').trigger('change.select2');
+            if(window.jQuery) {
+                $('#dynamicForm select').val(null).trigger('change.select2');
+            }
 
             document.querySelectorAll('#modalGeneric').forEach(m => { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); });
             document.querySelectorAll('#modalGenericContent').forEach(mc => { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); });
@@ -757,23 +890,40 @@
             var m = document.getElementById('modalSmartPaste');
             var mc = document.getElementById('modalSmartPasteContent');
             
+            var lblProvider = document.getElementById('lblPasteProvider');
+            if (lblProvider) {
+                lblProvider.innerText = currentSheet === 'Game' ? 'Pilih Game' : 'Pilih Provider';
+            }
+
+            var btnAddPaste = document.getElementById('btnPasteAdd');
+            if (btnAddPaste) {
+                btnAddPaste.onclick = currentSheet === 'Game' ? openAddKategoriGameModal : openAddProviderModal;
+                btnAddPaste.title = currentSheet === 'Game' ? 'Tambah Game Baru' : 'Tambah Provider Baru';
+            }
+
             var sel = document.getElementById('pasteProvider');
             sel.innerHTML = '<option value="">Memuat...</option>';
             
             if (!window.BGL2_DROPDOWN_CACHE || !window.BGL2_DROPDOWN_CACHE.providerData) {
-                Swal.fire({ title: 'Memuat Provider...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
+                Swal.fire({ title: 'Memuat Data...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
                 try {
                     window.BGL2_DROPDOWN_CACHE = await gasRun('getDropdownData');
                     localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(window.BGL2_DROPDOWN_CACHE));
                     Swal.close();
                 } catch(e) {
-                    Swal.fire('Error', 'Gagal memuat provider', 'error');
+                    Swal.fire('Error', 'Gagal memuat data opsi', 'error');
                     return;
                 }
             }
             
-            var provs = window.BGL2_DROPDOWN_CACHE.providerData || [];
-            var opts = '<option value="">-- Pilih Provider --</option>';
+            var provs = [];
+            if (currentSheet === 'Game') {
+                provs = window.BGL2_DROPDOWN_CACHE.kategoriGameData || [];
+            } else {
+                provs = window.BGL2_DROPDOWN_CACHE.providerData || [];
+            }
+
+            var opts = '<option value="">-- ' + (currentSheet === 'Game' ? 'Pilih Game' : 'Pilih Provider') + ' --</option>';
             provs.forEach(p => opts += `<option value="${p}">${p}</option>`);
             sel.innerHTML = opts;
             
@@ -789,23 +939,121 @@
             if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
         }
 
+        function populateUmumSettings(data) {
+            var form = document.getElementById('formPengaturanUmum');
+            if(!form) return;
+            var validData = [];
+            if(data && data.length > 0) {
+                for (var k = data.length - 1; k >= 0; k--) {
+                    if(data[k] && data[k][0] !== "") { validData.push({row: data[k], originalIndex: k}); break; }
+                }
+            }
+            
+            if (validData.length > 0) {
+                var row = validData[0].row;
+                document.getElementById('umumEditIndex').value = validData[0].originalIndex;
+                document.getElementById('umumIdPengaturan').value = row[0] || '';
+                document.getElementById('umumNamaKonter').value = row[1] || '';
+                document.getElementById('umumAlamatKonter').value = row[2] || '';
+                document.getElementById('umumLogoBase64').value = row[3] || '';
+                
+                var preview = document.getElementById('umumLogoPreview');
+                var icon = document.getElementById('umumLogoIcon');
+                if (row[3] && row[3].trim() !== '') {
+                    preview.src = row[3];
+                    preview.classList.remove('hidden');
+                    icon.classList.add('hidden');
+                } else {
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                    icon.classList.remove('hidden');
+                }
+            } else {
+                form.reset();
+                document.getElementById('umumEditIndex').value = '-1';
+                document.getElementById('umumIdPengaturan').value = 'PU-001';
+                document.getElementById('umumLogoBase64').value = '';
+                document.getElementById('umumLogoPreview').classList.add('hidden');
+                document.getElementById('umumLogoIcon').classList.remove('hidden');
+            }
+        }
+
+        function previewUmumLogo(input) {
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                if(file.size > 2000000) { Swal.fire('Oops', 'Ukuran foto terlalu besar. Maksimal 2MB', 'warning'); return; }
+                
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var img = new Image();
+                    img.onload = function() {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        var maxW = 500, maxH = 500;
+                        var w = img.width, h = img.height;
+                        
+                        if(w > h) { if(w > maxW) { h *= maxW / w; w = maxW; } } 
+                        else { if(h > maxH) { w *= maxH / h; h = maxH; } }
+                        
+                        canvas.width = w; canvas.height = h;
+                        ctx.drawImage(img, 0, 0, w, h);
+                        var dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                        
+                        document.getElementById('umumLogoBase64').value = dataURL;
+                        var preview = document.getElementById('umumLogoPreview');
+                        var icon = document.getElementById('umumLogoIcon');
+                        preview.src = dataURL;
+                        preview.classList.remove('hidden');
+                        icon.classList.add('hidden');
+                    }
+                    img.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function submitPengaturanUmum(e) {
+            e.preventDefault();
+            var btn = document.getElementById('btnSubmitUmum');
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...';
+            
+            var editIdx = parseInt(document.getElementById('umumEditIndex').value);
+            var arr = [
+                document.getElementById('umumIdPengaturan').value,
+                document.getElementById('umumNamaKonter').value,
+                document.getElementById('umumAlamatKonter').value,
+                document.getElementById('umumLogoBase64').value
+            ];
+
+            Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
+            
+            try {
+                if(editIdx === -1) {
+                    await gasRun('saveData', 'Pengaturan_Umum', arr);
+                } else {
+                    await gasRun('updateData', 'Pengaturan_Umum', editIdx, arr);
+                }
+                Swal.fire({title: 'Sukses', text:'Pengaturan berhasil disimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+                refreshActiveData(false);
+            } catch(err) {
+                Swal.fire('Error', String(err), 'error');
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-2"></i> Simpan & Update Pengaturan';
+            }
+        }
+
         async function submitSmartPaste(e) {
             e.preventDefault();
             var btn = document.getElementById('btnSubmitPaste');
             var provider = document.getElementById('pasteProvider').value;
             var rawText = document.getElementById('pasteRawText').value;
             
-            if (!provider) return Swal.fire('Oops', 'Pilih provider terlebih dahulu!', 'warning');
+            if (!provider) return Swal.fire('Oops', 'Pilih kategori terlebih dahulu!', 'warning');
             if (!rawText.trim()) return Swal.fire('Oops', 'Teks data masih kosong!', 'warning');
 
-            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses Data...';
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
             
-            Swal.fire({
-                title: 'Mengekstrak Data...',
-                text: 'Memproses teks yang di-paste, mohon tunggu.',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
+            Swal.fire({ title: 'Mengekstrak Data...', text: 'Mohon tunggu.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             try {
                 let payload = [];
@@ -832,32 +1080,28 @@
 
                            nama = nama.replace(/\.000/g, '').replace(/000\b/g, '').trim();
 
-                           let hargaJual = nominal >= 100000 ? nominal + 5000 : nominal + 3000;
+                           let dynamicMargin = calculateDynamicMargin(currentSheet, nominal);
+                           let hargaJual = nominal + (dynamicMargin !== null ? dynamicMargin : (nominal >= 100000 ? 5000 : 3000));
                            
                            payload.push({ provider: provider, nama: nama, beli: hargaBeli, jual: hargaJual });
                        }
                     }
                 }
 
-                if(payload.length === 0) {
-                    throw new Error("Tidak ada data valid yang bisa diekstrak. Pastikan Anda memblok tabelnya (mulai dari XLA5 dst) dan tekan Ctrl+C sebelum mem-paste kesini.");
-                }
+                if(payload.length === 0) throw new Error("Tidak ada data valid yang bisa diekstrak.");
 
                 var res = await gasRun('batchSaveScrapedData', currentSheet, payload);
-                if(res && res.status === 'error') throw new Error(res.message);
+                if(res && res.status === 'error') {
+                    if(res.message.includes('appendRow')) {
+                        throw new Error("Backend Code.gs Anda belum diperbarui sepenuhnya! Tabel 'KategoriGame' belum tercetak di Spreadsheet. Silakan perbarui file Code.gs Anda.");
+                    }
+                    throw new Error(res.message);
+                }
 
                 closeSmartPasteModal();
-                Swal.fire({
-                    title: 'Sukses Di-Ekstrak!',
-                    html: `Menambahkan <b>${res.added}</b> produk baru.<br>Memperbarui <b>${res.updated}</b> harga produk lama.`,
-                    icon: 'success'
-                });
+                Swal.fire({ title: 'Sukses!', html: `Berhasil memproses data ${currentSheet}.`, icon: 'success' });
                 refreshActiveData(true); 
-            } catch(err) {
-                Swal.fire('Error', String(err), 'error');
-            } finally {
-                btn.disabled = false; btn.innerText = "Ekstrak & Simpan Data";
-            }
+            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Ekstrak & Simpan Data"; }
         }
 
         function openAddKategoriModal() {
@@ -895,21 +1139,12 @@
                 var sel = document.getElementById('kategori');
                 if(sel) {
                     var option = new Option(namaKat, namaKat, true, true);
-                    if(window.jQuery) {
-                        $(sel).append(option).trigger('change');
-                    } else {
-                        sel.add(option);
-                        sel.value = namaKat;
-                    }
+                    if(window.jQuery) $(sel).append(option).trigger('change');
                 }
                 
                 closeAddKategoriModal();
-                Swal.fire({title: 'Sukses', text: 'Kategori berhasil ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-            } catch(err) {
-                Swal.fire('Error', String(err), 'error');
-            } finally {
-                btn.disabled = false; btn.innerText = "Simpan Kategori";
-            }
+                Swal.fire({title: 'Sukses', text: 'Kategori ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Kategori"; }
         }
 
         function openAddProviderModal() {
@@ -947,21 +1182,72 @@
                 var sel = document.getElementById('provider');
                 if(sel) {
                     var option = new Option(namaProv, namaProv, true, true);
-                    if(window.jQuery) {
-                        $(sel).append(option).trigger('change');
-                    } else {
-                        sel.add(option);
-                        sel.value = namaProv;
-                    }
+                    if(window.jQuery) $(sel).append(option).trigger('change');
+                }
+
+                var selPaste = document.getElementById('pasteProvider');
+                if(selPaste && currentSheet !== 'Game') {
+                    var optionPaste = new Option(namaProv, namaProv, true, true);
+                    if(window.jQuery) $(selPaste).append(optionPaste).trigger('change');
                 }
                 
                 closeAddProviderModal();
-                Swal.fire({title: 'Sukses', text: 'Provider berhasil ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-            } catch(err) {
-                Swal.fire('Error', String(err), 'error');
-            } finally {
-                btn.disabled = false; btn.innerText = "Simpan Provider";
-            }
+                Swal.fire({title: 'Sukses', text: 'Provider ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Provider"; }
+        }
+
+        function openAddKategoriGameModal() {
+            var m = document.getElementById('modalAddKategoriGame');
+            var mc = document.getElementById('modalAddKategoriGameContent');
+            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
+            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
+            setTimeout(() => document.getElementById('inputNamaKategoriGame').focus(), 100);
+        }
+
+        function closeAddKategoriGameModal() {
+            var m = document.getElementById('modalAddKategoriGame');
+            var mc = document.getElementById('modalAddKategoriGameContent');
+            document.getElementById('formAddKategoriGame').reset();
+            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
+            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
+        }
+
+        async function submitAddKategoriGame(e) {
+            e.preventDefault();
+            var btn = document.getElementById('btnSubmitKategoriGame');
+            var namaGame = document.getElementById('inputNamaKategoriGame').value;
+            btn.disabled = true; btn.innerText = "Menyimpan...";
+            
+            try {
+                var res = await gasRun('saveData', 'KategoriGame', ["", namaGame]);
+                if(res && res.status === 'error') {
+                    if(res.message.includes('appendRow')) {
+                        throw new Error("Backend Code.gs Anda belum diperbarui sepenuhnya! Tabel 'KategoriGame' belum tercetak di Spreadsheet. Silakan perbarui file Code.gs Anda.");
+                    }
+                    throw new Error(res.message);
+                }
+                
+                window.BGL2_DROPDOWN_CACHE = null;
+                localStorage.removeItem('bgl2_dropdown_cache');
+                var db = await gasRun('getDropdownData');
+                window.BGL2_DROPDOWN_CACHE = db;
+                localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
+                
+                var sel = document.getElementById('kategori_game');
+                if(sel) {
+                    var option = new Option(namaGame, namaGame, true, true);
+                    if(window.jQuery) $(sel).append(option).trigger('change');
+                }
+
+                var selPaste = document.getElementById('pasteProvider');
+                if(selPaste && currentSheet === 'Game') {
+                    var optionPaste = new Option(namaGame, namaGame, true, true);
+                    if(window.jQuery) $(selPaste).append(optionPaste).trigger('change');
+                }
+                
+                closeAddKategoriGameModal();
+                Swal.fire({title: 'Sukses', text: 'Game ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Game"; }
         }
 
         function openKonterModal() {
@@ -1012,7 +1298,6 @@
             document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'none'); 
             document.querySelectorAll('#kntMarginInput').forEach(m => m.value = ''); 
 
-            // ZETTBOT FIX: Ubah label Nominal menjadi Harga untuk produk database
             var lblNominal = document.getElementById('lblKntNominal');
             if (lblNominal) {
                 lblNominal.innerText = ['VOUCHER', 'PERDANA', 'ACC', 'PULSA', 'GAME'].includes(jenis) ? 'Harga' : 'Nominal';
@@ -1045,22 +1330,20 @@
 
             if(jenis === 'GAME') {
                 document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<input type="text" id="kntDetailInput" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-500 outline-none" placeholder="Form Game Segera Hadir..." disabled>';
+                    container.innerHTML = '<select id="kntDetailSelect" required onchange="kntDetailChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"><option value="">Memuat data...</option></select>';
+                    if(window.jQuery) $(container).find('select').select2({ width: '100%' });
                 });
-                return;
-            }
-
-            if(jenis === 'TOKEN PLN') {
+            } else if(jenis === 'TOKEN PLN') {
                 document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
                     container.innerHTML = '<input type="text" id="kntDetailInput" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Masukkan No Meter...">';
                 });
                 return; 
-            } 
-            
-            document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                container.innerHTML = '<select id="kntDetailSelect" required onchange="kntDetailChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"><option value="">Memuat data...</option></select>';
-                if(window.jQuery) $(container).find('select').select2({ width: '100%' });
-            });
+            } else {
+                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
+                    container.innerHTML = '<select id="kntDetailSelect" required onchange="kntDetailChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"><option value="">Memuat data...</option></select>';
+                    if(window.jQuery) $(container).find('select').select2({ width: '100%' });
+                });
+            }
 
             try {
                 var db = window.BGL2_DROPDOWN_CACHE;
@@ -1081,6 +1364,10 @@
                 else if(jenis === 'PERDANA') opts = (db.perdanaData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.provider})</option>`);
                 else if(jenis === 'ACC') opts = (db.accData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.kategori})</option>`);
                 else if(jenis === 'PULSA') opts = (db.pulsaData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}">${v.nama} (${v.provider})</option>`);
+                else if(jenis === 'GAME') {
+                    let gameProd = window.BGL2_CACHE['Game'] || [];
+                    opts = gameProd.map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
+                }
                 
                 document.querySelectorAll('#kntDetailSelect').forEach(sel => {
                     sel.innerHTML = '<option value="">-- Pilih Detail --</option>' + opts.join('');
@@ -1088,10 +1375,6 @@
                 });
             } catch(error) {
                 console.error("Error Dropdown:", error);
-                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<select id="kntDetailSelect" class="w-full bg-red-50 border border-red-300 rounded-lg px-3 py-2.5 text-sm text-red-600 outline-none"><option value="">Gagal memuat data</option></select>';
-                    if(window.jQuery) $(container).find('select').select2({ width: '100%' });
-                });
             }
         }
 
@@ -1131,7 +1414,6 @@
             
             var getVal = (selector) => { var el = formEl.querySelector(selector); return el ? el.value : ''; };
             var jenisVal = getVal('#kntJenis');
-
             var sel = formEl.querySelector('#kntDetailSelect');
             var inp = formEl.querySelector('#kntDetailInput');
             var detailVal = '';
@@ -1140,31 +1422,31 @@
             else if (inp) detailVal = inp.value;
 
             var nomVal = getVal('#kntNominal');
+            var nominal = parseInt(nomVal.replace(/[^0-9]/g, '')) || 0;
+            
+            var hBeli = parseInt(String(getVal('#kntHargaBeliDB')).replace(/[^0-9]/g, '')) || 0;
+            var hJual = parseInt(String(getVal('#kntHargaJualDB')).replace(/[^0-9]/g, '')) || 0;
             var marginVal = getVal('#kntMarginInput'); 
-            var hBeli = getVal('#kntHargaBeliDB');
-            var hJual = getVal('#kntHargaJualDB');
 
-            if (jenisVal === 'JASA TRANSFER') {
-                var nInt = parseInt(nomVal.replace(/[^0-9]/g, '')) || 0;
-                hBeli = nInt;
-                hJual = nInt + 5000;
-            } else if (jenisVal === 'KUOTA INTERNET') {
-                var nInt = parseInt(nomVal.replace(/[^0-9]/g, '')) || 0;
-                var mInt = parseInt(marginVal.replace(/[^0-9]/g, ''));
-                if (isNaN(mInt)) mInt = 5000; 
-                hBeli = nInt;
-                hJual = nInt + mInt;
+            var dynamicMargin = calculateDynamicMargin(jenisVal, nominal);
+
+            if (dynamicMargin !== null) {
+                if (hBeli === 0) hBeli = nominal;
+                hJual = hBeli + dynamicMargin;
+            } else {
+                if (jenisVal === 'JASA TRANSFER') {
+                    hBeli = nominal; hJual = nominal + 5000;
+                } else if (jenisVal === 'KUOTA INTERNET') {
+                    var mInt = parseInt(marginVal.replace(/[^0-9]/g, '')) || 5000;
+                    hBeli = nominal; hJual = nominal + mInt;
+                } else if (['TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN'].includes(jenisVal)) {
+                    hBeli = nominal; hJual = nominal; 
+                }
             }
 
-            var payload = {
-                tanggal: getVal('#kntTanggal'),
-                jenis: jenisVal,
-                detail: detailVal,
-                nominal: nomVal,
-                hargaBeliDB: hBeli,
-                hargaJualDB: hJual
-            };
-
+            var payload = { tanggal: getVal('#kntTanggal'), jenis: jenisVal, detail: detailVal, nominal: nomVal, hargaBeliDB: hBeli, hargaJualDB: hJual };
+            
+            // ZETTBOT FIX: Pastikan editIndex ditangkap sebelum Form Konter di-close
             var currentIndex = editIndex; 
             closeKonterModal(); 
             Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, timerProgressBar: true, didOpen: () => Swal.showLoading() });
@@ -1174,12 +1456,9 @@
                 if(currentIndex === -1) res = await gasRun('saveKonterTransaction', payload);
                 else res = await gasRun('editKonterTransaction', currentIndex, payload);
                 if (res && res.status === 'error') throw new Error(res.message);
-                
                 Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
                 refreshActiveData(false); 
-            } catch(err) {
-                Swal.fire('Error', String(err), 'error');
-            } finally { window.isSubmittingKonter = false; }
+            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
         }
 
         async function editKonterData(origIdx) {
@@ -1189,20 +1468,16 @@
                     if(currentTableData[k].originalIndex === origIdx) { rowData = currentTableData[k].row; break; }
                 }
                 if(!rowData) return;
-
                 editIndex = origIdx;
                 document.querySelectorAll('#kntFormTitle').forEach(el => el.innerText = 'Edit Transaksi Konter');
                 document.querySelectorAll('#btnSubmitKonter').forEach(el => el.innerText = 'Update Transaksi');
                 document.querySelectorAll('#kntTanggal').forEach(el => el.value = rowData[1]);
-                
                 var jenis = rowData[2];
                 document.querySelectorAll('#kntJenis').forEach(elJenis => {
                     elJenis.value = jenis;
                     if(window.jQuery) $(elJenis).trigger('change.select2');
                 });
-                
                 await kntJenisChange();
-                
                 document.querySelectorAll('#kntDetailSelect').forEach(sel => {
                     if(!sel.disabled) {
                         sel.value = rowData[3];
@@ -1211,55 +1486,39 @@
                     }
                 });
                 document.querySelectorAll('#kntDetailInput').forEach(inp => { inp.value = rowData[3]; });
-
-                var autoCalcTypes = ['TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'PULSA', 'JASA TRANSFER', 'KUOTA INTERNET'];
-                if(autoCalcTypes.includes(jenis)) {
-                    var nomStr = String(rowData[4]).replace(/[^0-9]/g, ''); 
-                    document.querySelectorAll('#kntNominal').forEach(nom => {
-                        nom.value = nomStr;
-                        window.formatRupiahUI(nom);
-                    });
-                    
-                    if (jenis === 'KUOTA INTERNET') {
-                        var hBeliInt = parseInt(String(rowData[4]).replace(/[^0-9]/g, '')) || 0;
-                        var hJualInt = parseInt(String(rowData[5]).replace(/[^0-9]/g, '')) || 0;
-                        var marginInt = hJualInt - hBeliInt;
-                        document.querySelectorAll('#kntMarginInput').forEach(m => {
-                            m.value = marginInt;
-                            window.formatRupiahUI(m);
-                        });
-                    }
-                }
                 openKonterModal();
-            } catch(err) {
-                console.error("Error edit Konter:", err);
-                Swal.fire('Error', 'Gagal memuat form edit.', 'error');
-            }
+            } catch(err) { console.error(err); }
         }
 
-        function editDataGen(displayIndex) {
+        // ZETTBOT FIX: Ubah jadi asynchronous agar form sempat dibuat sebelum data disuntikkan
+        async function editDataGen(displayIndex) {
             try {
                 var rowData = currentTableData[displayIndex].row;
                 if (!rowData) return;
-
                 editIndex = currentTableData[displayIndex].originalIndex;
-                toggleForm(true);
-
+                
+                await toggleForm(true); 
+                
                 document.querySelectorAll('#genFormTitle').forEach(el => el.innerText = 'Form Edit Data');
                 document.querySelectorAll('#btnSubmitGen').forEach(el => el.innerText = 'Update Data');
-
                 for(var i=0; i<currentConfig.fields.length; i++) {
                     var f = currentConfig.fields[i];
-                    document.querySelectorAll('#' + f.id).forEach(el => {
-                        var val = rowData[i];
-                        if (f.type === 'rupiah' && val) {
-                            val = val.replace(/Rp /g, '').replace(/\./g, '');
-                            el.value = val; window.formatRupiahUI(el); 
-                        } else { el.value = val; }
+                    var el = document.getElementById(f.id);
+                    if(!el) continue;
+                    var val = rowData[i];
+
+                    if (f.type === 'select_multiple') {
+                        var arrVal = val ? val.split(',').map(s => s.trim()) : [];
+                        if(window.jQuery) { $(el).val(arrVal).trigger('change'); }
+                    } else if (f.type === 'rupiah' && val) {
+                        val = val.replace(/Rp /g, '').replace(/\./g, '');
+                        el.value = val; window.formatRupiahUI(el); 
+                    } else { 
+                        el.value = val; 
                         if ((f.type === 'select' || f.type === 'select_dynamic' || f.type === 'select_dynamic_add') && window.jQuery) { $(el).trigger('change.select2'); }
-                    });
+                    }
                 }
-            } catch(err) { console.error("Error edit Master:", err); Swal.fire('Error', 'Gagal memuat form edit.', 'error'); }
+            } catch(err) { console.error(err); }
         }
 
         function initGenericForm() {
@@ -1289,196 +1548,162 @@
             for(var i=0; i<currentConfig.fields.length; i++) {
                 var f = currentConfig.fields[i];
                 var inputHtml = '';
-                
-                if(f.type === 'select' || f.type === 'select_dynamic' || f.type === 'select_dynamic_add') {
-                    var opts = '<option value="">-- Pilih --</option>';
+                if(f.type === 'select' || f.type === 'select_dynamic' || f.type === 'select_dynamic_add' || f.type === 'select_multiple') {
+                    var opts = f.type !== 'select_multiple' ? '<option value="">-- Pilih --</option>' : '';
                     var src = f.options || data[f.source] || [];
                     for(var j=0; j<src.length; j++) opts += '<option value="'+src[j]+'">'+src[j]+'</option>';
                     
                     if (f.type === 'select_dynamic_add') {
-                        var modalFunc = (f.id === 'provider') ? 'openAddProviderModal()' : 'openAddKategoriModal()';
-                        var modalTitle = (f.id === 'provider') ? 'Tambah Provider Baru' : 'Tambah Kategori Baru';
-                        
-                        inputHtml = '<div class="flex items-center space-x-2">';
-                        inputHtml += '<select id="'+f.id+'" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" '+(f.required?'required':'')+'>'+opts+'</select>';
-                        inputHtml += '<button type="button" onclick="'+modalFunc+'" class="w-10 h-[42px] bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-200 rounded-lg flex items-center justify-center transition-colors shadow-sm shrink-0" title="'+modalTitle+'"><i class="fa-solid fa-plus"></i></button>';
-                        inputHtml += '</div>';
-                    } else {
-                        inputHtml = '<select id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" '+(f.required?'required':'')+'>'+opts+'</select>';
+                        var modalFunc = (f.id === 'provider') ? 'openAddProviderModal()' : (f.id === 'kategori_game' ? 'openAddKategoriGameModal()' : 'openAddKategoriModal()');
+                        inputHtml = '<div class="flex items-center space-x-2"><select id="'+f.id+'" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm" '+(f.required?'required':'')+'>'+opts+'</select><button type="button" onclick="'+modalFunc+'" class="w-10 h-[42px] bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-plus"></i></button></div>';
+                    } else if (f.type === 'select_multiple') {
+                        inputHtml = '<select id="'+f.id+'" multiple="multiple" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm" '+(f.required?'required':'')+'>'+opts+'</select>';
+                    } else { 
+                        inputHtml = '<select id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm" '+(f.required?'required':'')+'>'+opts+'</select>'; 
                     }
-                } else if (f.type === 'rupiah') {
-                    inputHtml = '<div class="relative"><span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold">Rp</span><input type="text" id="'+f.id+'" oninput="window.formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" '+(f.required?'required':'')+'></div>';
-                } else {
-                    inputHtml = '<input type="text" id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none '+(f.disabled?'bg-slate-100 text-slate-500':'')+'" '+(f.required?'required':'')+' '+(f.disabled?'readonly':'')+'>';
+                } else if (f.type === 'rupiah') { 
+                    inputHtml = '<div class="relative"><span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span><input type="tel" autocomplete="off" placeholder="0" id="'+f.id+'" oninput="window.formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+'></div>'; 
+                } else if (f.type === 'textarea') { 
+                    inputHtml = '<textarea id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+' rows="3"></textarea>'; 
+                } else { 
+                    inputHtml = '<input type="text" id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm '+(f.disabled?'bg-slate-100 text-slate-500':'')+' outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+' '+(f.disabled?'readonly':'')+'>'; 
                 }
-                html += '<div><label class="block text-xs font-semibold text-slate-700 mb-1.5">'+f.label+'</label>' + inputHtml + '</div>';
+                
+                var colSpanClass = f.type === 'select_multiple' ? 'md:col-span-2' : '';
+                html += '<div class="' + colSpanClass + '"><label class="block text-xs font-semibold text-slate-700 mb-1.5">'+f.label+'</label>' + inputHtml + '</div>';
             }
-            html += '</div><div class="flex justify-end pt-4 border-t border-slate-100 mt-6 space-x-3">';
-            html += '<button type="button" onclick="closeGenericModal()" class="px-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors shadow-sm">Batal</button>';
-            html += '<button type="submit" id="btnSubmitGen" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg shadow-md font-bold text-sm transition-colors">Simpan Data</button>';
-            html += '</div>';
+            html += '</div><div class="flex justify-end pt-4 border-t border-slate-100 mt-6 space-x-3"><button type="button" onclick="closeGenericModal()" class="px-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg">Batal</button><button type="submit" id="btnSubmitGen" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold text-sm">Simpan Data</button></div>';
             
-            document.querySelectorAll('#dynamicForm').forEach(form => {
-                form.innerHTML = html;
-                if(window.jQuery) $(form).find('select').select2({ width: '100%' });
+            document.querySelectorAll('#dynamicForm').forEach(form => { 
+                form.innerHTML = html; 
+                if(window.jQuery) {
+                    $(form).find('select').each(function() {
+                        var isMulti = $(this).attr('multiple');
+                        $(this).select2({ width: '100%', placeholder: isMulti ? '-- Pilih Layanan (Bisa lebih dari 1) --' : '' });
+                    });
+                }
             });
         }
 
-        // ... existing function renderKonterTable, renderGenericTable, delKonter, delGen, dll tidak disentuh ...
         function renderKonterTable(data, colCount) {
+            var btnTambah = document.getElementById('btnTambahData');
+            if (btnTambah) btnTambah.classList.remove('hidden');
+
             var tbody = document.getElementById('dataTableBody');
             if(!tbody) return;
-            if(!data || !Array.isArray(data) || data.length === 0 || (data.length === 1 && (!data[0] || data[0][0] === ""))) { 
-                tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; 
-            }
-            
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data.</td></tr>'; return; }
             var reversedData = [];
-            for (var k = data.length - 1; k >= 0; k--) {
-                if(data[k] && Array.isArray(data[k]) && data[k].length > 0 && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k});
-            }
+            for (var k = data.length - 1; k >= 0; k--) { if(data[k] && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k}); }
             currentTableData = reversedData;
-
-            if(reversedData.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
-            
-            var rowsHtml = []; 
-            for(var i=0; i<reversedData.length; i++) {
-                var row = reversedData[i].row; var origIdx = reversedData[i].originalIndex; var html = '';
-                
-                html += '<td class="py-1.5 px-3 font-mono font-bold text-center align-middle">'+(row[0]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 text-center align-middle">'+(row[1]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 font-bold text-blue-700 text-center align-middle">'+(row[2]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 text-center align-middle">'+(row[3]||'-')+'</td>';
-                html += '<td class="py-1.5 px-3 font-bold text-emerald-600 text-center align-middle">'+(row[5]||'-')+'</td>';
-                
-                var act = '<div class="flex space-x-1.5 justify-center">';
-                if(activeRole === 'Admin') {
-                    act += '<button type="button" onclick="editKonterData('+origIdx+')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Edit Data"><i class="fa-solid fa-pen-to-square text-xs"></i></button>';
-                    act += '<button type="button" onclick="delKonter('+origIdx+')" class="bg-red-100 hover:bg-red-200 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button>';
-                } else { act += '<i class="fa-solid fa-ban text-slate-300"></i>'; }
-                act += '</div>';
-                
-                html += '<td class="py-1.5 px-3 align-middle">' + act + '</td>';
-                rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
-            }
+            var rowsHtml = reversedData.map(d => {
+                var r = d.row; var o = d.originalIndex;
+                return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors"><td class="py-1.5 px-3 font-mono font-bold text-center">${r[0]||'-'}</td><td class="py-1.5 px-3 text-center">${r[1]||'-'}</td><td class="py-1.5 px-3 font-bold text-blue-700 text-center">${r[2]||'-'}</td><td class="py-1.5 px-3 text-center">${r[3]||'-'}</td><td class="py-1.5 px-3 font-bold text-emerald-600 text-center">${r[5]||'-'}</td><td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
+            });
             tbody.innerHTML = rowsHtml.join('');
         }
 
         function renderGenericTable(data, colCount) {
+            var btnTambah = document.getElementById('btnTambahData');
             var tbody = document.getElementById('dataTableBody');
-            if(!tbody) return;
-            if(!data || !Array.isArray(data) || data.length === 0 || (data.length === 1 && (!data[0] || data[0][0] === ""))) { 
-                tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; 
-            }
             
-            var reversedData = [];
-            for (var k = data.length - 1; k >= 0; k--) {
-                if(data[k] && Array.isArray(data[k]) && data[k].length > 0 && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k});
+            if(!tbody || !data || data.length === 0) {
+                if(btnTambah) btnTambah.classList.remove('hidden');
+                if(tbody) tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>';
+                return;
             }
+
+            var reversedData = [];
+            for (var k = data.length - 1; k >= 0; k--) { if(data[k] && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k}); }
             currentTableData = reversedData;
 
-            if(reversedData.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>'; return; }
-            
-            var rowsHtml = []; 
-            for(var i=0; i<reversedData.length; i++) {
-                var row = reversedData[i].row; var origIdx = reversedData[i].originalIndex; var html = '';
-                
-                for(var j=0; j<row.length; j++) {
-                    var cellVal = String(row[j] || '').replace(/^'/, '');
-                    if (currentSheet === 'Users' && j === 1) html += '<td class="py-1.5 px-3 text-center align-middle">••••••••</td>';
-                    else html += '<td class="py-1.5 px-3 text-center align-middle">'+cellVal+'</td>';
-                }
-                
-                var btnHtml = '<div class="flex space-x-1.5 justify-center">';
-                if(activeRole === 'Admin') {
-                    btnHtml += '<button type="button" onclick="editDataGen('+i+')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Edit Data"><i class="fa-solid fa-pen-to-square text-xs"></i></button>';
-                    btnHtml += `<button type="button" onclick="delGen(${origIdx}, '${currentSheet}')" class="bg-red-100 hover:bg-red-200 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center transition-colors shadow-sm" title="Hapus Data"><i class="fa-solid fa-trash text-xs"></i></button>`;
-                } else { btnHtml += '<i class="fa-solid fa-ban text-slate-300"></i>'; }
-                btnHtml += '</div>';
-                
-                html += '<td class="py-1.5 px-3 align-middle">' + btnHtml + '</td>';
-                rowsHtml.push('<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">' + html + '</tr>');
+            if (btnTambah) {
+                btnTambah.classList.remove('hidden');
             }
+
+            var rowsHtml = reversedData.map((d, i) => {
+                var r = d.row; var o = d.originalIndex;
+                
+                var cells = '';
+                for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
+                    var c = r[idx] || '';
+                    cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
+                }
+
+                return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">${cells}<td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
+            });
             tbody.innerHTML = rowsHtml.join('');
         }
-        
+
         function delKonter(idx) { 
-            Swal.fire({title: 'Hapus Data Konter?', text: "Data tidak bisa dikembalikan!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
+            Swal.fire({title: 'Hapus?', text: "Data tidak bisa balik!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
                 if(r.isConfirmed) {
                     Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    try {
-                        var res = await gasRun('deleteData', 'DB_konter', idx);
-                        if(res && res.status === 'error') throw new Error(res.message);
-                        Swal.fire({title: 'Berhasil', text: 'Transaksi Konter Terhapus!', icon: 'success', timer: 1500, showConfirmButton: false});
-                        refreshActiveData(true); 
-                    } catch(err) { Swal.fire('Error', String(err), 'error'); }
+                    try { await gasRun('deleteData', 'DB_konter', idx); refreshActiveData(true); Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); } catch(err) { Swal.fire('Error', String(err), 'error'); }
                 }
             });
         }
         
         function delGen(idx, sheetName) { 
-            var targetSheet = sheetName || currentConfig.sheet;
-            Swal.fire({title: 'Hapus Data?', text: "Data master ini akan dihapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
+            Swal.fire({title: 'Hapus?', text: "Hapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
                 if(r.isConfirmed) {
                     Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    try {
-                        var res = await gasRun('deleteData', targetSheet, idx);
-                        if(res && res.status === 'error') throw new Error(res.message);
-                        
-                        window.BGL2_DROPDOWN_CACHE = null;
-                        localStorage.removeItem('bgl2_dropdown_cache');
-                        
-                        Swal.fire({title: 'Berhasil', text: 'Data Master Terhapus!', icon: 'success', timer: 1500, showConfirmButton: false});
-                        refreshActiveData(true); 
-                    } catch(err) { Swal.fire('Error', String(err), 'error'); }
+                    try { await gasRun('deleteData', sheetName, idx); window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache'); refreshActiveData(true); Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); } catch(err) { Swal.fire('Error', String(err), 'error'); }
                 }
             });
         }
 
-        window.isSubmittingMaster = false;
         async function handleFormSubmit(e, formEl) {
             e.preventDefault();
             if(window.isSubmittingMaster) return;
             window.isSubmittingMaster = true;
-
+            
             var arr = [];
             for(var i=0; i<currentConfig.fields.length; i++) {
                 var f = currentConfig.fields[i];
                 var el = formEl.querySelector('#' + f.id);
-                var v = el ? el.value : "";
-                if(f.type === 'rupiah') arr.push("Rp " + v);
-                else arr.push(v);
+                var v = "";
+                
+                if (f.type === 'select_multiple') {
+                    var selected = window.jQuery ? $('#' + f.id).val() : [];
+                    v = selected ? selected.join(', ') : '';
+                } else {
+                    v = el ? el.value : "";
+                }
+
+                if(f.type === 'rupiah') arr.push("Rp " + v); else arr.push(v);
             }
             
-            var currentIndex = editIndex;
+            // ZETTBOT FIX: Mengunci Index Edit sebelum Form Ditutup!
+            var currentIndex = editIndex; 
             closeGenericModal(); 
-            Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, timerProgressBar: true, didOpen: () => Swal.showLoading() });
-
+            
+            Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
             try {
-                let res;
-                if(currentIndex === -1) res = await gasRun('saveData', currentConfig.sheet, arr);
-                else res = await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
-                if(res && res.status === 'error') throw new Error(res.message);
-                
-                window.BGL2_DROPDOWN_CACHE = null;
-                localStorage.removeItem('bgl2_dropdown_cache');
-                
-                Swal.fire({title: 'Sukses', text: 'Data Master Berhasil Disimpan', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+                if(currentIndex === -1) {
+                    await gasRun('saveData', currentConfig.sheet, arr);
+                } else {
+                    await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
+                }
+                window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache');
+                Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
                 refreshActiveData(false); 
-            } catch(err) {
-                Swal.fire('Error', String(err), 'error');
-            } finally { window.isSubmittingMaster = false; }
+            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
         }
 
         window.formatRupiahUI = function(element) {
             var numericStr = element.value.replace(/[^0-9]/g, '');
-            if(!numericStr) { element.value = ''; return; }
+            if(!numericStr) { 
+                if(element.value !== '') element.value = ''; 
+                return; 
+            }
             var split = numericStr.split(','); var sisa = split[0].length % 3; var rupiah = split[0].substr(0, sisa);
             var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
             if(ribuan) { var separator = sisa ? '.' : ''; rupiah += separator + ribuan.join('.'); }
-            element.value = rupiah;
+            if (element.value !== rupiah) {
+                element.value = rupiah;
+            }
         };
 
-        // EXPORT FUNGSI
         window.handleLogin = handleLogin; window.logout = logout; window.toggleSidebar = toggleSidebar; window.switchPage = switchPage; window.toggleForm = toggleForm; 
         window.openModal = openModal; window.closeModal = closeModal;
         window.openGenericModal = openGenericModal; window.closeGenericModal = closeGenericModal; window.openKonterModal = openKonterModal; window.closeKonterModal = closeKonterModal;
@@ -1488,7 +1713,9 @@
         window.renderMiniDashboard = renderMiniDashboard; window.filterTable = filterTable;
         window.openAddKategoriModal = openAddKategoriModal; window.closeAddKategoriModal = closeAddKategoriModal; window.submitAddKategori = submitAddKategori;
         window.openAddProviderModal = openAddProviderModal; window.closeAddProviderModal = closeAddProviderModal; window.submitAddProvider = submitAddProvider;
+        window.openAddKategoriGameModal = openAddKategoriGameModal; window.closeAddKategoriGameModal = closeAddKategoriGameModal; window.submitAddKategoriGame = submitAddKategoriGame;
         window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
+        window.populateUmumSettings = populateUmumSettings; window.previewUmumLogo = previewUmumLogo; window.submitPengaturanUmum = submitPengaturanUmum;
     </script>
 </body>
 </html>
