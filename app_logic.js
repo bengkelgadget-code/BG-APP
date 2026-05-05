@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     switchPage('Konter', 'Transaksi Konter');
 });
 
-// ZETTBOT FIX: Update Kalkulator Margin untuk membaca Nominal Awal pada mode Persentase
 function calculateDynamicMargin(layananName, nominal) {
     var marginData = window.BGL2_CACHE['Pengaturan_Margin'] || [];
     for (var i = 0; i < marginData.length; i++) {
@@ -42,10 +41,9 @@ function calculateDynamicMargin(layananName, nominal) {
         let tipe = isNewFormat ? row[1] : 'Range Nominal';
         let layanansStr = isNewFormat ? String(row[2]) : String(row[1]);
         
-        // Pembacaan Parameter Dinamis Backward-Compatible
-        let param1Str = isNewFormat ? String(row[3]) : String(row[2]); // Nominal Awal ATAU pct_lama
-        let param2Str = isNewFormat ? String(row[4]) : String(row[3]); // Nominal Akhir ATAU pct_baru ATAU '-'
-        let marginStr = isNewFormat ? String(row[5]) : String(row[4]); // Keuntungan Minimal
+        let param1Str = isNewFormat ? String(row[3]) : String(row[2]); 
+        let param2Str = isNewFormat ? String(row[4]) : String(row[3]); 
+        let marginStr = isNewFormat ? String(row[5]) : String(row[4]); 
         
         var layanans = layanansStr.split(',').map(s => s.trim().toUpperCase());
         
@@ -64,23 +62,19 @@ function calculateDynamicMargin(layananName, nominal) {
                 var minNom = 0;
                 var pct = 0;
                 
-                // Cek jika data menggunakan format lama (sebelum koreksi ini)
                 if (param1Str.includes('%')) {
                     pct = parseFloat(param1Str.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
                 } else {
-                    // Format baru: param1=Nominal Awal, param2=Persentase
                     minNom = parseInt(param1Str.replace(/[^0-9]/g, '')) || 0;
                     pct = parseFloat(param2Str.replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
                 }
 
-                // Cek apakah nominal transaksi masuk kualifikasi Nominal Awal (Threshold)
                 if (nominal >= minNom) {
                     var minMargin = parseInt(marginStr.replace(/[^0-9]/g, '')) || 0;
                     var calculatedMargin = Math.floor(nominal * (pct / 100));
                     
                     return calculatedMargin > minMargin ? calculatedMargin : minMargin;
                 }
-                // Jika nominal di bawah batas awal, sistem otomatis akan cek baris margin lain (kalo ada)
             }
         }
     }
@@ -480,9 +474,15 @@ async function submitKonterForm(e, formEl) {
         }
     }
 
-    var payload = { tanggal: getVal('#kntTanggal'), jenis: jenisVal, detail: detailVal, nominal: nomVal, hargaBeliDB: hBeli, hargaJualDB: hJual };
-    
+    // ZETTBOT FIX: Mendapatkan ID Firebase untuk Edit Konter
     var currentIndex = parseInt(editIndex, 10); 
+    var itemId = null;
+    if (currentIndex !== -1 && window.BGL2_CACHE['DB_konter'] && window.BGL2_CACHE['DB_konter'][currentIndex]) {
+        itemId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
+    }
+    
+    var payload = { id: itemId, tanggal: getVal('#kntTanggal'), jenis: jenisVal, detail: detailVal, nominal: nomVal, hargaBeliDB: hBeli, hargaJualDB: hJual };
+    
     closeKonterModal(); 
     Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, timerProgressBar: true, didOpen: () => Swal.showLoading() });
 
@@ -538,7 +538,6 @@ async function editDataGen(displayIndex) {
         document.querySelectorAll('#genFormTitle').forEach(el => el.innerText = 'Form Edit Data');
         document.querySelectorAll('#btnSubmitGen').forEach(el => el.innerText = 'Update Data');
         
-        // ZETTBOT FIX: Update Parsing Edit Form Margin (Load Nominal Awal)
         if (currentConfig.sheet === 'Pengaturan_Margin') {
              let isNewFormat = (rowData[1] === 'Range Nominal' || rowData[1] === 'Persentase');
              
@@ -562,9 +561,8 @@ async function editDataGen(displayIndex) {
 
                  if (tipe === 'Persentase') {
                      let eMin = document.getElementById('min_nom');
-                     // Backward Compatibility check
                      if (p1.includes('%')) {
-                         eMin.value = '0'; // Default jika data lama (tanpa nominal awal)
+                         eMin.value = '0'; 
                          document.getElementById('persentase_val').value = p1.replace('%', '');
                      } else {
                          eMin.value = p1.replace(/Rp /g, '').replace(/\./g, '');
@@ -640,7 +638,14 @@ function delKonter(idx) {
             Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try { 
                 var safeIdx = parseInt(idx, 10);
-                await gasRun('deleteData', 'DB_konter', safeIdx); 
+                
+                // ZETTBOT FIX: Mengambil ID Unik untuk dikirim ke Firebase
+                var itemId = null;
+                if (window.BGL2_CACHE['DB_konter'] && window.BGL2_CACHE['DB_konter'][safeIdx]) {
+                    itemId = window.BGL2_CACHE['DB_konter'][safeIdx][0];
+                }
+                
+                await gasRun('deleteData', 'DB_konter', safeIdx, itemId); 
                 await refreshActiveData(true); 
                 Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
             } catch(err) { Swal.fire('Error', String(err), 'error'); }
@@ -655,7 +660,14 @@ function delGen(idx, sheetKey) {
             try { 
                 var safeIdx = parseInt(idx, 10);
                 var actualSheet = (currentConfig && currentConfig.sheet) ? currentConfig.sheet : (pageConfigs[sheetKey] ? pageConfigs[sheetKey].sheet : sheetKey);
-                await gasRun('deleteData', actualSheet, safeIdx); 
+                
+                // ZETTBOT FIX: Mengambil ID Unik untuk dikirim ke Firebase
+                var itemId = null;
+                if (window.BGL2_CACHE[actualSheet] && window.BGL2_CACHE[actualSheet][safeIdx]) {
+                    itemId = window.BGL2_CACHE[actualSheet][safeIdx][0];
+                }
+                
+                await gasRun('deleteData', actualSheet, safeIdx, itemId); 
                 window.BGL2_DROPDOWN_CACHE = null; 
                 localStorage.removeItem('bgl2_dropdown_cache'); 
                 await refreshActiveData(true); 
@@ -675,7 +687,6 @@ async function handleFormSubmit(e, formEl) {
     
     var arr = [];
 
-    // ZETTBOT FIX: Update Parsing Form Margin (Menyimpan Nominal Awal pada Persentase)
     if (currentConfig.sheet === 'Pengaturan_Margin') {
         let tipe = document.getElementById('tipe_margin').value;
         let id = document.getElementById('id_margin').value;
@@ -741,6 +752,7 @@ async function handleFormSubmit(e, formEl) {
         if(currentIndex === -1) {
             await gasRun('saveData', currentConfig.sheet, arr);
         } else {
+            // ZETTBOT FIX: UpdateData secara otomatis mengirimkan Array di mana arr[0] adalah ID Unik
             await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
         }
         window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache');
