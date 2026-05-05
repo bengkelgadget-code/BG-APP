@@ -13,48 +13,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f1f5f9; margin: 0; padding: 0; overflow: hidden; height: 100vh; }
-        .dropdown-content { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out; }
-        .menu-container:hover .dropdown-content { max-height: 500px; opacity: 1; }
-        .chevron-icon { transition: transform 0.3s ease; }
-        .menu-container:hover .chevron-icon { transform: rotate(180deg); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        #mainContainer { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .main-active-modal { transform: scale(0.97) translateY(10px); opacity: 0.4; filter: blur(2px); pointer-events: none; }
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type="number"] { -moz-appearance: textfield; }
-        
-        .select2-container--default .select2-selection--single { height: 42px !important; border-color: #cbd5e1 !important; border-radius: 0.5rem !important; display: flex !important; align-items: center !important; padding: 0 0.75rem !important; background-color: #ffffff !important; }
-        .select2-container--default .select2-selection--single .select2-selection__rendered { color: #1e293b !important; font-size: 0.875rem !important; line-height: 1.25rem !important; padding-left: 0 !important; }
-        .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; right: 10px !important; }
-        
-        /* ZETTBOT FIX: Styling Select Multiple yang Super Rapi dan Modern */
-        .select2-container--default .select2-selection--multiple { border-color: #cbd5e1 !important; border-radius: 0.5rem !important; min-height: 42px !important; padding: 4px 8px !important; background-color: #ffffff !important; display: flex !important; align-items: center !important; }
-        .select2-container--default.select2-container--focus .select2-selection--multiple { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
-        .select2-container--default .select2-selection--multiple .select2-selection__rendered { display: flex !important; flex-wrap: wrap !important; width: 100% !important; margin: 0 !important; padding: 0 !important; align-items: center !important; gap: 6px !important; }
-        .select2-container--default .select2-search--inline .select2-search__field { margin-top: 0 !important; font-family: inherit !important; font-size: 0.875rem !important; color: #475569 !important; line-height: 1.5 !important; }
-        
-        .select2-container--default .select2-selection--multiple .select2-selection__choice { background-color: #f8fafc !important; border: 1px solid #cbd5e1 !important; border-radius: 9999px !important; padding: 4px 8px 4px 12px !important; margin: 0 !important; font-size: 0.75rem !important; font-weight: 700 !important; color: #334155 !important; display: flex !important; flex-direction: row-reverse !important; align-items: center !important; gap: 8px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: #ffffff !important; background-color: #ef4444 !important; border: none !important; border-radius: 50% !important; width: 18px !important; height: 18px !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: bold !important; font-size: 13px !important; line-height: 1 !important; padding: 0 !important; margin: 0 !important; cursor: pointer !important; transition: all 0.2s ease !important; position: relative !important; }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #dc2626 !important; transform: scale(1.1); }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__display { padding: 0 !important; margin: 0 !important; }
-        
-        .select2-search__field { border-radius: 0.25rem !important; border-color: #cbd5e1 !important; font-size: 0.875rem !important; padding: 0.5rem !important; outline: none !important; color: #1e293b !important; }
-        .select2-search__field:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
-        .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable { background-color: #eff6ff !important; color: #1d4ed8 !important; }
-        .select2-results__option { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; color: #1e293b !important; }
-        .select2-dropdown { background-color: #ffffff !important; border-color: #cbd5e1 !important; }
-        .select2-container--open { z-index: 99999 !important; }
-    </style>
+    <!-- Memanggil Modular CSS -->
+    <?!= include('styles'); ?>
 </head>
 
-<body style="background-color: #0f172a; display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
+<body style="display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
 
     <div id="bootScreen" style="position:fixed; inset:0; z-index:99999; background:#0f172a; display:flex; flex-direction:column; justify-content:center; align-items:center; transition: opacity 0.3s ease;">
         <i class="fa-solid fa-microchip fa-spin text-5xl text-[#39ff14] mb-4"></i>
@@ -89,114 +52,128 @@
         </div>
     </div>
 
-    <div id="dashboardView" class="hidden w-full h-full text-slate-800 bg-slate-50 relative flex overflow-hidden">
+    <div id="dashboardView" class="hidden w-full h-full text-slate-800 bg-slate-100 relative flex overflow-hidden md:p-3 md:gap-3">
         
         <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden" onclick="toggleSidebar()"></div>
-        <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 w-64 bg-slate-900 text-white flex flex-col h-full shadow-2xl z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0">
-            <div class="p-5 flex items-center justify-center border-b border-slate-800 relative bg-slate-900/80">
-                <i class="fa-solid fa-microchip text-2xl text-[#39ff14] mr-3"></i>
-                <h1 class="text-xl font-black tracking-wider">BGL2<span class="text-[#ffff00]">SYS</span></h1>
-                <button onclick="toggleSidebar()" class="md:hidden absolute right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+        
+        <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 w-[240px] bg-slate-900 text-slate-300 flex flex-col h-full md:rounded-2xl shadow-xl z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 border-r md:border border-slate-800/80">
+            
+            <div class="px-5 py-5 flex items-center justify-center shrink-0 border-b border-slate-800/80">
+                <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-[#39ff14] to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 mr-2.5">
+                    <i class="fa-solid fa-microchip text-slate-900 text-sm"></i>
+                </div>
+                <h1 class="text-lg font-black tracking-wider text-white">BGL2<span class="text-[#39ff14]">SYS</span></h1>
+                <button onclick="toggleSidebar()" class="md:hidden absolute right-4 top-5 text-slate-400 hover:text-white transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
-            <div class="px-5 py-2.5 bg-slate-800 border-b border-slate-700/50 shadow-inner flex flex-col items-center justify-center">
-                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Halaman Aktif</span>
-                <span id="sidebarPageTitle" class="text-sm font-black text-[#39ff14] text-center uppercase tracking-wide">Konter HP</span>
-            </div>
-            
-            <nav class="flex-1 overflow-y-auto py-2 custom-scrollbar">
-                <ul class="space-y-0.5">
-                    <li class="menu-container">
-                        <button class="w-full block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors focus:outline-none group">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><i class="fa-solid fa-cash-register w-6 text-blue-400"></i> <span class="text-sm font-semibold">Transaksi</span></div>
-                                <i class="fa-solid fa-chevron-down text-[10px] mr-2 chevron-icon"></i>
-                            </div>
-                        </button>
-                        <ul class="dropdown-content bg-slate-800/30 text-xs font-medium">
-                            <li><a href="#" onclick="switchPage('Konter', 'Konter HP')" class="block px-12 py-2.5 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors border-l-2 border-transparent hover:border-blue-400">Konter HP</a></li>
-                        </ul>
-                    </li>
+            <nav class="flex-1 overflow-y-auto py-3 custom-scrollbar px-3 space-y-1">
+                
+                <div class="pb-1 px-4">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Transaksi</p>
+                </div>
 
-                    <li class="mt-4 mb-1 px-6 text-[10px] font-black text-slate-600 uppercase tracking-widest">Master Data</li>
-                    <li>
-                        <a href="#" onclick="switchPage('Users', 'Data User')" class="block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors border-l-4 border-transparent hover:border-emerald-400">
-                            <div class="flex items-center"><i class="fa-solid fa-users w-5 text-emerald-400"></i> <span class="text-sm font-semibold">Data User</span></div>
-                        </a>
-                    </li>
-                    
-                    <li class="menu-container">
-                        <button class="w-full block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors focus:outline-none group border-l-4 border-transparent hover:border-orange-400">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><i class="fa-solid fa-money-bill-transfer w-5 text-orange-400"></i> <span class="text-sm font-semibold">Mini ATM</span></div>
-                                <i class="fa-solid fa-chevron-down text-[10px] mr-2 chevron-icon"></i>
-                            </div>
-                        </button>
-                        <ul class="dropdown-content bg-slate-800/30 text-xs font-medium">
-                            <li><a href="#" onclick="switchPage('Bank', 'Input Nama Bank')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">BANK</a></li>
-                            <li><a href="#" onclick="switchPage('E_Wallet', 'Input E-Wallet')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">E-Wallet</a></li>
-                            <li><a href="#" onclick="switchPage('PPOB', 'Input PPOB')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">PPOB</a></li>
-                        </ul>
-                    </li>
+                <li class="list-none">
+                    <a href="#" onclick="switchPage('Konter', 'Transaksi Konter')" class="w-full flex items-center px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mr-3 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-cash-register text-xs"></i></div>
+                        <span class="text-xs font-bold tracking-wide">Transaksi Konter</span>
+                    </a>
+                </li>
+                
+                <li class="list-none">
+                    <a href="#" onclick="switchPage('Service', 'Service HP')" class="w-full flex items-center px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mr-3 group-hover:bg-purple-500 group-hover:text-white transition-colors"><i class="fa-solid fa-screwdriver-wrench text-xs"></i></div>
+                        <span class="text-xs font-bold tracking-wide">Service HP</span>
+                    </a>
+                </li>
 
-                    <li class="menu-container">
-                        <button class="w-full block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors focus:outline-none group border-l-4 border-transparent hover:border-[#ffff00]">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><i class="fa-solid fa-store w-5 text-[#ffff00]"></i> <span class="text-sm font-semibold">Data Konter</span></div>
-                                <i class="fa-solid fa-chevron-down text-[10px] mr-2 chevron-icon"></i>
-                            </div>
-                        </button>
-                        <ul class="dropdown-content bg-slate-800/30 text-xs font-medium">
-                            <li><a href="#" onclick="switchPage('Voucher', 'Input Voucher')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">VOUCHER</a></li>
-                            <li><a href="#" onclick="switchPage('Perdana', 'Input Perdana')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">PERDANA</a></li>
-                            <li><a href="#" onclick="switchPage('ACC', 'Input ACC')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">ACC</a></li>
-                            <li><a href="#" onclick="switchPage('Pulsa', 'Input Pulsa')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">PULSA</a></li>
-                            <li><a href="#" onclick="switchPage('Game', 'Input Game')" class="block px-12 py-2 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">GAME</a></li>
-                        </ul>
-                    </li>
+                <div class="pt-3 pb-1 px-4">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Master Data</p>
+                </div>
 
-                    <li class="mt-4 mb-1 px-6 text-[10px] font-black text-slate-600 uppercase tracking-widest">Pengaturan</li>
-                    <li>
-                        <a href="#" onclick="switchPage('Umum', 'Pengaturan Umum')" class="block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors border-l-4 border-transparent hover:border-teal-400">
-                            <div class="flex items-center"><i class="fa-solid fa-sliders w-5 text-teal-400"></i> <span class="text-sm font-semibold">Umum</span></div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onclick="switchPage('Margin', 'Pengaturan Margin')" class="block px-6 py-3 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors border-l-4 border-transparent hover:border-indigo-400">
-                            <div class="flex items-center"><i class="fa-solid fa-percent w-5 text-indigo-400"></i> <span class="text-sm font-semibold">Margin</span></div>
-                        </a>
-                    </li>
-                </ul>
+                <li class="list-none">
+                    <a href="#" onclick="switchPage('Users', 'Data User')" class="w-full flex items-center px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center mr-3 group-hover:bg-emerald-500 group-hover:text-white transition-colors"><i class="fa-solid fa-users text-xs"></i></div>
+                        <span class="text-xs font-bold tracking-wide">Data User</span>
+                    </a>
+                </li>
+                
+                <li class="menu-container list-none">
+                    <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all focus:outline-none group">
+                        <div class="flex items-center">
+                            <div class="w-7 h-7 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center mr-3 group-hover:bg-orange-500 group-hover:text-white transition-colors"><i class="fa-solid fa-money-bill-transfer text-xs"></i></div>
+                            <span class="text-xs font-bold tracking-wide">Mini ATM</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-500 group-hover:text-slate-300 chevron-icon"></i>
+                    </button>
+                    <ul class="dropdown-content mt-1 space-y-1">
+                        <li><a href="#" onclick="switchPage('Bank', 'Input Nama Bank')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-2 opacity-70"></span> BANK</a></li>
+                        <li><a href="#" onclick="switchPage('E_Wallet', 'Input E-Wallet')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-2 opacity-70"></span> E-Wallet</a></li>
+                        <li><a href="#" onclick="switchPage('PPOB', 'Input PPOB')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-2 opacity-70"></span> PPOB</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-container list-none">
+                    <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all focus:outline-none group">
+                        <div class="flex items-center">
+                            <div class="w-7 h-7 rounded-lg bg-[#ffff00]/10 text-[#ffff00] flex items-center justify-center mr-3 group-hover:bg-[#ffff00] group-hover:text-slate-900 transition-colors"><i class="fa-solid fa-store text-xs"></i></div>
+                            <span class="text-xs font-bold tracking-wide">Data Konter</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-500 group-hover:text-slate-300 chevron-icon"></i>
+                    </button>
+                    <ul class="dropdown-content mt-1 space-y-1">
+                        <li><a href="#" onclick="switchPage('Voucher', 'Input Voucher')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> VOUCHER</a></li>
+                        <li><a href="#" onclick="switchPage('Perdana', 'Input Perdana')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> PERDANA</a></li>
+                        <li><a href="#" onclick="switchPage('ACC', 'Input ACC')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> ACC</a></li>
+                        <li><a href="#" onclick="switchPage('Pulsa', 'Input Pulsa')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> PULSA</a></li>
+                        <li><a href="#" onclick="switchPage('Game', 'Input Game')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> GAME</a></li>
+                    </ul>
+                </li>
+
+                <div class="pt-3 pb-1 px-4">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Pengaturan</p>
+                </div>
+                
+                <li class="list-none">
+                    <a href="#" onclick="switchPage('Umum', 'Pengaturan Umum')" class="w-full flex items-center px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center mr-3 group-hover:bg-teal-500 group-hover:text-white transition-colors"><i class="fa-solid fa-sliders text-xs"></i></div>
+                        <span class="text-xs font-bold tracking-wide">Umum</span>
+                    </a>
+                </li>
+                <li class="list-none">
+                    <a href="#" onclick="switchPage('Margin', 'Pengaturan Margin')" class="w-full flex items-center px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center mr-3 group-hover:bg-indigo-500 group-hover:text-white transition-colors"><i class="fa-solid fa-percent text-xs"></i></div>
+                        <span class="text-xs font-bold tracking-wide">Margin</span>
+                    </a>
+                </li>
             </nav>
             
-            <div class="p-4 border-t border-slate-800 bg-slate-900/90 shrink-0">
-                <div class="flex items-center space-x-3 mb-3 bg-slate-800/50 p-2 rounded-xl border border-slate-700/50">
-                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-[#39ff14] flex items-center justify-center text-slate-900 font-bold shadow-lg text-sm shrink-0">
-                        <span id="avatarLabel">AD</span>
+            <div class="p-3 shrink-0 border-t border-slate-800/80">
+                <div class="bg-slate-800/40 rounded-xl p-2 flex items-center justify-between border border-slate-700/30">
+                    <div class="flex items-center space-x-2.5 overflow-hidden">
+                        <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-[#39ff14] flex items-center justify-center text-slate-900 font-bold shadow-md text-xs shrink-0 relative overflow-hidden">
+                            <span id="avatarLabel" class="relative z-10">AD</span>
+                            <div class="absolute inset-0 bg-white/20"></div>
+                        </div>
+                        <div class="overflow-hidden flex-1">
+                            <p class="text-xs font-black text-white truncate tracking-wide leading-tight" id="roleLabel">Admin</p>
+                            <p class="text-[9px] text-slate-400 truncate font-medium">Bengkel L2</p>
+                        </div>
                     </div>
-                    <div class="overflow-hidden">
-                        <p class="text-sm font-black text-white truncate tracking-wide" id="roleLabel">Admin</p>
-                        <p class="text-[10px] text-blue-300 truncate font-semibold">Bengkel Gadget L2</p>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    <button onclick="logout()" class="w-full bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white py-2.5 rounded-xl border border-slate-700 hover:border-red-500 transition-all text-[11px] font-bold flex items-center justify-center group shadow-md relative overflow-hidden">
-                        <div class="absolute inset-0 bg-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <i class="fa-solid fa-power-off text-base mr-2 group-hover:scale-110 transition-transform relative z-10"></i> 
-                        <span class="relative z-10 uppercase tracking-widest">Logout</span>
+                    <button onclick="logout()" class="h-8 w-8 bg-slate-900/50 hover:bg-red-500 text-slate-400 hover:text-white rounded-lg border border-transparent transition-all flex items-center justify-center shadow-sm shrink-0" title="Logout">
+                        <i class="fa-solid fa-power-off text-xs"></i> 
                     </button>
                 </div>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full relative overflow-hidden w-full bg-slate-50">
+        <main class="flex-1 flex flex-col h-full relative overflow-hidden w-full bg-transparent">
             
             <div class="md:hidden bg-white shadow-sm border-b border-slate-200 px-4 py-3 flex justify-between items-center shrink-0 z-20">
                 <h2 class="font-black text-slate-800 text-lg uppercase tracking-wide text-blue-600" id="mobilePageTitle">Konter HP</h2>
                 <button onclick="toggleSidebar()" class="text-slate-600 hover:text-blue-600 text-2xl transition-colors"><i class="fa-solid fa-bars"></i></button>
             </div>
 
-            <div class="flex-1 flex flex-col h-full overflow-hidden p-2 sm:p-4 relative" id="mainContainer">
+            <div class="flex-1 flex flex-col h-full overflow-hidden p-2 sm:p-0 relative" id="mainContainer">
 
                 <div id="miniDashboardKonterContainer" class="hidden flex-col mb-2 sm:mb-4 fade-in shrink-0">
                     <div class="flex justify-between items-center mb-1.5 px-1">
@@ -234,10 +211,13 @@
                     </div>
                 </div>
 
-                <div id="mainTableWrapper" class="bg-white rounded-xl shadow-md border border-slate-200 flex flex-col flex-1 min-h-0 relative">
+                <div id="mainTableWrapper" class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col flex-1 min-h-0 relative">
                     
-                    <div class="p-2 sm:p-3 border-b border-slate-100 flex flex-wrap justify-between items-center gap-2 shrink-0 bg-slate-50/50 rounded-t-xl">
-                        <h3 class="font-bold text-slate-700 text-sm hidden sm:block"><i class="fa-solid fa-database mr-1 text-slate-400"></i> Data Tersimpan</h3>
+                    <div class="p-3 sm:p-4 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3 shrink-0 bg-slate-50/50 rounded-t-xl">
+                        <h3 class="font-black text-slate-800 text-sm hidden sm:flex items-center uppercase tracking-widest">
+                            <i class="fa-solid fa-folder-open mr-2 text-blue-500"></i> 
+                            <span id="sidebarPageTitle">Konter HP</span>
+                        </h3>
                         
                         <div class="flex items-center space-x-1.5 w-full sm:w-auto justify-end flex-1 sm:flex-none">
                             <button id="btnOpenPaste" onclick="openSmartPasteModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-3 rounded-lg shadow-sm flex items-center transition-colors text-xs shrink-0 border border-emerald-700 mr-2">
@@ -486,1236 +466,10 @@
         </div>
     </div>
 
-    <script>
-        // ==============================================================================
-        // ZETTBOT: MESIN PENGGERAK API GITHUB PAGES
-        // ==============================================================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
-
-        function gasRun(funcName, ...args) {
-            return new Promise(async function(resolve, reject) {
-                if (typeof google !== 'undefined' && google.script && google.script.run) {
-                    google.script.run
-                        .withSuccessHandler(resolve)
-                        .withFailureHandler(reject)
-                        [funcName](...args);
-                } else {
-                    try {
-                        const response = await fetch(API_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                            body: JSON.stringify({ action: funcName, args: args })
-                        });
-                        
-                        const res = await response.json();
-                        if(res.status === 'success') {
-                            resolve(res.data);
-                        } else {
-                            reject(new Error(res.message));
-                        }
-                    } catch(err) {
-                        console.error("API Error:", err);
-                        reject(new Error("Koneksi ke server API terputus atau URL tidak valid."));
-                    }
-                }
-            });
-        }
-
-        var window = window || {};
-        window.BGL2_CACHE = window.BGL2_CACHE || {}; 
-        window.BGL2_DROPDOWN_CACHE = window.BGL2_DROPDOWN_CACHE || null; 
-        
-        try {
-            var savedDrop = localStorage.getItem('bgl2_dropdown_cache');
-            if (savedDrop) window.BGL2_DROPDOWN_CACHE = JSON.parse(savedDrop);
-        } catch(e) {}
-        
-        var isSidebarOpen = false;
-        var isKonterMode = true; 
-        var activeRole = '';
-        var currentSheet = 'Konter';
-        var currentTableData = [];
-        var currentConfig = {};
-        var editIndex = -1; 
-        
-        var pageConfigs = {
-            'Users': { sheet: 'Users', headers: ['Username', 'Password', 'Kategori', 'Updated At', 'Aksi'], fields: [{ id: 'username', label: 'Username', type: 'text', required: true }, { id: 'password', label: 'Password', type: 'password', required: true }, { id: 'kategori', label: 'Kategori', type: 'select', options: ['Admin', 'Kasir'], required: true }] },
-            'Bank': { sheet: 'Bank', prefix: 'BK', headers: ['ID Bank', 'Nama Bank', 'Updated At', 'Aksi'], idType: 'bank', fields: [{ id: 'id_bank', label: 'ID Bank', type: 'text', disabled: true }, { id: 'nama_bank', label: 'Nama Bank', type: 'text', required: true }] },
-            'Provider': { sheet: 'Provider', prefix: 'PR', headers: ['ID Provider', 'Nama Provider', 'Updated At', 'Aksi'], idType: 'provider', fields: [{ id: 'id_provider', label: 'ID Provider', type: 'text', disabled: true }, { id: 'nama_provider', label: 'Nama Provider', type: 'text', required: true }] },
-            'Voucher': { sheet: 'Voucher', prefix: 'VC', headers: ['ID Voucher', 'Provider', 'Nama Voucher', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'voucher', fields: [{ id: 'id_voucher', label: 'ID Voucher', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_voucher', label: 'Nama Voucher', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
-            'Perdana': { sheet: 'Perdana', prefix: 'PD', headers: ['ID Perdana', 'Provider', 'Nama Perdana', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'perdana', fields: [{ id: 'id_perdana', label: 'ID Perdana', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_perdana', label: 'Nama Perdana', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
-            'E_Wallet': { sheet: 'E_Wallet', prefix: 'EW', headers: ['ID E-Wallet', 'Nama E-Wallet', 'Updated At', 'Aksi'], idType: 'ewallet', fields: [{ id: 'id_ewallet', label: 'ID E-Wallet', type: 'text', disabled: true }, { id: 'nama_ewallet', label: 'Nama E-Wallet', type: 'text', required: true }] },
-            'PPOB': { sheet: 'PPOB', prefix: 'PP', headers: ['ID PPOB', 'Nama PPOB', 'Updated At', 'Aksi'], idType: 'ppob', fields: [{ id: 'id_ppob', label: 'ID PPOB', type: 'text', disabled: true }, { id: 'nama_ppob', label: 'Nama PPOB', type: 'text', required: true }] },
-            'ACC': { sheet: 'ACC', prefix: 'AC', headers: ['ID ACC', 'Kategori', 'Nama ACC', 'Harga Beli', 'Harga Jual', 'Stok', 'Updated At', 'Aksi'], idType: 'acc', fields: [{ id: 'id_acc', label: 'ID ACC', type: 'text', disabled: true }, { id: 'kategori', label: 'Kategori', type: 'select_dynamic_add', source: 'kategoriAccData', required: true }, { id: 'nama_acc', label: 'Nama ACC', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }, { id: 'stok', label: 'Stok Barang', type: 'number', required: true }] },
-            'Pulsa': { sheet: 'Pulsa', prefix: 'PL', headers: ['ID Pulsa', 'Provider', 'Nominal / Nama', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'pulsa', fields: [{ id: 'id_pulsa', label: 'ID Pulsa', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_pulsa', label: 'Nominal / Nama', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
-            'Game': { sheet: 'Game', prefix: 'GM', headers: ['ID Game', 'Nama Game', 'Item / Nominal', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'game', fields: [{ id: 'id_game', label: 'ID Game', type: 'text', disabled: true }, { id: 'kategori_game', label: 'Nama Game', type: 'select_dynamic_add', source: 'kategoriGameData', required: true }, { id: 'nama_item', label: 'Item / Nominal', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
-            'Umum': { sheet: 'Pengaturan_Umum', prefix: 'PU' },
-            'Margin': { sheet: 'Pengaturan_Margin', prefix: 'PM', headers: ['ID', 'Layanan Terkait', 'Nominal Awal', 'Nominal Akhir', 'Margin', 'Aksi'], fields: [{ id: 'id_margin', label: 'ID Margin', type: 'text', disabled: true }, { id: 'layanan_margin', label: 'Layanan Terkait', type: 'select_multiple', options: ['TRANSFER', 'JASA TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'VOUCHER', 'PERDANA', 'PULSA', 'KUOTA INTERNET', 'ACC', 'GAME'], required: true }, { id: 'min_nom', label: 'Nominal Awal (>=)', type: 'rupiah', required: true }, { id: 'max_nom', label: 'Nominal Akhir (<) (Boleh kosong)', type: 'rupiah', required: false }, { id: 'val_margin', label: 'Margin / Keuntungan (IDR)', type: 'rupiah', required: true }] }
-        };
-
-        const getEl = (id) => {
-            const els = document.querySelectorAll('#' + id);
-            return els.length > 0 ? els[els.length - 1] : null;
-        };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            activeRole = 'Admin'; 
-            document.getElementById('loginView').classList.add('hidden');
-            document.getElementById('dashboardView').classList.remove('hidden');
-            document.getElementById('dashboardView').classList.add('flex');
-            
-            var loader = document.getElementById('bootScreen');
-            if(loader) { 
-                loader.style.opacity = '0'; 
-                setTimeout(function() { loader.style.display = 'none'; }, 300); 
-            }
-
-            try {
-                if(window.jQuery) {
-                    $('#kntJenis').select2({ width: '100%' });
-                    $(document).on('select2:select', '#kntJenis', function (e) { kntJenisChange(); });
-                    $(document).on('select2:select', '#kntDetailSelect', function (e) { kntDetailChange(); });
-                }
-            } catch(e) { console.error("Select2 Error:", e); }
-
-            switchPage('Konter', 'Konter HP');
-        });
-
-        function calculateDynamicMargin(layananName, nominal) {
-            var marginData = window.BGL2_CACHE['Pengaturan_Margin'] || [];
-            for (var i = 0; i < marginData.length; i++) {
-                var row = marginData[i];
-                if (!row || row[0] === "") continue;
-                
-                var layanans = (row[1] || '').split(',').map(s => s.trim().toUpperCase());
-                if (layanans.includes(layananName.toUpperCase())) {
-                    var minNom = parseInt(String(row[2]).replace(/[^0-9]/g, '')) || 0;
-                    var maxNomStr = String(row[3]).replace(/[^0-9]/g, '');
-                    var maxNom = maxNomStr ? parseInt(maxNomStr) : Infinity; 
-                    
-                    if (nominal >= minNom && nominal < maxNom) {
-                        return parseInt(String(row[4]).replace(/[^0-9]/g, '')) || 0;
-                    }
-                }
-            }
-            return null; 
-        }
-
-        function renderMiniDashboard() {
-            var dash = document.getElementById('miniDashboardKonterContainer');
-            if (!dash) return;
-
-            if (activeRole !== 'Admin' || !isKonterMode) {
-                dash.classList.add('hidden'); dash.classList.remove('flex');
-                return;
-            }
-
-            dash.classList.remove('hidden'); dash.classList.add('flex');
-
-            var filterVal = document.getElementById('dashFilterPeriode') ? document.getElementById('dashFilterPeriode').value : 'harian';
-            var data = window.BGL2_CACHE['DB_konter'] || [];
-            
-            var todayStr = new Date().toLocaleDateString('id-ID'); 
-            var parts = todayStr.replace(/(^|\/)(0+)/g, '$1').trim().split('/');
-            var currentDay = parseInt(parts[0]);
-            var currentMonth = parseInt(parts[1]);
-            var currentYear = parseInt(parts[2]);
-
-            var totalTrx = 0; var totalProfit = 0;
-
-            for (var i = 0; i < data.length; i++) {
-                if (data[i] && Array.isArray(data[i]) && data[i].length > 6) {
-                    var rowDateStr = String(data[i][1]).replace(/(^|\/)(0+)/g, '$1').trim(); 
-                    if(!rowDateStr) continue;
-                    
-                    var rParts = rowDateStr.split('/');
-                    if(rParts.length < 3) continue;
-                    var rDay = parseInt(rParts[0]);
-                    var rMonth = parseInt(rParts[1]);
-                    var rYear = parseInt(rParts[2]);
-
-                    var match = false;
-                    if (filterVal === 'harian') { if (rDay === currentDay && rMonth === currentMonth && rYear === currentYear) match = true; } 
-                    else if (filterVal === 'bulanan') { if (rMonth === currentMonth && rYear === currentYear) match = true; }
-
-                    if (match) {
-                        totalTrx++;
-                        var profitStr = String(data[i][6]).replace(/[^0-9,-]/g, ''); 
-                        var profitNum = parseInt(profitStr) || 0;
-                        totalProfit += profitNum;
-                    }
-                }
-            }
-
-            document.getElementById('dashTotalTrx').innerText = totalTrx;
-            document.getElementById('dashTotalProfit').innerText = "Rp " + totalProfit.toLocaleString('id-ID');
-            
-            var lblPeriode = filterVal === 'harian' ? 'Hari Ini' : 'Bulan Ini';
-            var elTrx = document.getElementById('dashLabelTrx');
-            var elProf = document.getElementById('dashLabelProfit');
-            if(elTrx) elTrx.innerText = 'Trx ' + lblPeriode;
-            if(elProf) elProf.innerText = 'Profit ' + lblPeriode;
-        }
-
-        function filterTable() {
-            var input = document.getElementById("searchInput");
-            if(!input) return;
-            var filter = input.value.toLowerCase();
-            var tbody = document.getElementById("dataTableBody");
-            if(!tbody) return;
-            var trs = tbody.getElementsByTagName("tr");
-
-            for (var i = 0; i < trs.length; i++) {
-                if (trs[i].getElementsByTagName("td")[0] && trs[i].getElementsByTagName("td")[0].colSpan > 1) continue; 
-                var tds = trs[i].getElementsByTagName("td");
-                var showRow = false;
-                for (var j = 0; j < tds.length; j++) {
-                    if (tds[j]) {
-                        if (tds[j].innerText.toLowerCase().indexOf(filter) > -1) { showRow = true; break; }
-                    }
-                }
-                trs[i].style.display = showRow ? "" : "none";
-            }
-        }
-
-        async function refreshActiveData(showIconLoader = false) {
-            var icon = document.getElementById('refreshIcon');
-            if(icon && showIconLoader) icon.classList.add('fa-spin');
-            
-            try {
-                if(!currentConfig) currentConfig = {}; 
-                var activeSheet = isKonterMode ? 'DB_konter' : currentConfig.sheet;
-                
-                if (activeSheet) {
-                    let singleData = await gasRun('getData', activeSheet);
-                    window.BGL2_CACHE[activeSheet] = Array.isArray(singleData) ? singleData : [];
-                }
-
-                if (!window.BGL2_CACHE['Pengaturan_Margin'] && currentSheet !== 'Margin') {
-                    window.BGL2_CACHE['Pengaturan_Margin'] = await gasRun('getData', 'Pengaturan_Margin') || [];
-                }
-                
-                var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig.headers || []);
-                           
-                if (isKonterMode) {
-                    renderKonterTable(window.BGL2_CACHE['DB_konter'], hdrs.length);
-                    renderMiniDashboard();
-                }
-                else if (currentSheet === 'Umum') {
-                    populateUmumSettings(window.BGL2_CACHE['Pengaturan_Umum'] || []);
-                }
-                else if (activeSheet) {
-                    renderGenericTable(window.BGL2_CACHE[activeSheet], hdrs.length);
-                }
-                
-                filterTable();
-            } catch(err) {
-                console.error("Refresh failed", err);
-                var tbody = document.getElementById('dataTableBody');
-                if(tbody) tbody.innerHTML = '<tr><td colspan="10" class="p-8 text-center text-red-500 font-medium">Gagal memuat data: ' + (err.message || "Timeout Server") + '. Silakan refresh.</td></tr>';
-            } finally {
-                if (icon) icon.classList.remove('fa-spin');
-            }
-        }
-
-        function handleLogin(e) { e.preventDefault(); }
-        function logout() { sessionStorage.removeItem('bgl2_session'); location.reload(); }
-        function toggleSidebar() {
-            isSidebarOpen = !isSidebarOpen;
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebarOverlay').classList.toggle('opacity-0');
-            document.getElementById('sidebarOverlay').classList.toggle('pointer-events-none');
-        }
-
-        function switchPage(key, title) {
-            try {
-                currentSheet = key;
-                isKonterMode = (key === 'Konter');
-                if (!isKonterMode) currentConfig = pageConfigs[key];
-                else currentConfig = {};
-
-                if(title) {
-                    var spTitle = document.getElementById('sidebarPageTitle');
-                    var mpTitle = document.getElementById('mobilePageTitle');
-                    if(spTitle) spTitle.innerText = title;
-                    if(mpTitle) mpTitle.innerText = title;
-                }
-                
-                var searchInput = document.getElementById('searchInput');
-                if(searchInput) searchInput.value = '';
-                
-                var btnPaste = document.getElementById('btnOpenPaste');
-                if (btnPaste) {
-                    if (['Pulsa', 'Game'].includes(key)) {
-                        btnPaste.classList.remove('hidden');
-                    } else {
-                        btnPaste.classList.add('hidden');
-                    }
-                }
-
-                closeGenericModal();
-                closeKonterModal();
-                
-                var tableWrapper = document.getElementById('mainTableWrapper');
-                var umumSettings = document.getElementById('umumSettingsContainer');
-                var dash = document.getElementById('miniDashboardKonterContainer');
-
-                if (key === 'Umum') {
-                    if(tableWrapper) { tableWrapper.classList.add('hidden'); tableWrapper.classList.remove('flex'); }
-                    if(umumSettings) { umumSettings.classList.remove('hidden'); umumSettings.classList.add('flex'); }
-                    if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
-                } else if(isKonterMode) {
-                    if(tableWrapper) { tableWrapper.classList.remove('hidden'); tableWrapper.classList.add('flex'); }
-                    if(umumSettings) { umumSettings.classList.add('hidden'); umumSettings.classList.remove('flex'); }
-                    if(dash) { dash.classList.remove('hidden'); dash.classList.add('flex'); }
-                } else {
-                    if(tableWrapper) { tableWrapper.classList.remove('hidden'); tableWrapper.classList.add('flex'); }
-                    if(umumSettings) { umumSettings.classList.add('hidden'); umumSettings.classList.remove('flex'); }
-                    if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
-                }
-                
-                loadTableData(false); 
-                
-                if(window.innerWidth < 768 && isSidebarOpen) toggleSidebar();
-            } catch(e) { console.error(e); }
-        }
-
-        function loadTableData(forceRefresh = false) {
-            try {
-                var tableContainer = document.getElementById('dataTableContainer');
-                var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
-                
-                if (currentSheet === 'Umum') {
-                    if (forceRefresh || !window.BGL2_CACHE[sheet] || window.BGL2_CACHE[sheet].length === 0) {
-                        refreshActiveData(forceRefresh);
-                    } else {
-                        populateUmumSettings(window.BGL2_CACHE[sheet]);
-                    }
-                    return;
-                }
-
-                if(!tableContainer) return;
-                var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers : []);
-                
-                if (!hdrs || hdrs.length === 0) {
-                    tableContainer.innerHTML = '<table class="w-full"><tr><td class="p-8 text-center text-slate-500 italic">Silakan pilih menu.</td></tr></table>';
-                    return;
-                }
-
-                var html = '<table class="w-full text-left border-collapse whitespace-nowrap" id="dataTable">';
-                html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-sm uppercase tracking-wider">';
-                html += '<tr>';
-                for(var i=0; i<hdrs.length; i++) html += '<th class="py-2.5 px-4 font-bold text-center">' + hdrs[i] + '</th>';
-                html += '</tr></thead><tbody class="text-sm divide-y divide-slate-100" id="dataTableBody"></tbody></table>';
-                
-                tableContainer.innerHTML = html;
-                var tbody = document.getElementById('dataTableBody');
-
-                if (forceRefresh || !window.BGL2_CACHE[sheet] || window.BGL2_CACHE[sheet].length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="'+hdrs.length+'" class="p-8 text-center text-blue-500 font-medium"><i class="fa-solid fa-spinner fa-spin text-2xl mb-2 block"></i><br><span class="text-sm">Memuat Data...</span></td></tr>';
-                    refreshActiveData(forceRefresh);
-                } else {
-                    if (isKonterMode) { renderKonterTable(window.BGL2_CACHE['DB_konter'] || [], hdrs.length); renderMiniDashboard(); }
-                    else renderGenericTable(window.BGL2_CACHE[sheet] || [], hdrs.length);
-                    filterTable();
-                }
-            } catch (e) { console.error("Tabel Error:", e); }
-        }
-
-        async function toggleForm(forceShow) {
-            if (isKonterMode) {
-                var m = getEl('modalKonter');
-                if (forceShow === true || (m && m.classList.contains('opacity-0'))) {
-                    if(editIndex === -1) {
-                        document.querySelectorAll('#kntTanggal').forEach(el => el.value = new Date().toLocaleDateString('id-ID'));
-                        if(window.jQuery) $('select#kntJenis').val('').trigger('change.select2'); 
-                    }
-                    openKonterModal();
-                } else { closeKonterModal(); }
-            } 
-            else {
-                var mGen = getEl('modalGeneric');
-                if (forceShow === true || (mGen && mGen.classList.contains('opacity-0'))) {
-                    
-                    var requireServerData = false;
-                    if (currentConfig && currentConfig.fields) {
-                        requireServerData = currentConfig.fields.some(f => f.type === 'select_dynamic' || f.type === 'select_dynamic_add');
-                    }
-
-                    if (requireServerData && (!window.BGL2_DROPDOWN_CACHE || Object.keys(window.BGL2_DROPDOWN_CACHE).length === 0)) {
-                        Swal.fire({ title: 'Memuat Form...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
-                        try {
-                            var db = await gasRun('getDropdownData');
-                            window.BGL2_DROPDOWN_CACHE = db;
-                            localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
-                            Swal.close();
-                        } catch(e) {
-                            Swal.fire('Error', 'Gagal memuat opsi form: ' + e.message, 'error');
-                            return; 
-                        }
-                    }
-
-                    buildGenHTML(window.BGL2_DROPDOWN_CACHE || {});
-                    if(editIndex === -1) initGenericForm();
-                    openGenericModal();
-                } else { closeGenericModal(); }
-            }
-        }
-
-        function openModal(id) { var m = getEl(id); if(m) m.classList.remove('hidden'); }
-        function closeModal(id) { var m = getEl(id); if(m) m.classList.add('hidden'); }
-
-        function openGenericModal() {
-            document.querySelectorAll('#modalGeneric').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
-            document.querySelectorAll('#modalGenericContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
-            document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
-        }
-
-        function closeGenericModal() {
-            editIndex = -1;
-            document.querySelectorAll('#dynamicForm').forEach(form => form.reset());
-            document.querySelectorAll('#genFormTitle').forEach(title => title.innerText = 'Form Input');
-            document.querySelectorAll('#btnSubmitGen').forEach(btn => btn.innerText = 'Simpan Data');
-            
-            if(window.jQuery) {
-                $('#dynamicForm select').val(null).trigger('change.select2');
-            }
-
-            document.querySelectorAll('#modalGeneric').forEach(m => { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); });
-            document.querySelectorAll('#modalGenericContent').forEach(mc => { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); });
-            document.querySelectorAll('#mainContainer').forEach(main => main.classList.remove('main-active-modal'));
-        }
-
-        async function openSmartPasteModal() {
-            var m = document.getElementById('modalSmartPaste');
-            var mc = document.getElementById('modalSmartPasteContent');
-            
-            var lblProvider = document.getElementById('lblPasteProvider');
-            if (lblProvider) {
-                lblProvider.innerText = currentSheet === 'Game' ? 'Pilih Game' : 'Pilih Provider';
-            }
-
-            var btnAddPaste = document.getElementById('btnPasteAdd');
-            if (btnAddPaste) {
-                btnAddPaste.onclick = currentSheet === 'Game' ? openAddKategoriGameModal : openAddProviderModal;
-                btnAddPaste.title = currentSheet === 'Game' ? 'Tambah Game Baru' : 'Tambah Provider Baru';
-            }
-
-            var sel = document.getElementById('pasteProvider');
-            sel.innerHTML = '<option value="">Memuat...</option>';
-            
-            if (!window.BGL2_DROPDOWN_CACHE || !window.BGL2_DROPDOWN_CACHE.providerData) {
-                Swal.fire({ title: 'Memuat Data...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
-                try {
-                    window.BGL2_DROPDOWN_CACHE = await gasRun('getDropdownData');
-                    localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(window.BGL2_DROPDOWN_CACHE));
-                    Swal.close();
-                } catch(e) {
-                    Swal.fire('Error', 'Gagal memuat data opsi', 'error');
-                    return;
-                }
-            }
-            
-            var provs = [];
-            if (currentSheet === 'Game') {
-                provs = window.BGL2_DROPDOWN_CACHE.kategoriGameData || [];
-            } else {
-                provs = window.BGL2_DROPDOWN_CACHE.providerData || [];
-            }
-
-            var opts = '<option value="">-- ' + (currentSheet === 'Game' ? 'Pilih Game' : 'Pilih Provider') + ' --</option>';
-            provs.forEach(p => opts += `<option value="${p}">${p}</option>`);
-            sel.innerHTML = opts;
-            
-            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
-            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
-        }
-
-        function closeSmartPasteModal() {
-            var m = document.getElementById('modalSmartPaste');
-            var mc = document.getElementById('modalSmartPasteContent');
-            document.getElementById('formSmartPaste').reset();
-            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
-            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
-        }
-
-        function populateUmumSettings(data) {
-            var form = document.getElementById('formPengaturanUmum');
-            if(!form) return;
-            var validData = [];
-            if(data && data.length > 0) {
-                for (var k = data.length - 1; k >= 0; k--) {
-                    if(data[k] && data[k][0] !== "") { validData.push({row: data[k], originalIndex: k}); break; }
-                }
-            }
-            
-            if (validData.length > 0) {
-                var row = validData[0].row;
-                document.getElementById('umumEditIndex').value = validData[0].originalIndex;
-                document.getElementById('umumIdPengaturan').value = row[0] || '';
-                document.getElementById('umumNamaKonter').value = row[1] || '';
-                document.getElementById('umumAlamatKonter').value = row[2] || '';
-                document.getElementById('umumLogoBase64').value = row[3] || '';
-                
-                var preview = document.getElementById('umumLogoPreview');
-                var icon = document.getElementById('umumLogoIcon');
-                if (row[3] && row[3].trim() !== '') {
-                    preview.src = row[3];
-                    preview.classList.remove('hidden');
-                    icon.classList.add('hidden');
-                } else {
-                    preview.src = '';
-                    preview.classList.add('hidden');
-                    icon.classList.remove('hidden');
-                }
-            } else {
-                form.reset();
-                document.getElementById('umumEditIndex').value = '-1';
-                document.getElementById('umumIdPengaturan').value = 'PU-001';
-                document.getElementById('umumLogoBase64').value = '';
-                document.getElementById('umumLogoPreview').classList.add('hidden');
-                document.getElementById('umumLogoIcon').classList.remove('hidden');
-            }
-        }
-
-        function previewUmumLogo(input) {
-            if (input.files && input.files[0]) {
-                var file = input.files[0];
-                if(file.size > 2000000) { Swal.fire('Oops', 'Ukuran foto terlalu besar. Maksimal 2MB', 'warning'); return; }
-                
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var img = new Image();
-                    img.onload = function() {
-                        var canvas = document.createElement('canvas');
-                        var ctx = canvas.getContext('2d');
-                        var maxW = 500, maxH = 500;
-                        var w = img.width, h = img.height;
-                        
-                        if(w > h) { if(w > maxW) { h *= maxW / w; w = maxW; } } 
-                        else { if(h > maxH) { w *= maxH / h; h = maxH; } }
-                        
-                        canvas.width = w; canvas.height = h;
-                        ctx.drawImage(img, 0, 0, w, h);
-                        var dataURL = canvas.toDataURL('image/jpeg', 0.8);
-                        
-                        document.getElementById('umumLogoBase64').value = dataURL;
-                        var preview = document.getElementById('umumLogoPreview');
-                        var icon = document.getElementById('umumLogoIcon');
-                        preview.src = dataURL;
-                        preview.classList.remove('hidden');
-                        icon.classList.add('hidden');
-                    }
-                    img.src = e.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
-        async function submitPengaturanUmum(e) {
-            e.preventDefault();
-            var btn = document.getElementById('btnSubmitUmum');
-            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...';
-            
-            var editIdx = parseInt(document.getElementById('umumEditIndex').value);
-            var arr = [
-                document.getElementById('umumIdPengaturan').value,
-                document.getElementById('umumNamaKonter').value,
-                document.getElementById('umumAlamatKonter').value,
-                document.getElementById('umumLogoBase64').value
-            ];
-
-            Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
-            
-            try {
-                if(editIdx === -1) {
-                    await gasRun('saveData', 'Pengaturan_Umum', arr);
-                } else {
-                    await gasRun('updateData', 'Pengaturan_Umum', editIdx, arr);
-                }
-                Swal.fire({title: 'Sukses', text:'Pengaturan berhasil disimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-                refreshActiveData(false);
-            } catch(err) {
-                Swal.fire('Error', String(err), 'error');
-            } finally {
-                btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk mr-2"></i> Simpan & Update Pengaturan';
-            }
-        }
-
-        async function submitSmartPaste(e) {
-            e.preventDefault();
-            var btn = document.getElementById('btnSubmitPaste');
-            var provider = document.getElementById('pasteProvider').value;
-            var rawText = document.getElementById('pasteRawText').value;
-            
-            if (!provider) return Swal.fire('Oops', 'Pilih kategori terlebih dahulu!', 'warning');
-            if (!rawText.trim()) return Swal.fire('Oops', 'Teks data masih kosong!', 'warning');
-
-            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
-            
-            Swal.fire({ title: 'Mengekstrak Data...', text: 'Mohon tunggu.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            try {
-                let payload = [];
-                let lines = rawText.trim().split('\n');
-                
-                for (let line of lines) {
-                    line = line.trim();
-                    if (!line) continue;
-
-                    let cols = line.split('\t');
-                    if (cols.length >= 3) {
-                       let nama = cols[1].trim();
-                       let hargaBeliStr = cols[2].replace(/[^0-9]/g, '');
-                       let hargaBeli = parseInt(hargaBeliStr) || 0;
-
-                       if (hargaBeli > 0 && nama !== "" && nama.toLowerCase() !== "produk") {
-                           let nominalMatch = nama.match(/(\d{1,3}(?:\.\d{3})+|\d{4,})/g);
-                           let nominal = 0;
-                           if (nominalMatch && nominalMatch.length > 0) {
-                               nominal = parseInt(nominalMatch[nominalMatch.length - 1].replace(/\./g, ''));
-                           } else {
-                               nominal = Math.round(hargaBeli / 5000) * 5000;
-                           }
-
-                           nama = nama.replace(/\.000/g, '').replace(/000\b/g, '').trim();
-
-                           let dynamicMargin = calculateDynamicMargin(currentSheet, nominal);
-                           let hargaJual = nominal + (dynamicMargin !== null ? dynamicMargin : (nominal >= 100000 ? 5000 : 3000));
-                           
-                           payload.push({ provider: provider, nama: nama, beli: hargaBeli, jual: hargaJual });
-                       }
-                    }
-                }
-
-                if(payload.length === 0) throw new Error("Tidak ada data valid yang bisa diekstrak.");
-
-                var res = await gasRun('batchSaveScrapedData', currentSheet, payload);
-                if(res && res.status === 'error') {
-                    if(res.message.includes('appendRow')) {
-                        throw new Error("Backend Code.gs Anda belum diperbarui sepenuhnya! Tabel 'KategoriGame' belum tercetak di Spreadsheet. Silakan perbarui file Code.gs Anda.");
-                    }
-                    throw new Error(res.message);
-                }
-
-                closeSmartPasteModal();
-                Swal.fire({ title: 'Sukses!', html: `Berhasil memproses data ${currentSheet}.`, icon: 'success' });
-                refreshActiveData(true); 
-            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Ekstrak & Simpan Data"; }
-        }
-
-        function openAddKategoriModal() {
-            var m = document.getElementById('modalAddKategori');
-            var mc = document.getElementById('modalAddKategoriContent');
-            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
-            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
-            setTimeout(() => document.getElementById('inputNamaKategori').focus(), 100); 
-        }
-
-        function closeAddKategoriModal() {
-            var m = document.getElementById('modalAddKategori');
-            var mc = document.getElementById('modalAddKategoriContent');
-            document.getElementById('formAddKategori').reset();
-            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
-            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
-        }
-
-        async function submitAddKategori(e) {
-            e.preventDefault();
-            var btn = document.getElementById('btnSubmitKategori');
-            var namaKat = document.getElementById('inputNamaKategori').value;
-            btn.disabled = true; btn.innerText = "Menyimpan...";
-            
-            try {
-                var res = await gasRun('saveData', 'KategoriACC', ["", namaKat]);
-                if(res && res.status === 'error') throw new Error(res.message);
-                
-                window.BGL2_DROPDOWN_CACHE = null;
-                localStorage.removeItem('bgl2_dropdown_cache');
-                var db = await gasRun('getDropdownData');
-                window.BGL2_DROPDOWN_CACHE = db;
-                localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
-                
-                var sel = document.getElementById('kategori');
-                if(sel) {
-                    var option = new Option(namaKat, namaKat, true, true);
-                    if(window.jQuery) $(sel).append(option).trigger('change');
-                }
-                
-                closeAddKategoriModal();
-                Swal.fire({title: 'Sukses', text: 'Kategori ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Kategori"; }
-        }
-
-        function openAddProviderModal() {
-            var m = document.getElementById('modalAddProvider');
-            var mc = document.getElementById('modalAddProviderContent');
-            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
-            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
-            setTimeout(() => document.getElementById('inputNamaProvider').focus(), 100);
-        }
-
-        function closeAddProviderModal() {
-            var m = document.getElementById('modalAddProvider');
-            var mc = document.getElementById('modalAddProviderContent');
-            document.getElementById('formAddProvider').reset();
-            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
-            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
-        }
-
-        async function submitAddProvider(e) {
-            e.preventDefault();
-            var btn = document.getElementById('btnSubmitProvider');
-            var namaProv = document.getElementById('inputNamaProvider').value;
-            btn.disabled = true; btn.innerText = "Menyimpan...";
-            
-            try {
-                var res = await gasRun('saveData', 'Provider', ["", namaProv]);
-                if(res && res.status === 'error') throw new Error(res.message);
-                
-                window.BGL2_DROPDOWN_CACHE = null;
-                localStorage.removeItem('bgl2_dropdown_cache');
-                var db = await gasRun('getDropdownData');
-                window.BGL2_DROPDOWN_CACHE = db;
-                localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
-                
-                var sel = document.getElementById('provider');
-                if(sel) {
-                    var option = new Option(namaProv, namaProv, true, true);
-                    if(window.jQuery) $(sel).append(option).trigger('change');
-                }
-
-                var selPaste = document.getElementById('pasteProvider');
-                if(selPaste && currentSheet !== 'Game') {
-                    var optionPaste = new Option(namaProv, namaProv, true, true);
-                    if(window.jQuery) $(selPaste).append(optionPaste).trigger('change');
-                }
-                
-                closeAddProviderModal();
-                Swal.fire({title: 'Sukses', text: 'Provider ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Provider"; }
-        }
-
-        function openAddKategoriGameModal() {
-            var m = document.getElementById('modalAddKategoriGame');
-            var mc = document.getElementById('modalAddKategoriGameContent');
-            if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
-            if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
-            setTimeout(() => document.getElementById('inputNamaKategoriGame').focus(), 100);
-        }
-
-        function closeAddKategoriGameModal() {
-            var m = document.getElementById('modalAddKategoriGame');
-            var mc = document.getElementById('modalAddKategoriGameContent');
-            document.getElementById('formAddKategoriGame').reset();
-            if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
-            if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
-        }
-
-        async function submitAddKategoriGame(e) {
-            e.preventDefault();
-            var btn = document.getElementById('btnSubmitKategoriGame');
-            var namaGame = document.getElementById('inputNamaKategoriGame').value;
-            btn.disabled = true; btn.innerText = "Menyimpan...";
-            
-            try {
-                var res = await gasRun('saveData', 'KategoriGame', ["", namaGame]);
-                if(res && res.status === 'error') {
-                    if(res.message.includes('appendRow')) {
-                        throw new Error("Backend Code.gs Anda belum diperbarui sepenuhnya! Tabel 'KategoriGame' belum tercetak di Spreadsheet. Silakan perbarui file Code.gs Anda.");
-                    }
-                    throw new Error(res.message);
-                }
-                
-                window.BGL2_DROPDOWN_CACHE = null;
-                localStorage.removeItem('bgl2_dropdown_cache');
-                var db = await gasRun('getDropdownData');
-                window.BGL2_DROPDOWN_CACHE = db;
-                localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
-                
-                var sel = document.getElementById('kategori_game');
-                if(sel) {
-                    var option = new Option(namaGame, namaGame, true, true);
-                    if(window.jQuery) $(sel).append(option).trigger('change');
-                }
-
-                var selPaste = document.getElementById('pasteProvider');
-                if(selPaste && currentSheet === 'Game') {
-                    var optionPaste = new Option(namaGame, namaGame, true, true);
-                    if(window.jQuery) $(selPaste).append(optionPaste).trigger('change');
-                }
-                
-                closeAddKategoriGameModal();
-                Swal.fire({title: 'Sukses', text: 'Game ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Game"; }
-        }
-
-        function openKonterModal() {
-            document.querySelectorAll('#modalKonter').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
-            document.querySelectorAll('#modalKonterContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
-            document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
-        }
-
-        function closeKonterModal() {
-            editIndex = -1;
-            document.querySelectorAll('#kntForm').forEach(form => form.reset());
-            document.querySelectorAll('#kntFormTitle').forEach(title => title.innerText = 'Transaksi Konter');
-            document.querySelectorAll('#btnSubmitKonter').forEach(btn => btn.innerText = 'Simpan Transaksi');
-            
-            if(window.jQuery) $('select#kntJenis').val('').trigger('change.select2');
-
-            document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'none'); 
-            document.querySelectorAll('#kntMarginInput').forEach(m => m.value = ''); 
-
-            document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                container.innerHTML = '<select id="kntDetailSelect" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-400 outline-none" disabled><option>-- Pilih Jenis Dulu --</option></select>';
-                if(window.jQuery) $(container).find('select').select2({ width: '100%' });
-            });
-            
-            document.querySelectorAll('#kntStokWrapper').forEach(stokWrap => stokWrap.style.display = 'none');
-            
-            document.querySelectorAll('#kntNominal').forEach(nom => { nom.readOnly = false; nom.value = ''; });
-            document.querySelectorAll('#kntHargaBeliDB').forEach(hBeli => hBeli.value = '');
-            document.querySelectorAll('#kntHargaJualDB').forEach(hJual => hJual.value = '');
-            
-            document.querySelectorAll('#modalKonter').forEach(m => { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); });
-            document.querySelectorAll('#modalKonterContent').forEach(mc => { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); });
-            document.querySelectorAll('#mainContainer').forEach(main => main.classList.remove('main-active-modal'));
-        }
-
-        async function kntJenisChange() {
-            var elJenis = getEl('kntJenis');
-            if(!elJenis) return;
-            var jenis = elJenis.value;
-
-            document.querySelectorAll('#kntStokWrapper').forEach(w => w.style.display = 'none');
-            document.querySelectorAll('#kntNominal').forEach(n => { n.value = ''; n.readOnly = false; });
-            document.querySelectorAll('#kntHargaBeliDB').forEach(b => b.value = '');
-            document.querySelectorAll('#kntHargaJualDB').forEach(j => j.value = '');
-            
-            document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'block');
-            document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'none'); 
-            document.querySelectorAll('#kntMarginInput').forEach(m => m.value = ''); 
-
-            var lblNominal = document.getElementById('lblKntNominal');
-            if (lblNominal) {
-                lblNominal.innerText = ['VOUCHER', 'PERDANA', 'ACC', 'PULSA', 'GAME'].includes(jenis) ? 'Harga' : 'Nominal';
-            }
-
-            if(jenis === '') {
-                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<select id="kntDetailSelect" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-400 outline-none" disabled><option>-- Pilih Jenis Dulu --</option></select>';
-                    if(window.jQuery) $(container).find('select').select2({ width: '100%' });
-                });
-                return;
-            }
-
-            if(jenis === 'JASA TRANSFER') {
-                document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<input type="hidden" id="kntDetailInput" value="-">';
-                });
-                return;
-            }
-
-            if(jenis === 'KUOTA INTERNET') {
-                document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<input type="hidden" id="kntDetailInput" value="-">';
-                });
-                document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'block');
-                return;
-            }
-
-            if(jenis === 'GAME') {
-                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<select id="kntDetailSelect" required onchange="kntDetailChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"><option value="">Memuat data...</option></select>';
-                    if(window.jQuery) $(container).find('select').select2({ width: '100%' });
-                });
-            } else if(jenis === 'TOKEN PLN') {
-                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<input type="text" id="kntDetailInput" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Masukkan No Meter...">';
-                });
-                return; 
-            } else {
-                document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
-                    container.innerHTML = '<select id="kntDetailSelect" required onchange="kntDetailChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"><option value="">Memuat data...</option></select>';
-                    if(window.jQuery) $(container).find('select').select2({ width: '100%' });
-                });
-            }
-
-            try {
-                var db = window.BGL2_DROPDOWN_CACHE;
-                if(!db || !db.providerData || typeof db.pulsaData === 'undefined') { 
-                    Swal.fire({ title: 'Memuat Opsi...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
-                    db = await gasRun('getDropdownData');
-                    window.BGL2_DROPDOWN_CACHE = db;
-                    localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
-                    Swal.close();
-                }
-                if(!db) db = {}; 
-
-                var opts = [];
-                if(jenis === 'TRANSFER' || jenis === 'TARIK TUNAI') opts = (db.bankData || []).map(v => `<option value="${v}">${v}</option>`);
-                else if(jenis === 'E-WALLET') opts = (db.ewalletData || []).map(v => `<option value="${v}">${v}</option>`);
-                else if(jenis === 'PPOB') opts = (db.ppobData || []).map(v => `<option value="${v}">${v}</option>`);
-                else if(jenis === 'VOUCHER') opts = (db.voucherData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.provider})</option>`);
-                else if(jenis === 'PERDANA') opts = (db.perdanaData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.provider})</option>`);
-                else if(jenis === 'ACC') opts = (db.accData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}" data-s="${v.stok}">${v.nama} (${v.kategori})</option>`);
-                else if(jenis === 'PULSA') opts = (db.pulsaData || []).map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}">${v.nama} (${v.provider})</option>`);
-                else if(jenis === 'GAME') {
-                    let gameProd = window.BGL2_CACHE['Game'] || [];
-                    opts = gameProd.map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
-                }
-                
-                document.querySelectorAll('#kntDetailSelect').forEach(sel => {
-                    sel.innerHTML = '<option value="">-- Pilih Detail --</option>' + opts.join('');
-                    if(window.jQuery) $(sel).select2({ width: '100%' });
-                });
-            } catch(error) {
-                console.error("Error Dropdown:", error);
-            }
-        }
-
-        function kntDetailChange() {
-            var sel = getEl('kntDetailSelect');
-            if(!sel || sel.selectedIndex < 0) return;
-            var opt = sel.options[sel.selectedIndex];
-            
-            if(opt && opt.hasAttribute('data-j')) {
-                document.querySelectorAll('#kntNominal').forEach(nom => {
-                    nom.value = opt.getAttribute('data-j');
-                    window.formatRupiahUI(nom);
-                    nom.readOnly = true;
-                });
-                document.querySelectorAll('#kntHargaBeliDB').forEach(el => el.value = opt.getAttribute('data-b'));
-                document.querySelectorAll('#kntHargaJualDB').forEach(el => el.value = opt.getAttribute('data-j'));
-                
-                if (opt.hasAttribute('data-s') && opt.getAttribute('data-s') !== "undefined" && opt.getAttribute('data-s') !== null) {
-                    document.querySelectorAll('#kntStokLabel').forEach(el => el.innerText = opt.getAttribute('data-s'));
-                    document.querySelectorAll('#kntStokWrapper').forEach(el => el.style.display = 'flex'); 
-                } else {
-                    document.querySelectorAll('#kntStokWrapper').forEach(el => el.style.display = 'none'); 
-                }
-            } else {
-                document.querySelectorAll('#kntNominal').forEach(nom => { nom.readOnly = false; nom.value = ''; });
-                document.querySelectorAll('#kntHargaBeliDB').forEach(el => el.value = '');
-                document.querySelectorAll('#kntHargaJualDB').forEach(el => el.value = '');
-                document.querySelectorAll('#kntStokWrapper').forEach(el => el.style.display = 'none');
-            }
-        }
-
-        window.isSubmittingKonter = false;
-        async function submitKonterForm(e, formEl) {
-            e.preventDefault();
-            if(window.isSubmittingKonter) return;
-            window.isSubmittingKonter = true;
-            
-            var getVal = (selector) => { var el = formEl.querySelector(selector); return el ? el.value : ''; };
-            var jenisVal = getVal('#kntJenis');
-            var sel = formEl.querySelector('#kntDetailSelect');
-            var inp = formEl.querySelector('#kntDetailInput');
-            var detailVal = '';
-            
-            if (sel && !sel.disabled && !sel.classList.contains('hidden')) detailVal = sel.value;
-            else if (inp) detailVal = inp.value;
-
-            var nomVal = getVal('#kntNominal');
-            var nominal = parseInt(nomVal.replace(/[^0-9]/g, '')) || 0;
-            
-            var hBeli = parseInt(String(getVal('#kntHargaBeliDB')).replace(/[^0-9]/g, '')) || 0;
-            var hJual = parseInt(String(getVal('#kntHargaJualDB')).replace(/[^0-9]/g, '')) || 0;
-            var marginVal = getVal('#kntMarginInput'); 
-
-            var dynamicMargin = calculateDynamicMargin(jenisVal, nominal);
-
-            if (dynamicMargin !== null) {
-                if (hBeli === 0) hBeli = nominal;
-                hJual = hBeli + dynamicMargin;
-            } else {
-                if (jenisVal === 'JASA TRANSFER') {
-                    hBeli = nominal; hJual = nominal + 5000;
-                } else if (jenisVal === 'KUOTA INTERNET') {
-                    var mInt = parseInt(marginVal.replace(/[^0-9]/g, '')) || 5000;
-                    hBeli = nominal; hJual = nominal + mInt;
-                } else if (['TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN'].includes(jenisVal)) {
-                    hBeli = nominal; hJual = nominal; 
-                }
-            }
-
-            var payload = { tanggal: getVal('#kntTanggal'), jenis: jenisVal, detail: detailVal, nominal: nomVal, hargaBeliDB: hBeli, hargaJualDB: hJual };
-            
-            // ZETTBOT FIX: Pastikan editIndex ditangkap sebelum Form Konter di-close
-            var currentIndex = editIndex; 
-            closeKonterModal(); 
-            Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, timerProgressBar: true, didOpen: () => Swal.showLoading() });
-
-            try {
-                let res;
-                if(currentIndex === -1) res = await gasRun('saveKonterTransaction', payload);
-                else res = await gasRun('editKonterTransaction', currentIndex, payload);
-                if (res && res.status === 'error') throw new Error(res.message);
-                Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
-                refreshActiveData(false); 
-            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
-        }
-
-        async function editKonterData(origIdx) {
-            try {
-                var rowData = null;
-                for(var k=0; k<currentTableData.length; k++){
-                    if(currentTableData[k].originalIndex === origIdx) { rowData = currentTableData[k].row; break; }
-                }
-                if(!rowData) return;
-                editIndex = origIdx;
-                document.querySelectorAll('#kntFormTitle').forEach(el => el.innerText = 'Edit Transaksi Konter');
-                document.querySelectorAll('#btnSubmitKonter').forEach(el => el.innerText = 'Update Transaksi');
-                document.querySelectorAll('#kntTanggal').forEach(el => el.value = rowData[1]);
-                var jenis = rowData[2];
-                document.querySelectorAll('#kntJenis').forEach(elJenis => {
-                    elJenis.value = jenis;
-                    if(window.jQuery) $(elJenis).trigger('change.select2');
-                });
-                await kntJenisChange();
-                document.querySelectorAll('#kntDetailSelect').forEach(sel => {
-                    if(!sel.disabled) {
-                        sel.value = rowData[3];
-                        if(window.jQuery) $(sel).trigger('change.select2');
-                        kntDetailChange(); 
-                    }
-                });
-                document.querySelectorAll('#kntDetailInput').forEach(inp => { inp.value = rowData[3]; });
-                openKonterModal();
-            } catch(err) { console.error(err); }
-        }
-
-        // ZETTBOT FIX: Ubah jadi asynchronous agar form sempat dibuat sebelum data disuntikkan
-        async function editDataGen(displayIndex) {
-            try {
-                var rowData = currentTableData[displayIndex].row;
-                if (!rowData) return;
-                editIndex = currentTableData[displayIndex].originalIndex;
-                
-                await toggleForm(true); 
-                
-                document.querySelectorAll('#genFormTitle').forEach(el => el.innerText = 'Form Edit Data');
-                document.querySelectorAll('#btnSubmitGen').forEach(el => el.innerText = 'Update Data');
-                for(var i=0; i<currentConfig.fields.length; i++) {
-                    var f = currentConfig.fields[i];
-                    var el = document.getElementById(f.id);
-                    if(!el) continue;
-                    var val = rowData[i];
-
-                    if (f.type === 'select_multiple') {
-                        var arrVal = val ? val.split(',').map(s => s.trim()) : [];
-                        if(window.jQuery) { $(el).val(arrVal).trigger('change'); }
-                    } else if (f.type === 'rupiah' && val) {
-                        val = val.replace(/Rp /g, '').replace(/\./g, '');
-                        el.value = val; window.formatRupiahUI(el); 
-                    } else { 
-                        el.value = val; 
-                        if ((f.type === 'select' || f.type === 'select_dynamic' || f.type === 'select_dynamic_add') && window.jQuery) { $(el).trigger('change.select2'); }
-                    }
-                }
-            } catch(err) { console.error(err); }
-        }
-
-        function initGenericForm() {
-            document.querySelectorAll('#dynamicForm').forEach(form => form.reset());
-            if (currentConfig && currentConfig.prefix && currentConfig.fields[0] && currentConfig.fields[0].disabled) {
-                var sheetData = window.BGL2_CACHE[currentConfig.sheet] || [];
-                var nextNum = 1;
-                if (sheetData.length > 0) {
-                    var maxNum = 0;
-                    for(var i=0; i<sheetData.length; i++) {
-                        var idStr = String(sheetData[i][0] || '');
-                        var parts = idStr.split('-');
-                        if (parts.length > 1) {
-                            var num = parseInt(parts[1]);
-                            if (!isNaN(num) && num > maxNum) maxNum = num;
-                        }
-                    }
-                    nextNum = maxNum + 1;
-                }
-                var newId = currentConfig.prefix + "-" + nextNum.toString().padStart(3, '0');
-                document.querySelectorAll('#' + currentConfig.fields[0].id).forEach(el => el.value = newId);
-            }
-        }
-
-        function buildGenHTML(data) {
-            var html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">';
-            for(var i=0; i<currentConfig.fields.length; i++) {
-                var f = currentConfig.fields[i];
-                var inputHtml = '';
-                if(f.type === 'select' || f.type === 'select_dynamic' || f.type === 'select_dynamic_add' || f.type === 'select_multiple') {
-                    var opts = f.type !== 'select_multiple' ? '<option value="">-- Pilih --</option>' : '';
-                    var src = f.options || data[f.source] || [];
-                    for(var j=0; j<src.length; j++) opts += '<option value="'+src[j]+'">'+src[j]+'</option>';
-                    
-                    if (f.type === 'select_dynamic_add') {
-                        var modalFunc = (f.id === 'provider') ? 'openAddProviderModal()' : (f.id === 'kategori_game' ? 'openAddKategoriGameModal()' : 'openAddKategoriModal()');
-                        inputHtml = '<div class="flex items-center space-x-2"><select id="'+f.id+'" class="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm" '+(f.required?'required':'')+'>'+opts+'</select><button type="button" onclick="'+modalFunc+'" class="w-10 h-[42px] bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-plus"></i></button></div>';
-                    } else if (f.type === 'select_multiple') {
-                        inputHtml = '<select id="'+f.id+'" multiple="multiple" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm" '+(f.required?'required':'')+'>'+opts+'</select>';
-                    } else { 
-                        inputHtml = '<select id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm" '+(f.required?'required':'')+'>'+opts+'</select>'; 
-                    }
-                } else if (f.type === 'rupiah') { 
-                    inputHtml = '<div class="relative"><span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span><input type="tel" autocomplete="off" placeholder="0" id="'+f.id+'" oninput="window.formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+'></div>'; 
-                } else if (f.type === 'textarea') { 
-                    inputHtml = '<textarea id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+' rows="3"></textarea>'; 
-                } else { 
-                    inputHtml = '<input type="text" id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm '+(f.disabled?'bg-slate-100 text-slate-500':'')+' outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+' '+(f.disabled?'readonly':'')+'>'; 
-                }
-                
-                var colSpanClass = f.type === 'select_multiple' ? 'md:col-span-2' : '';
-                html += '<div class="' + colSpanClass + '"><label class="block text-xs font-semibold text-slate-700 mb-1.5">'+f.label+'</label>' + inputHtml + '</div>';
-            }
-            html += '</div><div class="flex justify-end pt-4 border-t border-slate-100 mt-6 space-x-3"><button type="button" onclick="closeGenericModal()" class="px-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg">Batal</button><button type="submit" id="btnSubmitGen" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold text-sm">Simpan Data</button></div>';
-            
-            document.querySelectorAll('#dynamicForm').forEach(form => { 
-                form.innerHTML = html; 
-                if(window.jQuery) {
-                    $(form).find('select').each(function() {
-                        var isMulti = $(this).attr('multiple');
-                        $(this).select2({ width: '100%', placeholder: isMulti ? '-- Pilih Layanan (Bisa lebih dari 1) --' : '' });
-                    });
-                }
-            });
-        }
-
-        function renderKonterTable(data, colCount) {
-            var btnTambah = document.getElementById('btnTambahData');
-            if (btnTambah) btnTambah.classList.remove('hidden');
-
-            var tbody = document.getElementById('dataTableBody');
-            if(!tbody) return;
-            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data.</td></tr>'; return; }
-            var reversedData = [];
-            for (var k = data.length - 1; k >= 0; k--) { if(data[k] && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k}); }
-            currentTableData = reversedData;
-            var rowsHtml = reversedData.map(d => {
-                var r = d.row; var o = d.originalIndex;
-                return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors"><td class="py-1.5 px-3 font-mono font-bold text-center">${r[0]||'-'}</td><td class="py-1.5 px-3 text-center">${r[1]||'-'}</td><td class="py-1.5 px-3 font-bold text-blue-700 text-center">${r[2]||'-'}</td><td class="py-1.5 px-3 text-center">${r[3]||'-'}</td><td class="py-1.5 px-3 font-bold text-emerald-600 text-center">${r[5]||'-'}</td><td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
-            });
-            tbody.innerHTML = rowsHtml.join('');
-        }
-
-        function renderGenericTable(data, colCount) {
-            var btnTambah = document.getElementById('btnTambahData');
-            var tbody = document.getElementById('dataTableBody');
-            
-            if(!tbody || !data || data.length === 0) {
-                if(btnTambah) btnTambah.classList.remove('hidden');
-                if(tbody) tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>';
-                return;
-            }
-
-            var reversedData = [];
-            for (var k = data.length - 1; k >= 0; k--) { if(data[k] && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k}); }
-            currentTableData = reversedData;
-
-            if (btnTambah) {
-                btnTambah.classList.remove('hidden');
-            }
-
-            var rowsHtml = reversedData.map((d, i) => {
-                var r = d.row; var o = d.originalIndex;
-                
-                var cells = '';
-                for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
-                    var c = r[idx] || '';
-                    cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
-                }
-
-                return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">${cells}<td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
-            });
-            tbody.innerHTML = rowsHtml.join('');
-        }
-
-        function delKonter(idx) { 
-            Swal.fire({title: 'Hapus?', text: "Data tidak bisa balik!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
-                if(r.isConfirmed) {
-                    Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    try { await gasRun('deleteData', 'DB_konter', idx); refreshActiveData(true); Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); } catch(err) { Swal.fire('Error', String(err), 'error'); }
-                }
-            });
-        }
-        
-        function delGen(idx, sheetName) { 
-            Swal.fire({title: 'Hapus?', text: "Hapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
-                if(r.isConfirmed) {
-                    Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    try { await gasRun('deleteData', sheetName, idx); window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache'); refreshActiveData(true); Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); } catch(err) { Swal.fire('Error', String(err), 'error'); }
-                }
-            });
-        }
-
-        async function handleFormSubmit(e, formEl) {
-            e.preventDefault();
-            if(window.isSubmittingMaster) return;
-            window.isSubmittingMaster = true;
-            
-            var arr = [];
-            for(var i=0; i<currentConfig.fields.length; i++) {
-                var f = currentConfig.fields[i];
-                var el = formEl.querySelector('#' + f.id);
-                var v = "";
-                
-                if (f.type === 'select_multiple') {
-                    var selected = window.jQuery ? $('#' + f.id).val() : [];
-                    v = selected ? selected.join(', ') : '';
-                } else {
-                    v = el ? el.value : "";
-                }
-
-                if(f.type === 'rupiah') arr.push("Rp " + v); else arr.push(v);
-            }
-            
-            // ZETTBOT FIX: Mengunci Index Edit sebelum Form Ditutup!
-            var currentIndex = editIndex; 
-            closeGenericModal(); 
-            
-            Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
-            try {
-                if(currentIndex === -1) {
-                    await gasRun('saveData', currentConfig.sheet, arr);
-                } else {
-                    await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
-                }
-                window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache');
-                Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-                refreshActiveData(false); 
-            } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
-        }
-
-        window.formatRupiahUI = function(element) {
-            var numericStr = element.value.replace(/[^0-9]/g, '');
-            if(!numericStr) { 
-                if(element.value !== '') element.value = ''; 
-                return; 
-            }
-            var split = numericStr.split(','); var sisa = split[0].length % 3; var rupiah = split[0].substr(0, sisa);
-            var ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-            if(ribuan) { var separator = sisa ? '.' : ''; rupiah += separator + ribuan.join('.'); }
-            if (element.value !== rupiah) {
-                element.value = rupiah;
-            }
-        };
-
-        window.handleLogin = handleLogin; window.logout = logout; window.toggleSidebar = toggleSidebar; window.switchPage = switchPage; window.toggleForm = toggleForm; 
-        window.openModal = openModal; window.closeModal = closeModal;
-        window.openGenericModal = openGenericModal; window.closeGenericModal = closeGenericModal; window.openKonterModal = openKonterModal; window.closeKonterModal = closeKonterModal;
-        window.kntJenisChange = kntJenisChange; window.kntDetailChange = kntDetailChange; window.editKonterData = editKonterData;
-        window.editDataGen = editDataGen; window.initGenericForm = initGenericForm; 
-        window.loadTableData = loadTableData; window.delKonter = delKonter; window.delGen = delGen;
-        window.renderMiniDashboard = renderMiniDashboard; window.filterTable = filterTable;
-        window.openAddKategoriModal = openAddKategoriModal; window.closeAddKategoriModal = closeAddKategoriModal; window.submitAddKategori = submitAddKategori;
-        window.openAddProviderModal = openAddProviderModal; window.closeAddProviderModal = closeAddProviderModal; window.submitAddProvider = submitAddProvider;
-        window.openAddKategoriGameModal = openAddKategoriGameModal; window.closeAddKategoriGameModal = closeAddKategoriGameModal; window.submitAddKategoriGame = submitAddKategoriGame;
-        window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
-        window.populateUmumSettings = populateUmumSettings; window.previewUmumLogo = previewUmumLogo; window.submitPengaturanUmum = submitPengaturanUmum;
-    </script>
+    <!-- Memanggil Modular JavaScript -->
+    <?!= include('config'); ?>
+    <?!= include('api'); ?>
+    <?!= include('ui_components'); ?>
+    <?!= include('app_logic'); ?>
 </body>
 </html>
