@@ -131,3 +131,76 @@ async function runHybridDatabase(funcName, ...args) {
         return executeGoogleSheets(funcName, args); 
     }
 }
+
+// ============================================================================
+// 🚀 ZETTBOT: SCRIPT MIGRASI DATA 1-KLIK (GOOGLE SHEETS -> FIREBASE)
+// ============================================================================
+window.migrateAllDataToFirebase = async function() {
+    if (!window.firebaseDB) {
+        Swal.fire('Error', 'Firebase belum siap atau belum dikonfigurasi. Pastikan window.USE_FIREBASE = true di config Anda.', 'error');
+        return;
+    }
+
+    const db = window.firebaseDB;
+    const col = window.fbCollection;
+    const addDoc = window.fbAddDoc;
+
+    Swal.fire({
+        title: 'Memulai Migrasi...',
+        html: 'Mengunduh seluruh database dari Google Sheets.<br><b>Mohon jangan tutup halaman ini.</b>',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    try {
+        console.log("Mengunduh semua data dari Google Sheets...");
+        // 1. Panggil Endpoint getAllData di Code.gs
+        const allData = await executeGoogleSheets('getAllData', []);
+
+        if (!allData || allData.error) {
+            throw new Error(allData.error || "Gagal mengambil data dari Google Sheets.");
+        }
+
+        let totalPushed = 0;
+        const sheetNames = Object.keys(allData);
+
+        // 2. Loop setiap sheet dan Push ke Firestore
+        for (let i = 0; i < sheetNames.length; i++) {
+            let sheetName = sheetNames[i];
+            let rows = allData[sheetName];
+
+            if (!rows || rows.length === 0) continue;
+
+            Swal.update({
+                html: `Memigrasikan tabel <b>${sheetName}</b>...<br>Proses: (${i + 1}/${sheetNames.length})`
+            });
+
+            console.log(`Memigrasikan ${rows.length} baris dari tabel ${sheetName}...`);
+
+            // Eksekusi berurutan agar tidak terkena limit / timeout request
+            for (let j = 0; j < rows.length; j++) {
+                let rowData = rows[j];
+                // Lewati baris kosong
+                if (!rowData || rowData[0] === "") continue;
+
+                await addDoc(col(db, sheetName), {
+                    rowArray: rowData,
+                    timestamp: new Date().getTime() + j // Ditambah j agar timestamp berurutan
+                });
+                totalPushed++;
+            }
+        }
+
+        Swal.fire({
+            title: 'Migrasi Selesai! 🎉',
+            text: `Berhasil memindahkan ${totalPushed} baris data ke Firebase Firestore.`,
+            icon: 'success'
+        }).then(() => {
+            location.reload(); 
+        });
+
+    } catch (error) {
+        console.error("Migrasi Error:", error);
+        Swal.fire('Gagal Migrasi', error.message, 'error');
+    }
+};
