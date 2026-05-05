@@ -478,7 +478,7 @@ function buildGenHTML(data) {
         } else if (f.type === 'textarea') { 
             inputHtml = '<textarea id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+' rows="3"></textarea>'; 
         } else if (f.type === 'text_pct') {
-            inputHtml = '<div class="relative"><input type="text" autocomplete="off" placeholder="Cth: 2.5" id="'+f.id+'" class="w-full bg-white pr-8 pl-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500" '+(f.required?'required':'')+'><span class="absolute right-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">%</span></div>';
+            inputHtml = '<div class="relative"><input type="text" autocomplete="off" placeholder="Cth: 0.04" id="'+f.id+'" class="w-full bg-white pr-8 pl-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500" '+(f.required?'required':'')+'><span class="absolute right-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">%</span></div>';
         } else { 
             inputHtml = '<input type="text" id="'+f.id+'" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm '+(f.disabled?'bg-slate-100 text-slate-500':'')+' outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" '+(f.required?'required':'')+' '+(f.disabled?'readonly':'')+'>'; 
         }
@@ -637,35 +637,37 @@ window.setFilterDate = function(val) {
     loadTableData(false); 
 };
 
-// ZETTBOT FIX: Update UI Toggle Field untuk Mode Persentase
+// ZETTBOT FIX: Update UI Toggle Field - Sembunyikan Margin untuk Persentase
 window.toggleMarginFields = function(el) {
     var val = el ? el.value : (document.getElementById('tipe_margin') ? document.getElementById('tipe_margin').value : 'Range Nominal');
     
     var cMin = document.getElementById('container_min_nom');
     var cMax = document.getElementById('container_max_nom');
     var cPct = document.getElementById('container_persentase_val');
-    var lblMargin = document.querySelector('#container_val_margin label');
+    var cMarg = document.getElementById('container_val_margin');
 
     var iMin = document.getElementById('min_nom');
     var iPct = document.getElementById('persentase_val');
+    var iMarg = document.getElementById('val_margin');
 
     if(val === 'Persentase') {
-        if(cMin) cMin.style.display = 'block'; // ZETTBOT: Nominal Awal Tetap Muncul
+        if(cMin) cMin.style.display = 'block'; 
         if(cMax) cMax.style.display = 'none';
         if(cPct) cPct.style.display = 'block';
+        if(cMarg) cMarg.style.display = 'none'; // Sembunyikan field Margin Minimum secara total
 
         if(iMin) iMin.required = true;
         if(iPct) iPct.required = true;
+        if(iMarg) iMarg.required = false; // Hilangkan required
 
-        if(lblMargin) lblMargin.innerText = 'Batas Margin Minimal (IDR)';
     } else {
         if(cMin) cMin.style.display = 'block';
         if(cMax) cMax.style.display = 'block';
         if(cPct) cPct.style.display = 'none';
+        if(cMarg) cMarg.style.display = 'block'; // Tampilkan kembali untuk mode Range
 
         if(iMin) iMin.required = true;
         if(iPct) iPct.required = false;
-
-        if(lblMargin) lblMargin.innerText = 'Margin / Keuntungan (IDR)';
+        if(iMarg) iMarg.required = true;
     }
 };
