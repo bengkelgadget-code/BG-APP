@@ -16,7 +16,7 @@ const firebaseConfig = {
 };
 
 // 2. State Mode Database (Switch: true = Firebase, false = Google Sheets murni)
-window.USE_FIREBASE = false; // SAAT INI DIMATIKAN agar Google Sheets Anda tetap jalan normal
+window.USE_FIREBASE = true; // SAAT INI DIMATIKAN agar Google Sheets Anda tetap jalan normal
 
 // 3. Inisialisasi Database (Hanya jika konfigurasi sudah diisi)
 try {
