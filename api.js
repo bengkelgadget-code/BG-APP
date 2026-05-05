@@ -49,7 +49,6 @@ async function runHybridDatabase(funcName, ...args) {
     const deleteDoc = window.fbDeleteDoc;
     const docRef = window.fbDoc;
 
-    // ZETTBOT FIX: Helper untuk format Rupiah di Client Side sebelum dikirim ke Firebase
     const fRupiah = (angka) => {
         let num = parseInt(angka, 10) || 0;
         return "Rp " + num.toLocaleString('id-ID').replace(/,/g, '.');
@@ -62,12 +61,23 @@ async function runHybridDatabase(funcName, ...args) {
         if (funcName === 'getData') {
             let sheetName = args[0];
             let snapshot = await getDocs(col(db, sheetName));
-            let dataArray = [];
+            let dataObjects = [];
             
             snapshot.forEach(doc => {
                 let d = doc.data();
-                if(d.rowArray) dataArray.push(d.rowArray); 
+                if(d.rowArray) {
+                    // Memberikan nilai default 0 jika data tidak memiliki timestamp
+                    d.timestamp = d.timestamp || 0;
+                    dataObjects.push(d); 
+                }
             });
+
+            // ZETTBOT FIX: Mengurutkan data berdasarkan Timestamp (Terlama -> Terbaru)
+            // Karena UI akan me-reverse datanya (Terbaru ada di Paling Atas)
+            dataObjects.sort((a, b) => a.timestamp - b.timestamp);
+            
+            // Ekstrak kembali array-nya setelah diurutkan
+            let dataArray = dataObjects.map(obj => obj.rowArray);
 
             if (dataArray.length === 0) {
                 throw new Error("Data di Firebase masih kosong, beralih membaca dari Google Sheets.");
@@ -89,9 +99,32 @@ async function runHybridDatabase(funcName, ...args) {
         else if (funcName === 'saveKonterTransaction') {
             let payload = args[0];
             
-            // ZETTBOT FIX: Menerapkan format Rupiah yang benar untuk Harga Beli, Jual, dan Profit
+            // ZETTBOT FIX: Membuat ID Transaksi Berurutan (TRX-TGLBLNTHN-XXX)
+            let dateObj = new Date();
+            let dd = String(dateObj.getDate()).padStart(2, '0');
+            let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            let yy = String(dateObj.getFullYear()).slice(-2);
+            let prefix = `TRX-${dd}${mm}${yy}-`;
+
+            let snapshot = await getDocs(col(db, 'DB_konter'));
+            let maxNum = 0;
+            
+            // Cari nomor urut terbesar di hari ini
+            snapshot.forEach(doc => {
+                let d = doc.data();
+                if (d.rowArray && d.rowArray[0] && String(d.rowArray[0]).startsWith(prefix)) {
+                    let numPart = String(d.rowArray[0]).split('-')[2];
+                    let num = parseInt(numPart, 10);
+                    if (!isNaN(num) && num > maxNum) {
+                        maxNum = num;
+                    }
+                }
+            });
+            
+            let newId = prefix + String(maxNum + 1).padStart(3, '0');
+            
             let row = [
-                "KNT-FB-" + new Date().getTime(), 
+                newId, 
                 payload.tanggal,
                 payload.jenis,
                 payload.detail,
@@ -100,6 +133,7 @@ async function runHybridDatabase(funcName, ...args) {
                 fRupiah(payload.hargaJualDB - payload.hargaBeliDB),
                 new Date().toLocaleDateString('id-ID')
             ];
+            
             await addDoc(col(db, 'DB_konter'), { 
                 rowArray: row, 
                 timestamp: new Date().getTime() 
@@ -147,7 +181,7 @@ async function runHybridDatabase(funcName, ...args) {
                 if (targetDocId) {
                     await updateDoc(docRef(db, sheetName, targetDocId), {
                         rowArray: rowData,
-                        timestamp: new Date().getTime()
+                        timestamp: new Date().getTime() // Perbarui timestamp agar naik ke atas jika diedit (Opsi)
                     });
                 } else {
                     await addDoc(col(db, sheetName), {
@@ -165,14 +199,18 @@ async function runHybridDatabase(funcName, ...args) {
             if (itemId) {
                 let snapshot = await getDocs(col(db, 'DB_konter'));
                 let targetDocId = null;
+                
+                // Ambil timestamp asli agar posisinya di urutan tidak berubah saat di-edit
+                let originalTimestamp = new Date().getTime(); 
+                
                 snapshot.forEach(doc => {
                     let d = doc.data();
                     if (d.rowArray && d.rowArray[0] === itemId) {
                         targetDocId = doc.id;
+                        if(d.timestamp) originalTimestamp = d.timestamp;
                     }
                 });
 
-                // ZETTBOT FIX: Menerapkan format Rupiah yang benar untuk Harga Beli, Jual, dan Profit
                 let row = [
                     itemId,
                     payload.tanggal,
@@ -187,12 +225,12 @@ async function runHybridDatabase(funcName, ...args) {
                 if (targetDocId) {
                     await updateDoc(docRef(db, 'DB_konter', targetDocId), {
                         rowArray: row,
-                        timestamp: new Date().getTime()
+                        timestamp: originalTimestamp
                     });
                 } else {
                      await addDoc(col(db, 'DB_konter'), {
                         rowArray: row,
-                        timestamp: new Date().getTime()
+                        timestamp: originalTimestamp
                     });
                 }
             }
