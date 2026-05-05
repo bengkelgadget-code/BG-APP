@@ -1,4 +1,3 @@
-<script>
     const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
 
     function gasRun(funcName, ...args) {
@@ -29,4 +28,4 @@
             }
         });
     }
-</script>
+
