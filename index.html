@@ -13,8 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Memanggil modular CSS -->
-    <?!= include('styles'); ?>
+    <!-- ZETTBOT: Pemanggilan Modular CSS untuk GitHub Pages -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body style="display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
@@ -57,6 +57,7 @@
         <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden" onclick="toggleSidebar()"></div>
         
         <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 w-[240px] bg-slate-900 text-slate-300 flex flex-col h-full md:rounded-2xl shadow-xl z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 border-r md:border border-slate-800/80">
+            
             <div class="px-5 py-5 flex items-center justify-center shrink-0 border-b border-slate-800/80">
                 <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-[#39ff14] to-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 mr-2.5">
                     <i class="fa-solid fa-microchip text-slate-900 text-sm"></i>
@@ -66,17 +67,23 @@
             </div>
             
             <nav class="flex-1 overflow-y-auto py-3 custom-scrollbar px-3 space-y-1">
-                <li class="menu-container list-none">
-                    <button class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all focus:outline-none group">
-                        <div class="flex items-center">
-                            <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mr-3 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-cash-register text-xs"></i></div>
-                            <span class="text-xs font-bold tracking-wide">Transaksi</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-500 group-hover:text-slate-300 chevron-icon"></i>
-                    </button>
-                    <ul class="dropdown-content mt-1 space-y-1">
-                        <li><a href="#" onclick="switchPage('Konter', 'Konter HP')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2 opacity-70"></span> Konter HP</a></li>
-                    </ul>
+                
+                <div class="pb-1 px-4">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Transaksi</p>
+                </div>
+
+                <li class="list-none">
+                    <a href="#" onclick="switchPage('Konter', 'Transaksi Konter')" class="w-full flex items-center px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center mr-3 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-cash-register text-xs"></i></div>
+                        <span class="text-xs font-bold tracking-wide">Transaksi Konter</span>
+                    </a>
+                </li>
+                
+                <li class="list-none">
+                    <a href="#" onclick="switchPage('Service', 'Service HP')" class="w-full flex items-center px-3 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-white transition-all group">
+                        <div class="w-7 h-7 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center mr-3 group-hover:bg-purple-500 group-hover:text-white transition-colors"><i class="fa-solid fa-screwdriver-wrench text-xs"></i></div>
+                        <span class="text-xs font-bold tracking-wide">Service HP</span>
+                    </a>
                 </li>
 
                 <div class="pt-3 pb-1 px-4">
@@ -118,7 +125,6 @@
                         <li><a href="#" onclick="switchPage('Perdana', 'Input Perdana')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> PERDANA</a></li>
                         <li><a href="#" onclick="switchPage('ACC', 'Input ACC')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> ACC</a></li>
                         <li><a href="#" onclick="switchPage('Pulsa', 'Input Pulsa')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> PULSA</a></li>
-                        <li><a href="#" onclick="switchPage('Token', 'Input Token PLN')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> TOKEN PLN</a></li>
                         <li><a href="#" onclick="switchPage('Game', 'Input Game')" class="flex items-center px-4 py-1.5 mx-2 rounded-lg text-[11px] font-semibold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all"><span class="w-1.5 h-1.5 rounded-full bg-[#ffff00] mr-2 opacity-70"></span> GAME</a></li>
                     </ul>
                 </li>
@@ -161,6 +167,7 @@
         </aside>
 
         <main class="flex-1 flex flex-col h-full relative overflow-hidden w-full bg-transparent">
+            
             <div class="md:hidden bg-white shadow-sm border-b border-slate-200 px-4 py-3 flex justify-between items-center shrink-0 z-20">
                 <h2 class="font-black text-slate-800 text-lg uppercase tracking-wide text-blue-600" id="mobilePageTitle">Konter HP</h2>
                 <button onclick="toggleSidebar()" class="text-slate-600 hover:text-blue-600 text-2xl transition-colors"><i class="fa-solid fa-bars"></i></button>
@@ -205,6 +212,7 @@
                 </div>
 
                 <div id="mainTableWrapper" class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col flex-1 min-h-0 relative">
+                    
                     <div class="p-3 sm:p-4 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3 shrink-0 bg-slate-50/50 rounded-t-xl">
                         <h3 class="font-black text-slate-800 text-sm hidden sm:flex items-center uppercase tracking-widest">
                             <i class="fa-solid fa-folder-open mr-2 text-blue-500"></i> 
@@ -292,7 +300,6 @@
         </main>
     </div>
 
-    <!-- Modals -->
     <div id="modalSmartPaste" class="fixed inset-0 z-[80] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
         <div id="modalSmartPasteContent" class="bg-white rounded-2xl w-full max-w-2xl shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative">
             <button type="button" onclick="closeSmartPasteModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -459,10 +466,13 @@
         </div>
     </div>
 
-    <!-- Memanggil Modular JavaScript -->
-    <?!= include('config'); ?>
-    <?!= include('api'); ?>
-    <?!= include('ui_components'); ?>
-    <?!= include('app_logic'); ?>
+    <!-- PENGATURAN GITHUB PAGES: Memanggil JS Eksternal -->
+    <!-- ZETTBOT: Persiapan Modul Firebase Database -->
+    <script type="module" src="firebase_config.js"></script>
+    
+    <script src="config.js"></script>
+    <script src="api.js"></script>
+    <script src="ui_components.js"></script>
+    <script src="app_logic.js"></script>
 </body>
 </html>
