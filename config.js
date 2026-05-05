@@ -1,4 +1,4 @@
-<script>
+
     var window = window || {};
     window.BGL2_CACHE = window.BGL2_CACHE || {}; 
     window.BGL2_DROPDOWN_CACHE = window.BGL2_DROPDOWN_CACHE || null; 
@@ -35,4 +35,4 @@
         const els = document.querySelectorAll('#' + id);
         return els.length > 0 ? els[els.length - 1] : null;
     };
-</script>
+
