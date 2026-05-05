@@ -1,4 +1,4 @@
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
         activeRole = 'Admin'; 
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('dashboardView').classList.remove('hidden');
@@ -37,14 +37,26 @@
             var row = marginData[i];
             if (!row || row[0] === "") continue;
             
-            var layanans = (row[1] || '').split(',').map(s => s.trim().toUpperCase());
+            // ZETTBOT FIX: Memperbaiki index array pembacaan rule margin
+            var tipe = row[1]; // Index 1 adalah Tipe (Range/Persentase)
+            var layanans = (row[2] || '').split(',').map(s => s.trim().toUpperCase()); // Index 2 adalah Layanan Terkait
+            
             if (layanans.includes(layananName.toUpperCase())) {
-                var minNom = parseInt(String(row[2]).replace(/[^0-9]/g, '')) || 0;
-                var maxNomStr = String(row[3]).replace(/[^0-9]/g, '');
-                var maxNom = maxNomStr ? parseInt(maxNomStr) : Infinity; 
+                var minNom = parseInt(String(row[3]).replace(/[^0-9]/g, '')) || 0; // Index 3 adalah Nominal Awal
                 
-                if (nominal >= minNom && nominal < maxNom) {
-                    return parseInt(String(row[4]).replace(/[^0-9]/g, '')) || 0;
+                if (tipe === 'Persentase') {
+                    if (nominal >= minNom) {
+                        var pctStr = String(row[5]).replace(/[^0-9.]/g, ''); // Index 5 adalah Persentase
+                        var pct = parseFloat(pctStr) || 0;
+                        return Math.round(nominal * (pct / 100));
+                    }
+                } else {
+                    var maxNomStr = String(row[4]).replace(/[^0-9]/g, ''); // Index 4 adalah Nominal Akhir
+                    var maxNom = maxNomStr ? parseInt(maxNomStr) : Infinity; 
+                    
+                    if (nominal >= minNom && nominal < maxNom) {
+                        return parseInt(String(row[6]).replace(/[^0-9]/g, '')) || 0; // Index 6 adalah Margin/Keuntungan
+                    }
                 }
             }
         }
@@ -573,7 +585,11 @@
                 Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 try { 
                     var safeIdx = parseInt(idx, 10);
-                    await gasRun('deleteData', 'DB_konter', safeIdx); 
+                    // ZETTBOT FIX: Mendapatkan ID item (TRX-...) untuk dikirim ke API Firebase
+                    var rowData = window.BGL2_CACHE['DB_konter'][safeIdx];
+                    var itemId = rowData ? rowData[0] : null;
+
+                    await gasRun('deleteData', 'DB_konter', safeIdx, itemId); 
                     await refreshActiveData(true); 
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
                 } catch(err) { Swal.fire('Error', String(err), 'error'); }
@@ -589,7 +605,11 @@
                     var safeIdx = parseInt(idx, 10);
                     var actualSheet = (currentConfig && currentConfig.sheet) ? currentConfig.sheet : (pageConfigs[sheetKey] ? pageConfigs[sheetKey].sheet : sheetKey);
                     
-                    await gasRun('deleteData', actualSheet, safeIdx); 
+                    // ZETTBOT FIX: Mendapatkan ID unik item untuk dikirim ke API Firebase
+                    var rowData = window.BGL2_CACHE[actualSheet][safeIdx];
+                    var itemId = rowData ? rowData[0] : null;
+
+                    await gasRun('deleteData', actualSheet, safeIdx, itemId); 
                     
                     window.BGL2_DROPDOWN_CACHE = null; 
                     localStorage.removeItem('bgl2_dropdown_cache'); 
