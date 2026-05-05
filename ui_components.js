@@ -12,11 +12,11 @@
         var filterVal = document.getElementById('dashFilterPeriode') ? document.getElementById('dashFilterPeriode').value : 'harian';
         var data = window.BGL2_CACHE['DB_konter'] || [];
         
-        var todayStr = new Date().toLocaleDateString('id-ID'); 
-        var parts = todayStr.replace(/(^|\/)(0+)/g, '$1').trim().split('/');
-        var currentDay = parseInt(parts[0]);
-        var currentMonth = parseInt(parts[1]);
-        var currentYear = parseInt(parts[2]);
+        // ZETTBOT FIX: Sinkronisasi Laporan dengan Paginasi Tanggal
+        var targetDate = window.currentFilterDate || new Date();
+        var currentDay = targetDate.getDate();
+        var currentMonth = targetDate.getMonth() + 1;
+        var currentYear = targetDate.getFullYear();
 
         var totalTrx = 0; var totalProfit = 0;
 
@@ -27,13 +27,17 @@
                 
                 var rParts = rowDateStr.split('/');
                 if(rParts.length < 3) continue;
-                var rDay = parseInt(rParts[0]);
-                var rMonth = parseInt(rParts[1]);
-                var rYear = parseInt(rParts[2]);
+                var rDay = parseInt(rParts[0], 10);
+                var rMonth = parseInt(rParts[1], 10);
+                var rYear = parseInt(rParts[2], 10);
 
                 var match = false;
-                if (filterVal === 'harian') { if (rDay === currentDay && rMonth === currentMonth && rYear === currentYear) match = true; } 
-                else if (filterVal === 'bulanan') { if (rMonth === currentMonth && rYear === currentYear) match = true; }
+                if (filterVal === 'harian') { 
+                    if (rDay === currentDay && rMonth === currentMonth && rYear === currentYear) match = true; 
+                } 
+                else if (filterVal === 'bulanan') { 
+                    if (rMonth === currentMonth && rYear === currentYear) match = true; 
+                }
 
                 if (match) {
                     totalTrx++;
@@ -47,7 +51,9 @@
         document.getElementById('dashTotalTrx').innerText = totalTrx;
         document.getElementById('dashTotalProfit').innerText = "Rp " + totalProfit.toLocaleString('id-ID');
         
-        var lblPeriode = filterVal === 'harian' ? 'Hari Ini' : 'Bulan Ini';
+        var isToday = new Date().toLocaleDateString('id-ID') === targetDate.toLocaleDateString('id-ID');
+        var lblPeriode = filterVal === 'harian' ? (isToday ? 'Hari Ini' : 'Tgl Terpilih') : 'Bulan Ini';
+        
         var elTrx = document.getElementById('dashLabelTrx');
         var elProf = document.getElementById('dashLabelProfit');
         if(elTrx) elTrx.innerText = 'Trx ' + lblPeriode;
@@ -497,15 +503,73 @@
 
         var tbody = document.getElementById('dataTableBody');
         if(!tbody) return;
-        if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data.</td></tr>'; return; }
-        var reversedData = [];
-        for (var k = data.length - 1; k >= 0; k--) { if(data[k] && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k}); }
-        currentTableData = reversedData;
-        var rowsHtml = reversedData.map(d => {
-            var r = d.row; var o = d.originalIndex;
-            return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors"><td class="py-1.5 px-3 font-mono font-bold text-center">${r[0]||'-'}</td><td class="py-1.5 px-3 text-center">${r[1]||'-'}</td><td class="py-1.5 px-3 font-bold text-blue-700 text-center">${r[2]||'-'}</td><td class="py-1.5 px-3 text-center">${r[3]||'-'}</td><td class="py-1.5 px-3 font-bold text-emerald-600 text-center">${r[5]||'-'}</td><td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
-        });
-        tbody.innerHTML = rowsHtml.join('');
+
+        // ZETTBOT FIX: Logika Paginasi Filter berdasarkan Tanggal
+        var targetDate = window.currentFilterDate || new Date();
+        var targetD = targetDate.getDate();
+        var targetM = targetDate.getMonth() + 1;
+        var targetY = targetDate.getFullYear();
+
+        var filteredData = [];
+        for (var k = data.length - 1; k >= 0; k--) { 
+            if(data[k] && data[k][0] !== "") {
+                var rowDateStr = String(data[k][1]).replace(/(^|\/)(0+)/g, '$1').trim();
+                if(!rowDateStr) continue;
+                var rParts = rowDateStr.split('/');
+                if(rParts.length >= 3) {
+                    var rDay = parseInt(rParts[0], 10);
+                    var rMonth = parseInt(rParts[1], 10);
+                    var rYear = parseInt(rParts[2], 10);
+                    if (rDay === targetD && rMonth === targetM && rYear === targetY) {
+                        filteredData.push({row: data[k], originalIndex: k});
+                    }
+                }
+            } 
+        }
+
+        currentTableData = filteredData;
+
+        if(!filteredData || filteredData.length === 0) { 
+            tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic font-medium">Tidak ada transaksi pada tanggal ini.</td></tr>'; 
+        } else {
+            var rowsHtml = filteredData.map(d => {
+                var r = d.row; var o = d.originalIndex;
+                return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors"><td class="py-1.5 px-3 font-mono font-bold text-center">${r[0]||'-'}</td><td class="py-1.5 px-3 text-center">${r[1]||'-'}</td><td class="py-1.5 px-3 font-bold text-blue-700 text-center">${r[2]||'-'}</td><td class="py-1.5 px-3 text-center">${r[3]||'-'}</td><td class="py-1.5 px-3 font-bold text-emerald-600 text-center">${r[5]||'-'}</td><td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
+            });
+            tbody.innerHTML = rowsHtml.join('');
+        }
+
+        // ZETTBOT FIX: Render UI Paginasi di bawah tabel
+        var container = document.getElementById('dataTableContainer');
+        var existingPag = document.getElementById('datePaginationWrap');
+        if (existingPag) existingPag.remove();
+
+        var yyyy = targetDate.getFullYear();
+        var mm = String(targetDate.getMonth() + 1).padStart(2, '0');
+        var dd = String(targetDate.getDate()).padStart(2, '0');
+        var dateInputVal = `${yyyy}-${mm}-${dd}`;
+
+        var options = { day: 'numeric', month: 'short', year: 'numeric' };
+        var displayStr = targetDate.toLocaleDateString('id-ID', options);
+
+        var pagHtml = `
+        <div id="datePaginationWrap" class="flex justify-center items-center p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white w-full sticky bottom-0 z-10 mt-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center">
+                <i class="fa-solid fa-chevron-left sm:mr-1.5"></i> <span class="hidden sm:inline">Prev</span>
+            </button>
+            <div class="relative flex items-center cursor-pointer bg-blue-50 border border-blue-200 rounded-lg px-4 py-1.5 hover:bg-blue-100 transition-colors" title="Pilih Tanggal">
+                <input type="date" id="konterDatePicker" value="${dateInputVal}" onchange="setFilterDate(this.value)" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-20">
+                <div class="flex items-center gap-2 font-bold text-blue-700 pointer-events-none text-xs">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span id="dateDisplayLabel">${displayStr}</span>
+                </div>
+            </div>
+            <button type="button" onclick="changeFilterDate(1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center">
+                <span class="hidden sm:inline">Next</span> <i class="fa-solid fa-chevron-right sm:ml-1.5"></i>
+            </button>
+        </div>`;
+
+        container.insertAdjacentHTML('beforeend', pagHtml);
     }
 
     function renderGenericTable(data, colCount) {
@@ -552,4 +616,18 @@
         if (element.value !== rupiah) {
             element.value = rupiah;
         }
+    };
+
+    // ZETTBOT FIX: Fungsi Global untuk Trigger Ganti Tanggal
+    window.changeFilterDate = function(offset) {
+        var d = window.currentFilterDate || new Date();
+        d.setDate(d.getDate() + offset);
+        window.currentFilterDate = new Date(d); // Force refresh object
+        loadTableData(false); // Render ulang tabel dari cache
+    };
+
+    window.setFilterDate = function(val) {
+        if(!val) return;
+        window.currentFilterDate = new Date(val);
+        loadTableData(false); // Render ulang tabel dari cache
     };
