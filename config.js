@@ -1,6 +1,10 @@
+
     var window = window || {};
     window.BGL2_CACHE = window.BGL2_CACHE || {}; 
     window.BGL2_DROPDOWN_CACHE = window.BGL2_DROPDOWN_CACHE || null; 
+    
+    // ZETTBOT FIX: State Global untuk Paginasi Tanggal
+    window.currentFilterDate = new Date();
     
     try {
         var savedDrop = localStorage.getItem('bgl2_dropdown_cache');
@@ -27,7 +31,8 @@
         'Pulsa': { sheet: 'Pulsa', prefix: 'PL', headers: ['ID Pulsa', 'Provider', 'Nominal / Nama', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'pulsa', fields: [{ id: 'id_pulsa', label: 'ID Pulsa', type: 'text', disabled: true }, { id: 'provider', label: 'Provider', type: 'select_dynamic_add', source: 'providerData', required: true }, { id: 'nama_pulsa', label: 'Nominal / Nama', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
         'Game': { sheet: 'Game', prefix: 'GM', headers: ['ID Game', 'Nama Game', 'Item / Nominal', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'game', fields: [{ id: 'id_game', label: 'ID Game', type: 'text', disabled: true }, { id: 'kategori_game', label: 'Nama Game', type: 'select_dynamic_add', source: 'kategoriGameData', required: true }, { id: 'nama_item', label: 'Item / Nominal', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
         'Umum': { sheet: 'Pengaturan_Umum', prefix: 'PU' },
-        'Margin': { sheet: 'Pengaturan_Margin', prefix: 'PM', headers: ['ID', 'Layanan Terkait', 'Nominal Awal', 'Nominal Akhir', 'Margin', 'Aksi'], fields: [{ id: 'id_margin', label: 'ID Margin', type: 'text', disabled: true }, { id: 'layanan_margin', label: 'Layanan Terkait', type: 'select_multiple', options: ['TRANSFER', 'JASA TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'VOUCHER', 'PERDANA', 'PULSA', 'KUOTA INTERNET', 'ACC', 'GAME'], required: true }, { id: 'min_nom', label: 'Nominal Awal (>=)', type: 'rupiah', required: true }, { id: 'max_nom', label: 'Nominal Akhir (<) (Boleh kosong)', type: 'rupiah', required: false }, { id: 'val_margin', label: 'Margin / Keuntungan (IDR)', type: 'rupiah', required: true }] }
+        'Margin': { sheet: 'Pengaturan_Margin', prefix: 'PM', headers: ['ID', 'Layanan Terkait', 'Nominal Awal', 'Nominal Akhir', 'Margin', 'Aksi'], fields: [{ id: 'id_margin', label: 'ID Margin', type: 'text', disabled: true }, { id: 'layanan_margin', label: 'Layanan Terkait', type: 'select_multiple', options: ['TRANSFER', 'JASA TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN', 'VOUCHER', 'PERDANA', 'PULSA', 'KUOTA INTERNET', 'ACC', 'GAME'], required: true }, { id: 'min_nom', label: 'Nominal Awal (>=)', type: 'rupiah', required: true }, { id: 'max_nom', label: 'Nominal Akhir (<) (Boleh kosong)', type: 'rupiah', required: false }, { id: 'val_margin', label: 'Margin / Keuntungan (IDR)', type: 'rupiah', required: true }] },
+        'Service': { sheet: 'DB_service', prefix: 'SV', headers: ['No Nota', 'Tanggal', 'ID Cust', 'Seri HP', 'PIN/Pola', 'Kerusakan', 'Kelengkapan', 'Garansi', 'Ket Tambahan', 'Total Biaya', 'Ket Bayar', 'Foto', 'Status', 'Updated At', 'Aksi'], fields: [] }
     };
 
     const getEl = (id) => {
