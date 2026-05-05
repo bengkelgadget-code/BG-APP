@@ -546,7 +546,6 @@ function renderKonterTable(data, colCount) {
         tbody.innerHTML = rowsHtml.join('');
     }
 
-    // ZETTBOT FIX: Memindahkan navigasi ke mainTableWrapper agar tetap di tengah (tidak terpengaruh scroll horizontal tabel)
     var wrapper = document.getElementById('mainTableWrapper');
     var existingPag = document.getElementById('datePaginationWrap');
     if (existingPag) existingPag.remove();
@@ -559,7 +558,6 @@ function renderKonterTable(data, colCount) {
     var options = { day: 'numeric', month: 'short', year: 'numeric' };
     var displayStr = targetDate.toLocaleDateString('id-ID', options);
 
-    // ZETTBOT FIX: Menambahkan trigger showPicker() agar pop-up kalender selalu muncul saat ditekan di browser mana pun
     var pagHtml = `
     <div id="datePaginationWrap" class="flex justify-center items-center p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white w-full shrink-0 z-10 rounded-b-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm">
@@ -600,11 +598,52 @@ function renderGenericTable(data, colCount) {
 
     var rowsHtml = reversedData.map((d, i) => {
         var r = d.row; var o = d.originalIndex;
-        
         var cells = '';
-        for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
-            var c = r[idx] || '';
-            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
+
+        // ZETTBOT FIX: Pemetaan Khusus untuk tabel Margin (Karena field input 7 namun kolom di UI hanya 6)
+        var isMargin = (currentSheet === 'Margin' || (currentConfig && currentConfig.sheet === 'Pengaturan_Margin'));
+
+        if (isMargin) {
+            // Mencegah error jika urutan field di config.html diacak dengan membaca berdasarkan field ID
+            var fMap = {};
+            if (currentConfig && currentConfig.fields) {
+                for (var fi = 0; fi < currentConfig.fields.length; fi++) {
+                    fMap[currentConfig.fields[fi].id] = r[fi] || '';
+                }
+            }
+            
+            var idVal = r[0] || '';
+            var tipeVal = fMap['tipe_margin'] || r[1] || '';
+            var layananVal = fMap['layanan_margin'] || r[2] || '';
+            var minVal = fMap['min_nom'] || r[3] || '';
+            var akhirVal = fMap['max_nom'] || r[4] || '';
+            var pctVal = fMap['persentase_val'] || r[5] || '';
+            var marginVal = fMap['val_margin'] || r[6] || '';
+
+            // Tentukan apa yang masuk ke kolom gabungan "AKHIR / PERSENTASE"
+            var displayAkhirPct = tipeVal === 'Persentase' ? pctVal : akhirVal;
+            // Tentukan apa yang masuk ke kolom "KEUNTUNGAN"
+            var displayKeuntungan = tipeVal === 'Persentase' ? '-' : marginVal;
+
+            // Backward compatibility untuk memastikan baris data lama tidak rusak tampilannya
+            if (r.length < 7 && tipeVal !== 'Persentase') {
+                displayAkhirPct = r[4] || '';
+                displayKeuntungan = r[5] || '';
+            }
+
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${idVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${tipeVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${layananVal}">${layananVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${minVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${displayAkhirPct}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center font-bold text-emerald-600 truncate max-w-[150px]">${displayKeuntungan}</td>`;
+
+        } else {
+            // Logika render default untuk menu data lain yang mapping kolomnya 1-to-1
+            for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
+                var c = r[idx] || '';
+                cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
+            }
         }
 
         return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">${cells}<td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
@@ -633,7 +672,6 @@ window.changeFilterDate = function(offset) {
     loadTableData(false); 
 };
 
-// ZETTBOT FIX: Mengubah metode parsing string tanggal untuk mencegah bug zona waktu yang memundurkan hari (-1 day) di kalender
 window.setFilterDate = function(val) {
     if(!val) return;
     var parts = val.split('-');
