@@ -1,4 +1,4 @@
-    const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
 
     async function gasRun(funcName, ...args) {
         if (typeof window.USE_FIREBASE === 'undefined') {
@@ -187,7 +187,7 @@
             }
             else if (funcName === 'deleteData') {
                 let sheetName = args[0];
-                let itemId = args[2];
+                let itemId = args[2]; // ZETTBOT FIX: Mengambil parameter ke-3 (ID) yang sekarang dikirim dari Frontend
 
                 if (itemId) {
                     let snapshot = await getDocs(col(db, sheetName));
@@ -216,22 +216,25 @@
                 if (itemId) {
                     let snapshot = await getDocs(col(db, sheetName));
                     let targetDocId = null;
+                    let originalTimestamp = new Date().getTime(); // ZETTBOT FIX: Menyiapkan variabel untuk menampung timestamp asli
+
                     snapshot.forEach(doc => {
                         let d = doc.data();
                         if (d.rowArray && d.rowArray[0] === itemId) {
                             targetDocId = doc.id;
+                            if (d.timestamp) originalTimestamp = d.timestamp; // Ambil timestamp aslinya!
                         }
                     });
 
                     if (targetDocId) {
                         await updateDoc(docRef(db, sheetName, targetDocId), {
                             rowArray: rowData,
-                            timestamp: new Date().getTime()
+                            timestamp: originalTimestamp // Gunakan timestamp asli agar urutan tabel tidak berubah
                         });
                     } else {
                         await addDoc(col(db, sheetName), {
                             rowArray: rowData,
-                            timestamp: new Date().getTime()
+                            timestamp: originalTimestamp
                         });
                     }
                 }
