@@ -6,12 +6,13 @@ import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } 
 
 // 1. Masukkan Config Firebase Anda di sini nanti (Dapat dari Console Firebase)
 const firebaseConfig = {
-    apiKey: "ISI_API_KEY_ANDA",
-    authDomain: "ISI_AUTH_DOMAIN_ANDA",
-    projectId: "ISI_PROJECT_ID_ANDA",
-    storageBucket: "ISI_STORAGE_BUCKET_ANDA",
-    messagingSenderId: "ISI_MESSAGING_SENDER_ID_ANDA",
-    appId: "ISI_APP_ID_ANDA"
+  apiKey: "AIzaSyCkv7rYTAIUy9Exd29HpLDvyubM2yq0jtc",
+  authDomain: "bengkelgadget-l2.firebaseapp.com",
+  projectId: "bengkelgadget-l2",
+  storageBucket: "bengkelgadget-l2.firebasestorage.app",
+  messagingSenderId: "8475192675",
+  appId: "1:8475192675:web:da12ee67f40c7bfd2ab756",
+  measurementId: "G-DVYLTDQK8Y"
 };
 
 // 2. State Mode Database (Switch: true = Firebase, false = Google Sheets murni)
