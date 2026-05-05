@@ -1,4 +1,3 @@
-<script>
     function renderMiniDashboard() {
         var dash = document.getElementById('miniDashboardKonterContainer');
         if (!dash) return;
@@ -554,4 +553,3 @@
             element.value = rupiah;
         }
     };
-</script>
