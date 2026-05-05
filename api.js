@@ -1,7 +1,17 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
 
-function gasRun(funcName, ...args) {
-    if (window.USE_FIREBASE && window.firebaseDB) {
+// ZETTBOT FIX: Jadikan async untuk menerapkan Jeda Pintar
+async function gasRun(funcName, ...args) {
+    // Menunggu module Firebase selesai dimuat (Mencegah Fallback terlalu cepat saat Reload awal)
+    if (typeof window.USE_FIREBASE === 'undefined') {
+        let retries = 30; // Tunggu maksimal 3 detik
+        while (typeof window.USE_FIREBASE === 'undefined' && retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            retries--;
+        }
+    }
+
+    if (window.USE_FIREBASE === true && window.firebaseDB) {
         return runHybridDatabase(funcName, ...args);
     }
 
@@ -66,17 +76,12 @@ async function runHybridDatabase(funcName, ...args) {
             snapshot.forEach(doc => {
                 let d = doc.data();
                 if(d.rowArray) {
-                    // Memberikan nilai default 0 jika data tidak memiliki timestamp
                     d.timestamp = d.timestamp || 0;
                     dataObjects.push(d); 
                 }
             });
 
-            // ZETTBOT FIX: Mengurutkan data berdasarkan Timestamp (Terlama -> Terbaru)
-            // Karena UI akan me-reverse datanya (Terbaru ada di Paling Atas)
             dataObjects.sort((a, b) => a.timestamp - b.timestamp);
-            
-            // Ekstrak kembali array-nya setelah diurutkan
             let dataArray = dataObjects.map(obj => obj.rowArray);
 
             if (dataArray.length === 0) {
@@ -85,7 +90,51 @@ async function runHybridDatabase(funcName, ...args) {
             result = dataArray;
         } 
         else if (funcName === 'getDropdownData') {
-            throw new Error("Fallback ke GS untuk Dropdown selama masa transisi.");
+            const collectionsToFetch = [
+                'BrandHP', 'Provider', 'Bank', 'E_Wallet', 'PPOB', 
+                'KategoriACC', 'KategoriGame', 'Voucher', 'Perdana', 'ACC', 'Pulsa'
+            ];
+            
+            // Pengambilan data secara paralel agar form edit muncul instan
+            const fetchPromises = collectionsToFetch.map(sheet => getDocs(col(db, sheet)));
+            const snapshots = await Promise.all(fetchPromises);
+            
+            const extractData = (snap) => {
+                let arr = [];
+                snap.forEach(doc => {
+                    let d = doc.data();
+                    if(d.rowArray) arr.push(d.rowArray);
+                });
+                return arr;
+            };
+
+            let brandRaw = extractData(snapshots[0]);
+            let provRaw = extractData(snapshots[1]);
+            let bankRaw = extractData(snapshots[2]);
+            let ewRaw = extractData(snapshots[3]);
+            let ppobRaw = extractData(snapshots[4]);
+            let kAccRaw = extractData(snapshots[5]);
+            let kGameRaw = extractData(snapshots[6]);
+            let vRaw = extractData(snapshots[7]);
+            let pRaw = extractData(snapshots[8]);
+            let aRaw = extractData(snapshots[9]);
+            let plRaw = extractData(snapshots[10]);
+
+            const parseNum = (str) => String(str || '').replace(/[^0-9]/g, '');
+
+            result = {
+                brandData: brandRaw.map(r => r[1]),
+                providerData: provRaw.map(r => r[1]),
+                bankData: bankRaw.map(r => r[1]),
+                ewalletData: ewRaw.map(r => r[1]),
+                ppobData: ppobRaw.map(r => r[1]),
+                kategoriAccData: kAccRaw.map(r => r[1]),
+                kategoriGameData: kGameRaw.map(r => r[1]),
+                voucherData: vRaw.map(r => ({ provider: r[1], nama: r[2], beli: parseNum(r[3]), jual: parseNum(r[4]), stok: r[5] })),
+                perdanaData: pRaw.map(r => ({ provider: r[1], nama: r[2], beli: parseNum(r[3]), jual: parseNum(r[4]), stok: r[5] })),
+                accData: aRaw.map(r => ({ kategori: r[1], nama: r[2], beli: parseNum(r[3]), jual: parseNum(r[4]), stok: r[5] })),
+                pulsaData: plRaw.map(r => ({ provider: r[1], nama: r[2], beli: parseNum(r[3]), jual: parseNum(r[4]) }))
+            };
         } 
         else if (funcName === 'saveData') {
             let sheetName = args[0];
@@ -99,7 +148,6 @@ async function runHybridDatabase(funcName, ...args) {
         else if (funcName === 'saveKonterTransaction') {
             let payload = args[0];
             
-            // ZETTBOT FIX: Membuat ID Transaksi Berurutan (TRX-TGLBLNTHN-XXX)
             let dateObj = new Date();
             let dd = String(dateObj.getDate()).padStart(2, '0');
             let mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -109,7 +157,6 @@ async function runHybridDatabase(funcName, ...args) {
             let snapshot = await getDocs(col(db, 'DB_konter'));
             let maxNum = 0;
             
-            // Cari nomor urut terbesar di hari ini
             snapshot.forEach(doc => {
                 let d = doc.data();
                 if (d.rowArray && d.rowArray[0] && String(d.rowArray[0]).startsWith(prefix)) {
@@ -181,7 +228,7 @@ async function runHybridDatabase(funcName, ...args) {
                 if (targetDocId) {
                     await updateDoc(docRef(db, sheetName, targetDocId), {
                         rowArray: rowData,
-                        timestamp: new Date().getTime() // Perbarui timestamp agar naik ke atas jika diedit (Opsi)
+                        timestamp: new Date().getTime() 
                     });
                 } else {
                     await addDoc(col(db, sheetName), {
@@ -200,7 +247,6 @@ async function runHybridDatabase(funcName, ...args) {
                 let snapshot = await getDocs(col(db, 'DB_konter'));
                 let targetDocId = null;
                 
-                // Ambil timestamp asli agar posisinya di urutan tidak berubah saat di-edit
                 let originalTimestamp = new Date().getTime(); 
                 
                 snapshot.forEach(doc => {
