@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2jA67OeRVDYgWGGVrwjkzYhg6uatkqZFLEPuEKL24nvTV9/exec";
 
     async function gasRun(funcName, ...args) {
         if (typeof window.USE_FIREBASE === 'undefined') {
@@ -85,7 +85,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
                 result = dataArray;
             }
             else if (funcName === 'getDropdownData') {
-                // ZETTBOT FIX: Tambahkan 'Token' ke dalam daftar pemanggilan Firebase
                 const collectionsToFetch = [
                     'BrandHP', 'Provider', 'Bank', 'E_Wallet', 'PPOB',
                     'KategoriACC', 'KategoriGame', 'Voucher', 'Perdana', 'ACC', 'Pulsa', 'Token'
@@ -114,7 +113,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
                 let pRaw = extractData(snapshots[8]);
                 let aRaw = extractData(snapshots[9]);
                 let plRaw = extractData(snapshots[10]);
-                let tRaw = extractData(snapshots[11]); // Token Data Firebase
+                let tRaw = extractData(snapshots[11]); 
 
                 const parseNum = (str) => String(str || '').replace(/[^0-9]/g, '');
 
@@ -130,7 +129,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
                     perdanaData: pRaw.map(r => ({ provider: r[1], nama: r[2], beli: parseNum(r[3]), jual: parseNum(r[4]), stok: r[5] })),
                     accData: aRaw.map(r => ({ kategori: r[1], nama: r[2], beli: parseNum(r[3]), jual: parseNum(r[4]), stok: r[5] })),
                     pulsaData: plRaw.map(r => ({ provider: r[1], nama: r[2], beli: parseNum(r[3]), jual: parseNum(r[4]) })),
-                    // Format khusus array Token PLN untuk dropdown
                     tokenData: tRaw.map(r => ({ nama: r[1], beli: parseNum(r[2]), jual: parseNum(r[3]) }))
                 };
             }
@@ -187,7 +185,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
             }
             else if (funcName === 'deleteData') {
                 let sheetName = args[0];
-                let itemId = args[2]; // ZETTBOT FIX: Mengambil parameter ke-3 (ID) yang sekarang dikirim dari Frontend
+                let itemId = args[2]; 
 
                 if (itemId) {
                     let snapshot = await getDocs(col(db, sheetName));
@@ -211,7 +209,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
             else if (funcName === 'updateData') {
                 let sheetName = args[0];
                 let rowData = args[2];
-                let itemId = rowData[0]; // ZETTBOT FIX: Pastikan ID selalu diambil tepat dari index ke-0 data baru
+                let itemId = rowData[0]; 
 
                 if (itemId) {
                     let snapshot = await getDocs(col(db, sheetName));
@@ -242,7 +240,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
             }
             else if (funcName === 'editKonterTransaction') {
                 let rowData = args[1];
-                let itemId = rowData[0]; // ZETTBOT FIX: Targetkan ID Transaksi yang benar (TRX-...)
+                let itemId = rowData[0]; 
                 let sheetName = 'DB_konter';
 
                 if (itemId) {
@@ -266,22 +264,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
                     }
                 }
                 result = { status: 'success', message: 'Transaksi diedit' };
-            }
-            else if (funcName === 'savePengaturanUmum') {
-
-                    if (targetDocId) {
-                        await updateDoc(docRef(db, 'DB_konter', targetDocId), {
-                            rowArray: row,
-                            timestamp: originalTimestamp
-                        });
-                    } else {
-                         await addDoc(col(db, 'DB_konter'), {
-                            rowArray: row,
-                            timestamp: originalTimestamp
-                        });
-                    }
-                }
-                result = { status: 'success', message: 'Transaksi Konter diupdate di Firebase & GS' };
             }
             else {
                  throw new Error(`Fungsi [${funcName}] belum di-mapping di Firebase.`);
