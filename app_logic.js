@@ -33,30 +33,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function calculateDynamicMargin(layananName, nominal) {
         var marginData = window.BGL2_CACHE['Pengaturan_Margin'] || [];
+        var validRules = [];
+        
+        // Kumpulkan semua rule yang valid untuk layanan ini
         for (var i = 0; i < marginData.length; i++) {
             var row = marginData[i];
             if (!row || row[0] === "") continue;
             
-            // ZETTBOT FIX: Memperbaiki index array pembacaan rule margin
-            var tipe = row[1]; // Index 1 adalah Tipe (Range/Persentase)
-            var layanans = (row[2] || '').split(',').map(s => s.trim().toUpperCase()); // Index 2 adalah Layanan Terkait
-            
+            var layanans = (row[2] || '').split(',').map(s => s.trim().toUpperCase());
             if (layanans.includes(layananName.toUpperCase())) {
-                var minNom = parseInt(String(row[3]).replace(/[^0-9]/g, '')) || 0; // Index 3 adalah Nominal Awal
-                
-                if (tipe === 'Persentase') {
-                    if (nominal >= minNom) {
-                        var pctStr = String(row[5]).replace(/[^0-9.]/g, ''); // Index 5 adalah Persentase
-                        var pct = parseFloat(pctStr) || 0;
-                        return Math.round(nominal * (pct / 100));
-                    }
-                } else {
-                    var maxNomStr = String(row[4]).replace(/[^0-9]/g, ''); // Index 4 adalah Nominal Akhir
-                    var maxNom = maxNomStr ? parseInt(maxNomStr) : Infinity; 
-                    
-                    if (nominal >= minNom && nominal < maxNom) {
-                        return parseInt(String(row[6]).replace(/[^0-9]/g, '')) || 0; // Index 6 adalah Margin/Keuntungan
-                    }
+                validRules.push({
+                    tipe: row[1],
+                    minNom: parseInt(String(row[3]).replace(/[^0-9]/g, '')) || 0,
+                    maxNomStr: String(row[4]).replace(/[^0-9]/g, ''),
+                    pctStr: String(row[5]).replace(/[^0-9.]/g, ''),
+                    marginNom: parseInt(String(row[6]).replace(/[^0-9]/g, '')) || 0
+                });
+            }
+        }
+        
+        // ZETTBOT FIX: Urutkan dari Nominal Awal TERBESAR ke TERKECIL (Descending)
+        // Mencegah nominal besar tersangkut di rule kecil karena maxNom kosong (Infinity)
+        validRules.sort(function(a, b) { return b.minNom - a.minNom; });
+        
+        // Evaluasi setelah diurutkan
+        for (var j = 0; j < validRules.length; j++) {
+            var rule = validRules[j];
+            var maxNom = rule.maxNomStr ? parseInt(rule.maxNomStr) : Infinity;
+            
+            if (rule.tipe === 'Persentase') {
+                if (nominal >= rule.minNom) {
+                    var pct = parseFloat(rule.pctStr) || 0;
+                    return Math.round(nominal * (pct / 100));
+                }
+            } else {
+                if (nominal >= rule.minNom && nominal < maxNom) {
+                    return rule.marginNom;
                 }
             }
         }
