@@ -211,25 +211,25 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
             else if (funcName === 'updateData') {
                 let sheetName = args[0];
                 let rowData = args[2];
-                let itemId = rowData[0];
+                let itemId = rowData[0]; // ZETTBOT FIX: Pastikan ID selalu diambil tepat dari index ke-0 data baru
 
                 if (itemId) {
                     let snapshot = await getDocs(col(db, sheetName));
                     let targetDocId = null;
-                    let originalTimestamp = new Date().getTime(); // ZETTBOT FIX: Menyiapkan variabel untuk menampung timestamp asli
+                    let originalTimestamp = new Date().getTime(); 
 
                     snapshot.forEach(doc => {
                         let d = doc.data();
                         if (d.rowArray && d.rowArray[0] === itemId) {
                             targetDocId = doc.id;
-                            if (d.timestamp) originalTimestamp = d.timestamp; // Ambil timestamp aslinya!
+                            if (d.timestamp) originalTimestamp = d.timestamp; 
                         }
                     });
 
                     if (targetDocId) {
                         await updateDoc(docRef(db, sheetName, targetDocId), {
                             rowArray: rowData,
-                            timestamp: originalTimestamp // Gunakan timestamp asli agar urutan tabel tidak berubah
+                            timestamp: originalTimestamp 
                         });
                     } else {
                         await addDoc(col(db, sheetName), {
@@ -241,33 +241,33 @@ const API_URL = "https://script.google.com/macros/s/AKfycbx5lbAmTXpQRntpv4IQqM2j
                 result = { status: 'success', message: 'Data diupdate di Firebase & GS' };
             }
             else if (funcName === 'editKonterTransaction') {
-                let payload = args[1];
-                let itemId = payload.id;
+                let rowData = args[1];
+                let itemId = rowData[0]; // ZETTBOT FIX: Targetkan ID Transaksi yang benar (TRX-...)
+                let sheetName = 'DB_konter';
 
                 if (itemId) {
-                    let snapshot = await getDocs(col(db, 'DB_konter'));
+                    let snapshot = await getDocs(col(db, sheetName));
                     let targetDocId = null;
-
                     let originalTimestamp = new Date().getTime();
 
                     snapshot.forEach(doc => {
                         let d = doc.data();
                         if (d.rowArray && d.rowArray[0] === itemId) {
                             targetDocId = doc.id;
-                            if(d.timestamp) originalTimestamp = d.timestamp;
+                            if (d.timestamp) originalTimestamp = d.timestamp;
                         }
                     });
 
-                    let row = [
-                        itemId,
-                        payload.tanggal,
-                        payload.jenis,
-                        payload.detail,
-                        fRupiah(payload.hargaBeliDB),
-                        fRupiah(payload.hargaJualDB),
-                        fRupiah(payload.hargaJualDB - payload.hargaBeliDB),
-                        new Date().toLocaleDateString('id-ID')
-                    ];
+                    if (targetDocId) {
+                        await updateDoc(docRef(db, sheetName, targetDocId), {
+                            rowArray: rowData,
+                            timestamp: originalTimestamp
+                        });
+                    }
+                }
+                result = { status: 'success', message: 'Transaksi diedit' };
+            }
+            else if (funcName === 'savePengaturanUmum') {
 
                     if (targetDocId) {
                         await updateDoc(docRef(db, 'DB_konter', targetDocId), {
