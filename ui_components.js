@@ -713,3 +713,6 @@ window.toggleMarginFields = function(el) {
         if(iPct) iPct.required = false;
         if(iMarg) iMarg.required = true;
     }
+};
+
+console.log("ui_components berhasil dimuat 100% tanpa terpotong!");
