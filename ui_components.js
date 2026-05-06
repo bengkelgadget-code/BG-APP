@@ -145,7 +145,6 @@ function loadTableData(forceRefresh = false) {
         var tableContainer = document.getElementById('dataTableContainer');
         var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
         
-        // ZETTBOT FIX: Sembunyikan dan hapus navigasi tanggal jika BUKAN di halaman Transaksi Konter
         if (!isKonterMode) {
             var existingPag = document.getElementById('datePaginationWrap');
             if (existingPag) existingPag.remove();
@@ -168,11 +167,17 @@ function loadTableData(forceRefresh = false) {
             return;
         }
 
-        var html = '<table class="w-full text-left border-collapse whitespace-nowrap" id="dataTable">';
-        html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-sm uppercase tracking-wider">';
+        // ZETTBOT FIX: Styling responsif untuk Header Tabel agar muat di HP
+        var html = '<table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="dataTable">';
+        html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
         html += '<tr>';
-        for(var i=0; i<hdrs.length; i++) html += '<th class="py-2.5 px-4 font-bold text-center">' + hdrs[i] + '</th>';
-        html += '</tr></thead><tbody class="text-sm divide-y divide-slate-100" id="dataTableBody"></tbody></table>';
+        for(var i=0; i<hdrs.length; i++) {
+            var thClass = "py-2.5 px-2 sm:px-4 font-bold text-center";
+            // Jika mode Konter, sembunyikan kolom ID TRX di HP
+            if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
+            html += '<th class="' + thClass + '">' + hdrs[i] + '</th>';
+        }
+        html += '</tr></thead><tbody class="text-[11px] sm:text-sm divide-y divide-slate-100" id="dataTableBody"></tbody></table>';
         
         tableContainer.innerHTML = html;
         var tbody = document.getElementById('dataTableBody');
@@ -235,6 +240,21 @@ function openGenericModal() {
     document.querySelectorAll('#modalGeneric').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
     document.querySelectorAll('#modalGenericContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
     document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
+
+    // ZETTBOT FIX: Auto Focus saat Form Terbuka
+    setTimeout(() => {
+        var form = document.getElementById('dynamicForm');
+        if(form) {
+            var firstInput = form.querySelector('input:not([type="hidden"]):not([readonly]):not([disabled]), select:not([disabled]), textarea:not([disabled])');
+            if(firstInput) {
+                if(firstInput.tagName === 'SELECT' && window.jQuery) {
+                    $(firstInput).select2('open'); // Langsung buka dropdown
+                } else {
+                    firstInput.focus(); // Arahkan kursor
+                }
+            }
+        }
+    }, 300);
 }
 
 function closeGenericModal() {
@@ -295,6 +315,8 @@ async function openSmartPasteModal() {
     
     if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
     if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
+
+    setTimeout(() => { if(window.jQuery) { $('#pasteProvider').select2('open'); } }, 300);
 }
 
 function closeSmartPasteModal() {
@@ -430,6 +452,16 @@ function openKonterModal() {
     document.querySelectorAll('#modalKonter').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
     document.querySelectorAll('#modalKonterContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
     document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
+
+    // ZETTBOT FIX: Auto Focus di Form Transaksi
+    setTimeout(() => {
+        if(window.jQuery && $('#kntJenis').length) {
+            $('#kntJenis').select2('open');
+        } else {
+            var jenis = document.getElementById('kntJenis');
+            if(jenis) jenis.focus();
+        }
+    }, 300);
 }
 
 function closeKonterModal() {
@@ -545,10 +577,22 @@ function renderKonterTable(data, colCount) {
     if(!filteredData || filteredData.length === 0) { 
         tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic font-medium">Tidak ada transaksi pada tanggal ini.</td></tr>'; 
     } else {
+        // ZETTBOT FIX: Styling Baris Transaksi Agar Ringkas dan Fit di HP tanpa Horizontal Scroll
         var rowsHtml = filteredData.map(d => {
             var r = d.row; var o = d.originalIndex;
-            return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors"><td class="py-1.5 px-3 font-mono font-bold text-center">${r[0]||'-'}</td><td class="py-1.5 px-3 text-center">${r[1]||'-'}</td><td class="py-1.5 px-3 font-bold text-blue-700 text-center">${r[2]||'-'}</td><td class="py-1.5 px-3 text-center">${r[3]||'-'}</td><td class="py-1.5 px-3 font-bold text-emerald-600 text-center">${r[5]||'-'}</td><td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
+            return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 hover:bg-slate-50 transition-colors">
+                <td class="py-2.5 px-1 sm:px-3 font-mono font-bold text-center hidden md:table-cell">${r[0]||'-'}</td>
+                <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
+                <td class="py-2.5 px-1 sm:px-3 font-bold text-blue-700 text-center whitespace-normal break-words">${r[2]||'-'}</td>
+                <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[3]||'-'}</td>
+                <td class="py-2.5 px-1 sm:px-3 font-bold text-emerald-600 text-center whitespace-normal break-words">${r[5]||'-'}</td>
+                <td class="py-2.5 px-1 sm:px-3 align-middle"><div class="flex space-x-1 sm:space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-[10px] sm:text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-[10px] sm:text-xs"></i></button></div></td>
+            </tr>`;
         });
+        
+        // ZETTBOT FIX: Menambahkan Spacer Kosong agar Baris Terakhir tidak Tertutup Navigasi Bottom saat di HP
+        rowsHtml.push(`<tr class="md:hidden h-16 border-none"><td colspan="${colCount}"></td></tr>`);
+        
         tbody.innerHTML = rowsHtml.join('');
     }
 
@@ -564,19 +608,20 @@ function renderKonterTable(data, colCount) {
     var options = { day: 'numeric', month: 'short', year: 'numeric' };
     var displayStr = targetDate.toLocaleDateString('id-ID', options);
 
+    // ZETTBOT FIX: Memaksa navigasi ini bersifat Fixed Bottom khusus saat diputar di Layar Mobile (md:static)
     var pagHtml = `
-    <div id="datePaginationWrap" class="flex justify-center items-center p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white w-full shrink-0 z-10 rounded-b-xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm">
+    <div id="datePaginationWrap" class="fixed bottom-0 left-0 right-0 md:static md:bottom-auto w-full flex justify-center items-center p-2 sm:p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white shrink-0 z-[60] shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.1)] md:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:rounded-b-xl" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+        <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm active:scale-95">
             <i class="fa-solid fa-chevron-left sm:mr-1.5"></i> <span class="hidden sm:inline">Prev</span>
         </button>
-        <div class="relative flex items-center cursor-pointer bg-blue-50 border border-blue-200 rounded-lg px-4 py-1.5 hover:bg-blue-100 transition-colors shadow-sm" title="Pilih Tanggal" onclick="try{document.getElementById('konterDatePicker').showPicker();}catch(e){}">
+        <div class="relative flex items-center cursor-pointer bg-blue-50 border border-blue-200 rounded-lg px-4 py-1.5 hover:bg-blue-100 transition-colors shadow-sm active:scale-95" title="Pilih Tanggal" onclick="try{document.getElementById('konterDatePicker').showPicker();}catch(e){}">
             <input type="date" id="konterDatePicker" value="${dateInputVal}" onchange="setFilterDate(this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
             <div class="flex items-center gap-2 font-bold text-blue-700 pointer-events-none text-xs">
                 <i class="fa-solid fa-calendar-days"></i>
                 <span id="dateDisplayLabel">${displayStr}</span>
             </div>
         </div>
-        <button type="button" onclick="changeFilterDate(1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm">
+        <button type="button" onclick="changeFilterDate(1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm active:scale-95">
             <span class="hidden sm:inline">Next</span> <i class="fa-solid fa-chevron-right sm:ml-1.5"></i>
         </button>
     </div>`;
