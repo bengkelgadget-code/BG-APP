@@ -145,6 +145,12 @@ function loadTableData(forceRefresh = false) {
         var tableContainer = document.getElementById('dataTableContainer');
         var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
         
+        // ZETTBOT FIX: Sembunyikan dan hapus navigasi tanggal jika BUKAN di halaman Transaksi Konter
+        if (!isKonterMode) {
+            var existingPag = document.getElementById('datePaginationWrap');
+            if (existingPag) existingPag.remove();
+        }
+
         if (currentSheet === 'Umum') {
             if (forceRefresh || !window.BGL2_CACHE[sheet] || window.BGL2_CACHE[sheet].length === 0) {
                 refreshActiveData(forceRefresh);
@@ -600,11 +606,9 @@ function renderGenericTable(data, colCount) {
         var r = d.row; var o = d.originalIndex;
         var cells = '';
 
-        // ZETTBOT FIX: Pemetaan Khusus untuk tabel Margin (Karena field input 7 namun kolom di UI hanya 6)
         var isMargin = (currentSheet === 'Margin' || (currentConfig && currentConfig.sheet === 'Pengaturan_Margin'));
 
         if (isMargin) {
-            // Mencegah error jika urutan field di config.html diacak dengan membaca berdasarkan field ID
             var fMap = {};
             if (currentConfig && currentConfig.fields) {
                 for (var fi = 0; fi < currentConfig.fields.length; fi++) {
@@ -620,12 +624,9 @@ function renderGenericTable(data, colCount) {
             var pctVal = fMap['persentase_val'] || r[5] || '';
             var marginVal = fMap['val_margin'] || r[6] || '';
 
-            // Tentukan apa yang masuk ke kolom gabungan "AKHIR / PERSENTASE"
             var displayAkhirPct = tipeVal === 'Persentase' ? pctVal : akhirVal;
-            // Tentukan apa yang masuk ke kolom "KEUNTUNGAN"
             var displayKeuntungan = tipeVal === 'Persentase' ? '-' : marginVal;
 
-            // Backward compatibility untuk memastikan baris data lama tidak rusak tampilannya
             if (r.length < 7 && tipeVal !== 'Persentase') {
                 displayAkhirPct = r[4] || '';
                 displayKeuntungan = r[5] || '';
@@ -639,7 +640,6 @@ function renderGenericTable(data, colCount) {
             cells += `<td class="py-1.5 px-3 text-center font-bold text-emerald-600 truncate max-w-[150px]">${displayKeuntungan}</td>`;
 
         } else {
-            // Logika render default untuk menu data lain yang mapping kolomnya 1-to-1
             for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
                 var c = r[idx] || '';
                 cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
@@ -713,4 +713,3 @@ window.toggleMarginFields = function(el) {
         if(iPct) iPct.required = false;
         if(iMarg) iMarg.required = true;
     }
-};
