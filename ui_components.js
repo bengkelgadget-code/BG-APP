@@ -585,8 +585,8 @@ function renderKonterTable(data, colCount) {
             </tr>`;
         });
         
-        // ZETTBOT FIX: Memperkuat Spacer Kosong agar tinggi tereksekusi sempurna dan baris tidak tertimpa navigasi
-        rowsHtml.push(`<tr class="md:hidden border-none"><td colspan="${colCount}"><div class="h-[90px] w-full"></div></td></tr>`);
+        // ZETTBOT FIX: Memperbesar Spacer Kosong dan memaksa tinggi menggunakan inline style agar browser tidak men-collapse tabel
+        rowsHtml.push(`<tr class="md:hidden"><td colspan="${colCount}" style="height: 140px; border: none;"></td></tr>`);
         
         tbody.innerHTML = rowsHtml.join('');
     }
@@ -603,8 +603,9 @@ function renderKonterTable(data, colCount) {
     var options = { day: 'numeric', month: 'short', year: 'numeric' };
     var displayStr = targetDate.toLocaleDateString('id-ID', options);
 
+    // ZETTBOT FIX: Memberikan sedikit extra padding-bottom pada kontainer navigasinya sendiri agar sedikit lebih lega
     var pagHtml = `
-    <div id="datePaginationWrap" class="fixed bottom-0 left-0 right-0 md:static md:bottom-auto w-full flex justify-center items-center p-2 sm:p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white shrink-0 z-[60] shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.1)] md:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:rounded-b-xl" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+    <div id="datePaginationWrap" class="fixed bottom-0 left-0 right-0 md:static md:bottom-auto w-full flex justify-center items-center p-2 sm:p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white shrink-0 z-[60] shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.1)] md:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:rounded-b-xl" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
         <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm active:scale-95">
             <i class="fa-solid fa-chevron-left sm:mr-1.5"></i> <span class="hidden sm:inline">Prev</span>
         </button>
