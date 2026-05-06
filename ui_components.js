@@ -167,13 +167,11 @@ function loadTableData(forceRefresh = false) {
             return;
         }
 
-        // ZETTBOT FIX: Styling responsif untuk Header Tabel agar muat di HP
         var html = '<table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="dataTable">';
         html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
         html += '<tr>';
         for(var i=0; i<hdrs.length; i++) {
             var thClass = "py-2.5 px-2 sm:px-4 font-bold text-center";
-            // Jika mode Konter, sembunyikan kolom ID TRX di HP
             if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
             html += '<th class="' + thClass + '">' + hdrs[i] + '</th>';
         }
@@ -241,16 +239,15 @@ function openGenericModal() {
     document.querySelectorAll('#modalGenericContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
     document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
 
-    // ZETTBOT FIX: Auto Focus saat Form Terbuka
     setTimeout(() => {
         var form = document.getElementById('dynamicForm');
         if(form) {
             var firstInput = form.querySelector('input:not([type="hidden"]):not([readonly]):not([disabled]), select:not([disabled]), textarea:not([disabled])');
             if(firstInput) {
                 if(firstInput.tagName === 'SELECT' && window.jQuery) {
-                    $(firstInput).select2('open'); // Langsung buka dropdown
+                    $(firstInput).select2('open'); 
                 } else {
-                    firstInput.focus(); // Arahkan kursor
+                    firstInput.focus(); 
                 }
             }
         }
@@ -453,7 +450,6 @@ function openKonterModal() {
     document.querySelectorAll('#modalKonterContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
     document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
 
-    // ZETTBOT FIX: Auto Focus di Form Transaksi
     setTimeout(() => {
         if(window.jQuery && $('#kntJenis').length) {
             $('#kntJenis').select2('open');
@@ -577,7 +573,6 @@ function renderKonterTable(data, colCount) {
     if(!filteredData || filteredData.length === 0) { 
         tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic font-medium">Tidak ada transaksi pada tanggal ini.</td></tr>'; 
     } else {
-        // ZETTBOT FIX: Styling Baris Transaksi Agar Ringkas dan Fit di HP tanpa Horizontal Scroll
         var rowsHtml = filteredData.map(d => {
             var r = d.row; var o = d.originalIndex;
             return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 hover:bg-slate-50 transition-colors">
@@ -590,8 +585,8 @@ function renderKonterTable(data, colCount) {
             </tr>`;
         });
         
-        // ZETTBOT FIX: Menambahkan Spacer Kosong agar Baris Terakhir tidak Tertutup Navigasi Bottom saat di HP
-        rowsHtml.push(`<tr class="md:hidden h-16 border-none"><td colspan="${colCount}"></td></tr>`);
+        // ZETTBOT FIX: Memperkuat Spacer Kosong agar tinggi tereksekusi sempurna dan baris tidak tertimpa navigasi
+        rowsHtml.push(`<tr class="md:hidden border-none"><td colspan="${colCount}"><div class="h-[90px] w-full"></div></td></tr>`);
         
         tbody.innerHTML = rowsHtml.join('');
     }
@@ -608,7 +603,6 @@ function renderKonterTable(data, colCount) {
     var options = { day: 'numeric', month: 'short', year: 'numeric' };
     var displayStr = targetDate.toLocaleDateString('id-ID', options);
 
-    // ZETTBOT FIX: Memaksa navigasi ini bersifat Fixed Bottom khusus saat diputar di Layar Mobile (md:static)
     var pagHtml = `
     <div id="datePaginationWrap" class="fixed bottom-0 left-0 right-0 md:static md:bottom-auto w-full flex justify-center items-center p-2 sm:p-3 gap-2 sm:gap-4 border-t border-slate-200 bg-white shrink-0 z-[60] shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.1)] md:shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:rounded-b-xl" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
         <button type="button" onclick="changeFilterDate(-1)" class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 transition-colors font-bold text-xs flex items-center shadow-sm active:scale-95">
