@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         activeRole = 'Admin'; 
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('dashboardView').classList.remove('hidden');
@@ -8,6 +8,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if(loader) { 
             loader.style.opacity = '0'; 
             setTimeout(function() { loader.style.display = 'none'; }, 300); 
+        }
+
+        // ZETTBOT FIX: Penjaga Global (Safety Guard) jika api.js gagal dimuat karena Syntax Error
+        if (typeof gasRun === 'undefined') {
+            console.error("ZETTBOT CRITICAL: gasRun tidak terdefinisi. Kemungkinan besar file api.js memiliki Syntax Error sehingga gagal dieksekusi browser.");
+            Swal.fire({
+                icon: 'error',
+                title: 'API Crash!',
+                text: 'Fungsi sistem utama (api.js) gagal dimuat karena Syntax Error. Silakan periksa Console (F12).'
+            });
         }
 
         try {
@@ -80,6 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if(icon && showIconLoader) icon.classList.add('fa-spin');
         
         try {
+            // ZETTBOT FIX: Mencegah error macet jika gasRun rusak
+            if (typeof gasRun === 'undefined') {
+                throw new Error("gasRun is not defined (Terdapat Syntax Error di file api.js)");
+            }
+
             if(!currentConfig) currentConfig = {}; 
             var activeSheet = isKonterMode ? 'DB_konter' : currentConfig.sheet;
             
@@ -109,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(err) {
             console.error("Refresh failed", err);
             var tbody = document.getElementById('dataTableBody');
-            if(tbody) tbody.innerHTML = '<tr><td colspan="10" class="p-8 text-center text-red-500 font-medium">Gagal memuat data: ' + (err.message || "Timeout Server") + '. Silakan refresh.</td></tr>';
+            if(tbody) tbody.innerHTML = '<tr><td colspan="10" class="p-8 text-center text-red-500 font-medium bg-red-50">Gagal memuat data: <br><span class="text-xs">' + (err.message || "Timeout Server") + '</span><br><button onclick="location.reload()" class="mt-2 text-xs bg-red-100 px-3 py-1 rounded text-red-700">Refresh Halaman</button></td></tr>';
         } finally {
             if (icon) icon.classList.remove('fa-spin');
         }
@@ -120,6 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitPengaturanUmum(e) {
         e.preventDefault();
+        
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         var btn = document.getElementById('btnSubmitUmum');
         btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...';
         
@@ -150,6 +168,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitSmartPaste(e) {
         e.preventDefault();
+
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         var btn = document.getElementById('btnSubmitPaste');
         var provider = document.getElementById('pasteProvider').value;
         var rawText = document.getElementById('pasteRawText').value;
@@ -212,6 +233,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitAddKategori(e) {
         e.preventDefault();
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         var btn = document.getElementById('btnSubmitKategori');
         var namaKat = document.getElementById('inputNamaKategori').value;
         btn.disabled = true; btn.innerText = "Menyimpan...";
@@ -239,6 +262,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitAddProvider(e) {
         e.preventDefault();
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         var btn = document.getElementById('btnSubmitProvider');
         var namaProv = document.getElementById('inputNamaProvider').value;
         btn.disabled = true; btn.innerText = "Menyimpan...";
@@ -272,6 +297,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitAddKategoriGame(e) {
         e.preventDefault();
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         var btn = document.getElementById('btnSubmitKategoriGame');
         var namaGame = document.getElementById('inputNamaKategoriGame').value;
         btn.disabled = true; btn.innerText = "Menyimpan...";
@@ -366,6 +393,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
+            if (typeof gasRun === 'undefined') throw new Error("API terganggu. gasRun not defined.");
+
             var db = window.BGL2_DROPDOWN_CACHE;
             if(!db || !db.providerData || typeof db.pulsaData === 'undefined') { 
                 Swal.fire({ title: 'Memuat Opsi...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
@@ -452,6 +481,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.isSubmittingKonter = false;
     async function submitKonterForm(e, formEl) {
         e.preventDefault();
+        
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         if(window.isSubmittingKonter) return;
         window.isSubmittingKonter = true;
         
@@ -592,6 +624,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function delKonter(idx) { 
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         Swal.fire({title: 'Hapus?', text: "Data tidak bisa balik!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
             if(r.isConfirmed) {
                 Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -610,6 +644,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function delGen(idx, sheetKey) { 
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         Swal.fire({title: 'Hapus?', text: "Hapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
             if(r.isConfirmed) {
                 Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -638,6 +674,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.isSubmittingMaster = false;
     async function handleFormSubmit(e, formEl) {
         e.preventDefault();
+
+        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
+
         if(window.isSubmittingMaster) return;
         window.isSubmittingMaster = true;
         
