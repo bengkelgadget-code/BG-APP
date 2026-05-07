@@ -1,4 +1,3 @@
-<script>
     document.addEventListener('DOMContentLoaded', function() {
         activeRole = 'Admin'; 
         document.getElementById('loginView').classList.add('hidden');
@@ -744,4 +743,3 @@
     window.openAddKategoriGameModal = openAddKategoriGameModal; window.closeAddKategoriGameModal = closeAddKategoriGameModal; window.submitAddKategoriGame = submitAddKategoriGame;
     window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
     window.populateUmumSettings = populateUmumSettings; window.previewUmumLogo = previewUmumLogo; window.submitPengaturanUmum = submitPengaturanUmum;
-</script>
