@@ -41,43 +41,74 @@
         switchPage('Konter', 'Konter HP');
     });
 
+    // ZETTBOT FIX: Fungsi Perhitungan Margin Ultra-Robust (Anti Pergeseran Kolom & Typo)
     function calculateDynamicMargin(layananName, nominal) {
         var marginData = window.BGL2_CACHE['Pengaturan_Margin'] || [];
         var validRules = [];
-        
-        // Kumpulkan semua rule yang valid untuk layanan ini
+        var safeLayanan = String(layananName || '').trim().toUpperCase();
+
         for (var i = 0; i < marginData.length; i++) {
             var row = marginData[i];
-            if (!row || row[0] === "") continue;
+            if (!row || !row[0]) continue;
             
-            var layanans = (row[2] || '').split(',').map(s => s.trim().toUpperCase());
-            if (layanans.includes(layananName.toUpperCase())) {
+            // Coba dapatkan string layanan dari kolom 2 (Layanan Terkait)
+            var layananDiDB = String(row[2] || '').toUpperCase();
+            var layanans = layananDiDB.split(',').map(s => s.trim());
+            
+            // Pencarian aman (exact match atau substring di dalam array)
+            var isLayananMatch = layanans.some(function(l) { 
+                return l === safeLayanan || l.includes(safeLayanan) || safeLayanan.includes(l); 
+            });
+
+            if (isLayananMatch) {
+                // Konversi seluruh baris ke huruf kecil untuk inspeksi cerdas
+                var rowStr = row.join('|||').toLowerCase();
+                var isPersentase = rowStr.includes('persen');
+                
+                var minNom = 0;
+                var maxNom = Infinity;
+                var pct = 0;
+                var marginNom = 0;
+                
+                if (row[3]) minNom = parseInt(String(row[3]).replace(/[^0-9]/g, '')) || 0;
+                
+                if (isPersentase) {
+                    // BRUTE-FORCE PARSING: Cari nilai desimal persentase di kolom 4 atau 5 secara berurutan
+                    var col4 = String(row[4] || '').replace(/,/g, '.').replace(/[^0-9.]/g, '');
+                    var col5 = String(row[5] || '').replace(/,/g, '.').replace(/[^0-9.]/g, '');
+                    pct = parseFloat(col5) || parseFloat(col4) || 0;
+                } else {
+                    if (row[4] && String(row[4]).trim() !== '') {
+                        maxNom = parseInt(String(row[4]).replace(/[^0-9]/g, '')) || Infinity;
+                    }
+                    if (row[6]) marginNom = parseInt(String(row[6]).replace(/[^0-9]/g, '')) || 0;
+                    else if (row[5]) marginNom = parseInt(String(row[5]).replace(/[^0-9]/g, '')) || 0; // Fallback lama
+                }
+                
                 validRules.push({
-                    tipe: row[1],
-                    minNom: parseInt(String(row[3]).replace(/[^0-9]/g, '')) || 0,
-                    maxNomStr: String(row[4]).replace(/[^0-9]/g, ''),
-                    pctStr: String(row[5]).replace(/[^0-9.]/g, ''),
-                    marginNom: parseInt(String(row[6]).replace(/[^0-9]/g, '')) || 0
+                    isPersentase: isPersentase,
+                    minNom: minNom,
+                    maxNom: maxNom,
+                    pct: pct,
+                    marginNom: marginNom
                 });
             }
         }
         
-        // ZETTBOT FIX: Urutkan dari Nominal Awal TERBESAR ke TERKECIL (Descending)
-        // Mencegah nominal besar tersangkut di rule kecil karena maxNom kosong (Infinity)
+        // Urutkan dari syarat Nominal Awal TERBESAR ke TERKECIL untuk memastikan Tier tertinggi dievaluasi duluan
         validRules.sort(function(a, b) { return b.minNom - a.minNom; });
         
-        // Evaluasi setelah diurutkan
+        // Evaluasi Penentuan Margin
         for (var j = 0; j < validRules.length; j++) {
             var rule = validRules[j];
-            var maxNom = rule.maxNomStr ? parseInt(rule.maxNomStr) : Infinity;
             
-            if (rule.tipe === 'Persentase') {
+            if (rule.isPersentase) {
                 if (nominal >= rule.minNom) {
-                    var pct = parseFloat(rule.pctStr) || 0;
-                    return Math.round(nominal * (pct / 100));
+                    // Hitung persentase murni tanpa potensi bocor
+                    return Math.round(nominal * (rule.pct / 100));
                 }
             } else {
-                if (nominal >= rule.minNom && nominal < maxNom) {
+                if (nominal >= rule.minNom && nominal < rule.maxNom) {
                     return rule.marginNom;
                 }
             }
@@ -571,6 +602,23 @@
             });
             
             document.querySelectorAll('#kntDetailInput').forEach(inp => { inp.value = rowData[3]; });
+
+            // ZETTBOT FIX: Memastikan Field Nominal & Harga Jual/Beli diisi dengan benar agar tidak bernilai Rp 0 saat di-update
+            var isFixedPrice = ['VOUCHER', 'PERDANA', 'ACC', 'PULSA', 'GAME', 'TOKEN PLN'].includes(jenis);
+            document.querySelectorAll('#kntNominal').forEach(nom => {
+                var targetVal = isFixedPrice ? String(rowData[5]) : String(rowData[4]); 
+                nom.value = targetVal.replace(/[^0-9]/g, '');
+                window.formatRupiahUI(nom);
+            });
+            
+            if (isFixedPrice) {
+                document.querySelectorAll('#kntHargaBeliDB').forEach(el => el.value = String(rowData[4]).replace(/[^0-9]/g, ''));
+                document.querySelectorAll('#kntHargaJualDB').forEach(el => el.value = String(rowData[5]).replace(/[^0-9]/g, ''));
+            } else {
+                document.querySelectorAll('#kntHargaBeliDB').forEach(el => el.value = '');
+                document.querySelectorAll('#kntHargaJualDB').forEach(el => el.value = '');
+            }
+
             openKonterModal();
         } catch(err) { console.error(err); }
     }
@@ -742,3 +790,4 @@
     window.openAddProviderModal = openAddProviderModal; window.closeAddProviderModal = closeAddProviderModal; window.submitAddProvider = submitAddProvider;
     window.openAddKategoriGameModal = openAddKategoriGameModal; window.closeAddKategoriGameModal = closeAddKategoriGameModal; window.submitAddKategoriGame = submitAddKategoriGame;
     window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
+    window.populateUmumSettings = populateUmumSettings; window.previewUmumLogo = previewUmumLogo; window.submitPengaturanUmum = submitPengaturanUmum;
