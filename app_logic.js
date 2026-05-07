@@ -1,3 +1,4 @@
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         activeRole = 'Admin'; 
         document.getElementById('loginView').classList.add('hidden');
@@ -528,8 +529,13 @@
 
         try {
             let res;
-            if(currentIndex === -1) res = await gasRun('saveKonterTransaction', payload);
-            else res = await gasRun('editKonterTransaction', currentIndex, payload);
+            if(currentIndex === -1) {
+                res = await gasRun('saveKonterTransaction', payload);
+            } else {
+                // ZETTBOT FIX: Ambil ID Transaksi asli dari cache untuk dikirim ke API Firebase
+                var originalId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
+                res = await gasRun('editKonterTransaction', currentIndex, payload, originalId);
+            }
             if (res && res.status === 'error') throw new Error(res.message);
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             refreshActiveData(false); 
@@ -738,3 +744,4 @@
     window.openAddKategoriGameModal = openAddKategoriGameModal; window.closeAddKategoriGameModal = closeAddKategoriGameModal; window.submitAddKategoriGame = submitAddKategoriGame;
     window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
     window.populateUmumSettings = populateUmumSettings; window.previewUmumLogo = previewUmumLogo; window.submitPengaturanUmum = submitPengaturanUmum;
+</script>
