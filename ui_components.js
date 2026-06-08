@@ -131,19 +131,29 @@ function switchPage(key, title) {
         var tableWrapper = document.getElementById('mainTableWrapper');
         var umumSettings = document.getElementById('umumSettingsContainer');
         var dash = document.getElementById('miniDashboardKonterContainer');
+        var dashboardPage = document.getElementById('dashboardPageContainer');
 
         if (key === 'Umum') {
             if(tableWrapper) { tableWrapper.classList.add('hidden'); tableWrapper.classList.remove('flex'); }
             if(umumSettings) { umumSettings.classList.remove('hidden'); umumSettings.classList.add('flex'); }
             if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
+            if(dashboardPage) { dashboardPage.classList.add('hidden'); dashboardPage.classList.remove('flex'); }
+        } else if (key === 'Dashboard') {
+            if(tableWrapper) { tableWrapper.classList.add('hidden'); tableWrapper.classList.remove('flex'); }
+            if(umumSettings) { umumSettings.classList.add('hidden'); umumSettings.classList.remove('flex'); }
+            if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
+            if(dashboardPage) { dashboardPage.classList.remove('hidden'); dashboardPage.classList.add('flex'); }
+            if(typeof window.renderDashboardPage === 'function') window.renderDashboardPage();
         } else if(isKonterMode) {
             if(tableWrapper) { tableWrapper.classList.remove('hidden'); tableWrapper.classList.add('flex'); }
             if(umumSettings) { umumSettings.classList.add('hidden'); umumSettings.classList.remove('flex'); }
             if(dash) { dash.classList.remove('hidden'); dash.classList.add('flex'); }
+            if(dashboardPage) { dashboardPage.classList.add('hidden'); dashboardPage.classList.remove('flex'); }
         } else {
             if(tableWrapper) { tableWrapper.classList.remove('hidden'); tableWrapper.classList.add('flex'); }
             if(umumSettings) { umumSettings.classList.add('hidden'); umumSettings.classList.remove('flex'); }
             if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
+            if(dashboardPage) { dashboardPage.classList.add('hidden'); dashboardPage.classList.remove('flex'); }
         }
         
         loadTableData(false); 

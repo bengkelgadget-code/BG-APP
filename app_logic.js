@@ -37,9 +37,38 @@
             }
             Swal.fire('Oops!', fieldName + ' wajib diisi atau dipilih!', 'warning');
         }, true); 
+        window.BGL2_CACHE = {};
+        window.BGL2_DROPDOWN_CACHE = null;
 
         switchPage('Konter', 'Konter HP');
     });
+
+    window.adjustStock = async function(jenis, detail, amount) {
+        if (!['VOUCHER', 'PERDANA', 'ACC'].includes(jenis)) return;
+        
+        let targetSheet = '';
+        if (jenis === 'VOUCHER') targetSheet = 'Voucher';
+        else if (jenis === 'PERDANA') targetSheet = 'Perdana';
+        else if (jenis === 'ACC') targetSheet = 'ACC';
+        
+        if (targetSheet) {
+            let sheetData = window.BGL2_CACHE[targetSheet] || [];
+            let itemIndex = sheetData.findIndex(row => row[2] === detail);
+            if (itemIndex > -1) {
+                let currentStok = parseInt(sheetData[itemIndex][5]) || 0;
+                let newStok = currentStok + amount;
+                if (newStok < 0) newStok = 0; 
+                
+                sheetData[itemIndex][5] = newStok;
+                window.BGL2_CACHE[targetSheet] = sheetData;
+                if(window.saveCacheToLocal) window.saveCacheToLocal();
+                
+                if(typeof gasRun !== 'undefined') {
+                    gasRun('updateData', targetSheet, itemIndex, sheetData[itemIndex]).catch(e => console.log("Gagal update stok GS", e));
+                }
+            }
+        }
+    };
 
     // ZETTBOT FIX: Fungsi Perhitungan Margin Ultra-Robust (Anti Pergeseran Kolom & Typo)
     function calculateDynamicMargin(layananName, nominal) {
@@ -570,9 +599,13 @@
                 if (!window.BGL2_CACHE['DB_konter']) window.BGL2_CACHE['DB_konter'] = [];
                 window.BGL2_CACHE['DB_konter'].push(newRow);
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
+                window.adjustStock(payload.jenis, payload.detail, -1);
                 gasRun('getData', 'DB_konter').then(d => { window.BGL2_CACHE['DB_konter'] = d; if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false); }).catch(e=>console.log("Background load failed", e));
             } else {
                 var originalId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
+                var oldJenis = window.BGL2_CACHE['DB_konter'][currentIndex][2];
+                var oldDetail = window.BGL2_CACHE['DB_konter'][currentIndex][3];
+                
                 res = await gasRun('editKonterTransaction', currentIndex, payload, originalId);
                 if (res && res.status === 'error') throw new Error(res.message);
                 var originalDate = window.BGL2_CACHE['DB_konter'][currentIndex][7];
@@ -580,6 +613,13 @@
                 var updatedRow = [originalId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), originalDate];
                 window.BGL2_CACHE['DB_konter'][currentIndex] = updatedRow;
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
+                
+                if (oldJenis === payload.jenis && oldDetail === payload.detail) {
+                    // Item did not change, no stock adjustment needed
+                } else {
+                    window.adjustStock(oldJenis, oldDetail, 1);
+                    window.adjustStock(payload.jenis, payload.detail, -1);
+                }
             }
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             loadTableData(false); 
@@ -701,11 +741,14 @@
                     // ZETTBOT FIX: Mendapatkan ID item (TRX-...) untuk dikirim ke API Firebase
                     var rowData = window.BGL2_CACHE['DB_konter'][safeIdx];
                     var itemId = rowData ? rowData[0] : null;
+                    var delJenis = rowData ? rowData[2] : null;
+                    var delDetail = rowData ? rowData[3] : null;
 
                     await gasRun('deleteData', 'DB_konter', safeIdx, itemId); 
                     if(window.BGL2_CACHE['DB_konter']) {
                         window.BGL2_CACHE['DB_konter'].splice(safeIdx, 1);
                         if(window.saveCacheToLocal) window.saveCacheToLocal();
+                        if(delJenis && delDetail) window.adjustStock(delJenis, delDetail, 1);
                     }
                     loadTableData(false);
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
