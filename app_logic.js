@@ -1,4 +1,15 @@
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
+        if(typeof Swal !== 'undefined') {
+            window.Swal = Swal.mixin({
+                customClass: {
+                    confirmButton: 'bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg mx-2',
+                    cancelButton: 'bg-slate-400 hover:bg-slate-500 text-white font-bold py-2 px-6 rounded-lg mx-2',
+                    actions: 'flex gap-2 justify-center mt-4 w-full'
+                },
+                buttonsStyling: false
+            });
+        }
+
         activeRole = 'Admin'; 
         document.getElementById('loginView').classList.add('hidden');
         document.getElementById('dashboardView').classList.remove('hidden');
