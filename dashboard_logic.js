@@ -1,4 +1,5 @@
-window.dashFilterDate = new Date();
+window.dashFilterDate = window.dashFilterDate || new Date();
+window.dashTop10Filter = window.dashTop10Filter || 'all';
 
 window.renderDashboardPage = async function() {
     var container = document.getElementById('dashboardPageContainer');
@@ -44,6 +45,10 @@ window.renderDashboardPage = async function() {
     var targetYear = window.dashFilterDate.getFullYear();
 
     var displayDateStr = window.dashFilterDate.toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
+    var yyyy = targetYear;
+    var mm = String(targetMonth).padStart(2, '0');
+    var dd = String(targetDay).padStart(2, '0');
+    var dateInputVal = `${yyyy}-${mm}-${dd}`;
 
     var todayTrx = 0;
     var todayIncome = 0;
@@ -51,16 +56,6 @@ window.renderDashboardPage = async function() {
     var monthIncome = 0;
 
     var itemCounts = {};
-
-    // For chart: last 3 months
-    var chartLabels = [];
-    var chartDataArr = [0, 0, 0];
-    var monthsInfo = [];
-    for(let i=2; i>=0; i--) {
-        let d = new Date(window.dashFilterDate.getFullYear(), window.dashFilterDate.getMonth() - i, 1);
-        chartLabels.push(d.toLocaleDateString('id-ID', {month:'short', year:'numeric'}));
-        monthsInfo.push({ month: d.getMonth() + 1, year: d.getFullYear() });
-    }
 
     allKonter.forEach(row => {
         let rowDateStr = row[1]; // DD/MM/YYYY
@@ -78,20 +73,21 @@ window.renderDashboardPage = async function() {
                 monthTrx++;
                 monthIncome += rowMargin;
             }
-
-            // Chart 3 months
-            for(let i=0; i<3; i++) {
-                if (p.month === monthsInfo[i].month && p.year === monthsInfo[i].year) {
-                    chartDataArr[i] += rowMargin;
-                }
-            }
         }
 
         // Top 10
         if (rowDetail) {
-            if (!itemCounts[rowDetail]) itemCounts[rowDetail] = { count: 0, income: 0 };
-            itemCounts[rowDetail].count++;
-            itemCounts[rowDetail].income += rowMargin;
+            var includeItem = true;
+            if (window.dashTop10Filter === 'month') {
+                if (!p || p.month !== targetMonth || p.year !== targetYear) {
+                    includeItem = false;
+                }
+            }
+            if (includeItem) {
+                if (!itemCounts[rowDetail]) itemCounts[rowDetail] = { count: 0, income: 0 };
+                itemCounts[rowDetail].count++;
+                itemCounts[rowDetail].income += rowMargin;
+            }
         }
     });
 
@@ -120,7 +116,10 @@ window.renderDashboardPage = async function() {
             </div>
             <div class="mt-4 sm:mt-0 flex items-center bg-slate-100 rounded-lg p-1 shadow-inner border border-slate-200">
                 <button onclick="changeDashDate(-1)" class="w-8 h-8 rounded text-slate-600 hover:bg-white hover:text-pink-600 hover:shadow transition-all"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                <div class="px-4 py-1 text-sm font-bold text-slate-700 w-36 text-center" id="dashDateDisplay">${displayDateStr}</div>
+                <div class="relative flex items-center justify-center cursor-pointer px-4 py-1 hover:bg-white transition-colors rounded" title="Pilih Tanggal" onclick="try{document.getElementById('dashDatePicker').showPicker();}catch(e){}">
+                    <input type="date" id="dashDatePicker" value="${dateInputVal}" onchange="setDashDate(this.value)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                    <div class="text-sm font-bold text-slate-700 w-32 text-center select-none z-10" id="dashDateDisplay">${displayDateStr}</div>
+                </div>
                 <button onclick="changeDashDate(1)" class="w-8 h-8 rounded text-slate-600 hover:bg-white hover:text-pink-600 hover:shadow transition-all"><i class="fa-solid fa-chevron-right text-xs"></i></button>
             </div>
         </div>
@@ -160,17 +159,44 @@ window.renderDashboardPage = async function() {
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                <!-- CHART -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center"><i class="fa-solid fa-chart-line text-blue-500 mr-2"></i>Tren Profit (3 Bulan Terakhir)</h3>
-                    <div class="flex-1 w-full relative min-h-[250px]">
-                        <canvas id="dashChart"></canvas>
+                <!-- TOP 10 ITEMS -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-[320px]">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-2">
+                        <h3 class="text-sm font-bold text-slate-800 flex items-center"><i class="fa-solid fa-trophy text-orange-500 mr-2"></i>Top 10 Layanan Terlaris</h3>
+                        <select onchange="setDashTop10Filter(this.value)" class="bg-slate-50 border border-slate-200 text-slate-600 text-[10px] sm:text-xs rounded px-2 py-1 outline-none focus:ring-1 focus:ring-blue-500 shadow-sm cursor-pointer font-bold">
+                            <option value="all" ${window.dashTop10Filter === 'all' ? 'selected' : ''}>Semua Waktu</option>
+                            <option value="month" ${window.dashTop10Filter === 'month' ? 'selected' : ''}>Bulan Ini</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 overflow-y-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-200 sticky top-0">
+                                    <th class="p-3 w-10 text-center">No</th>
+                                    <th class="p-3">Nama Item / Layanan</th>
+                                    <th class="p-3 text-center">Trx</th>
+                                    <th class="p-3 text-right">Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs text-slate-700 divide-y divide-slate-100">
+                                ${top10.length === 0 ? '<tr><td colspan="4" class="p-6 text-center text-xs text-slate-400">Belum ada data transaksi.</td></tr>' : 
+                                  top10.map((t, idx) => `
+                                    <tr class="hover:bg-slate-50 transition-colors">
+                                        <td class="p-3 text-center font-bold text-slate-400">${idx+1}</td>
+                                        <td class="p-3 font-semibold text-slate-800">${t.name}</td>
+                                        <td class="p-3 text-center"><span class="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold">${t.count}x</span></td>
+                                        <td class="p-3 text-right font-bold text-emerald-600">${fRupiah(t.income)}</td>
+                                    </tr>
+                                  `).join('')
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 <!-- OUT OF STOCK -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-[320px]">
-                    <h3 class="text-sm font-bold text-red-600 mb-4 flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Stok Habis / Kritis</h3>
+                    <h3 class="text-sm font-bold text-red-600 mb-4 flex items-center border-b border-slate-100 pb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Stok Habis / Kritis</h3>
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2">
                         ${lowStock.length === 0 ? '<div class="text-center text-xs text-slate-400 mt-10">Semua stok aman.</div>' : 
                           lowStock.map(ls => `
@@ -186,77 +212,11 @@ window.renderDashboardPage = async function() {
                     </div>
                 </div>
             </div>
-
-            <!-- TOP 10 ITEMS -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="p-5 border-b border-slate-100">
-                    <h3 class="text-sm font-bold text-slate-800 flex items-center"><i class="fa-solid fa-trophy text-orange-500 mr-2"></i>Top 10 Layanan & Produk Terlaris (All Time)</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-200">
-                                <th class="p-4 w-12 text-center">No</th>
-                                <th class="p-4">Nama Item / Layanan</th>
-                                <th class="p-4 text-center">Total Transaksi</th>
-                                <th class="p-4 text-right">Total Profit</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm text-slate-700 divide-y divide-slate-100">
-                            ${top10.length === 0 ? '<tr><td colspan="4" class="p-6 text-center text-xs text-slate-400">Belum ada data transaksi.</td></tr>' : 
-                              top10.map((t, idx) => `
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 text-center font-bold text-slate-400">${idx+1}</td>
-                                    <td class="p-4 font-semibold text-slate-800">${t.name}</td>
-                                    <td class="p-4 text-center"><span class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">${t.count}x</span></td>
-                                    <td class="p-4 text-right font-bold text-emerald-600">${fRupiah(t.income)}</td>
-                                </tr>
-                              `).join('')
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     `;
 
     container.innerHTML = html;
 
-    // Render Chart
-    var ctx = document.getElementById('dashChart');
-    if (ctx && window.Chart) {
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartLabels,
-                datasets: [{
-                    label: 'Total Profit',
-                    data: chartDataArr,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    fill: true,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#3b82f6',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [5,5] } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-    }
     } catch(err) {
         console.error("Dashboard render error:", err);
         container.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center pt-20"><i class="fa-solid fa-triangle-exclamation text-4xl text-red-500 mb-4"></i><p class="text-slate-600 font-medium">Gagal memuat Dashboard</p><p class="text-xs text-red-400 mt-2">' + err.message + '</p></div>';
@@ -265,5 +225,19 @@ window.renderDashboardPage = async function() {
 
 window.changeDashDate = function(dir) {
     window.dashFilterDate.setDate(window.dashFilterDate.getDate() + dir);
+    window.renderDashboardPage();
+};
+
+window.setDashDate = function(val) {
+    if(!val) return;
+    var parts = val.split('-');
+    if(parts.length === 3) {
+        window.dashFilterDate = new Date(parts[0], parts[1] - 1, parts[2]);
+        window.renderDashboardPage();
+    }
+};
+
+window.setDashTop10Filter = function(val) {
+    window.dashTop10Filter = val;
     window.renderDashboardPage();
 };
