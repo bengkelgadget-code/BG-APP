@@ -608,8 +608,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.BGL2_CACHE['DB_konter'].push(newRow);
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
                 window.adjustStock(payload.jenis, payload.detail, -1);
-                // gasRun background fetch dihapus untuk mencegah double-render
-                if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false);
+                loadTableData(false);
             } else {
                 var originalId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
                 var oldJenis = window.BGL2_CACHE['DB_konter'][currentIndex][2];
@@ -632,6 +631,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             loadTableData(false); 
+
+            // ZETTBOT FIX: Silent background sync to ensure data consistency with other devices
+            gasRun('getData', 'DB_konter').then(d => {
+                if(JSON.stringify(window.BGL2_CACHE['DB_konter']) !== JSON.stringify(d)) {
+                    window.BGL2_CACHE['DB_konter'] = d;
+                    if(window.saveCacheToLocal) window.saveCacheToLocal();
+                    if(isKonterMode) loadTableData(false);
+                }
+            }).catch(e=>{});
+
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
     }
 
@@ -761,6 +770,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     loadTableData(false);
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
+
+                    // ZETTBOT FIX: Silent background sync
+                    gasRun('getData', 'DB_konter').then(d => {
+                        if(JSON.stringify(window.BGL2_CACHE['DB_konter']) !== JSON.stringify(d)) {
+                            window.BGL2_CACHE['DB_konter'] = d;
+                            if(window.saveCacheToLocal) window.saveCacheToLocal();
+                            if(isKonterMode) loadTableData(false);
+                        }
+                    }).catch(e=>{});
                 } catch(err) { Swal.fire('Error', String(err), 'error'); }
             }
         });
@@ -791,6 +809,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     loadTableData(false);
                     
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
+
+                    // ZETTBOT FIX: Silent background sync to prevent cache divergence with other devices
+                    gasRun('getData', actualSheet).then(d => {
+                        if(JSON.stringify(window.BGL2_CACHE[actualSheet]) !== JSON.stringify(d)) {
+                            window.BGL2_CACHE[actualSheet] = d;
+                            if(window.saveCacheToLocal) window.saveCacheToLocal();
+                            var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+                            if(currentRenderedSheet === actualSheet) loadTableData(false);
+                        }
+                    }).catch(e=>{});
                 } catch(err) { 
                     Swal.fire('Error', String(err), 'error'); 
                 }
@@ -847,8 +875,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!window.BGL2_CACHE[currentConfig.sheet]) window.BGL2_CACHE[currentConfig.sheet] = [];
                 window.BGL2_CACHE[currentConfig.sheet].push(arr);
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
-                // gasRun background fetch dihapus untuk mencegah double-render
-                if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false);
+                loadTableData(false);
             } else {
                 await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
                 if(window.BGL2_CACHE[currentConfig.sheet] && window.BGL2_CACHE[currentConfig.sheet][currentIndex]) {
@@ -859,6 +886,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
             Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
             loadTableData(false); 
+
+            // ZETTBOT FIX: Silent background sync to ensure data consistency with other devices
+            gasRun('getData', currentConfig.sheet).then(d => {
+                if(JSON.stringify(window.BGL2_CACHE[currentConfig.sheet]) !== JSON.stringify(d)) {
+                    window.BGL2_CACHE[currentConfig.sheet] = d;
+                    if(window.saveCacheToLocal) window.saveCacheToLocal();
+                    var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+                    if(currentRenderedSheet === currentConfig.sheet) loadTableData(false);
+                }
+            }).catch(e=>{});
+
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
 

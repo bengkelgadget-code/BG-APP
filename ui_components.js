@@ -165,7 +165,13 @@ function switchPage(key, title) {
                 if(JSON.stringify(window.BGL2_CACHE[activeSheet]) !== JSON.stringify(d)) {
                     window.BGL2_CACHE[activeSheet] = d; 
                     if(window.saveCacheToLocal) window.saveCacheToLocal();
-                    // ZETTBOT FIX: Update cache di background tanpa memicu re-render yang mengganggu (Sesuai opsi B)
+                    // ZETTBOT FIX: Update UI otomatis jika ada perubahan dari device lain
+                    var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+                    if(currentRenderedSheet === activeSheet && key !== 'Dashboard') {
+                        loadTableData(false);
+                    } else if (key === 'Dashboard') {
+                        if(typeof window.renderDashboardPage === 'function') window.renderDashboardPage();
+                    }
                 }
             }).catch(e=>{});
         }
