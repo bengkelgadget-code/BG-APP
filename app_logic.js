@@ -55,9 +55,9 @@
             var layananDiDB = String(row[2] || '').toUpperCase();
             var layanans = layananDiDB.split(',').map(s => s.trim());
             
-            // Pencarian aman (exact match atau substring di dalam array)
+            // Pencarian aman (exact match)
             var isLayananMatch = layanans.some(function(l) { 
-                return l === safeLayanan || l.includes(safeLayanan) || safeLayanan.includes(l); 
+                return l !== "" && l === safeLayanan; 
             });
 
             if (isLayananMatch) {
