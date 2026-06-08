@@ -16,7 +16,7 @@ const firebaseConfig = {
 };
 
 // 2. State Mode Database (Switch: true = Firebase, false = Google Sheets murni)
-window.USE_FIREBASE = true; // DIAKTIFKAN: Web -> Firebase -> Google Sheets (Backup)
+window.USE_FIREBASE = false; // DIMATIKAN SEMENTARA: Kembali ke Google Sheets murni karena data Firebase tidak sinkron
 
 // 3. Inisialisasi Database (Hanya jika konfigurasi sudah diisi)
 try {
