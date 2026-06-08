@@ -132,10 +132,12 @@
             if (activeSheet) {
                 let singleData = await gasRun('getData', activeSheet);
                 window.BGL2_CACHE[activeSheet] = Array.isArray(singleData) ? singleData : [];
+                if(window.saveCacheToLocal) window.saveCacheToLocal();
             }
 
             if (!window.BGL2_CACHE['Pengaturan_Margin'] && currentSheet !== 'Margin') {
                 window.BGL2_CACHE['Pengaturan_Margin'] = await gasRun('getData', 'Pengaturan_Margin') || [];
+                if(window.saveCacheToLocal) window.saveCacheToLocal();
             }
             
             var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig.headers || []);
@@ -567,7 +569,8 @@
                 var newRow = [fakeId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), new Date().toLocaleDateString('id-ID')];
                 if (!window.BGL2_CACHE['DB_konter']) window.BGL2_CACHE['DB_konter'] = [];
                 window.BGL2_CACHE['DB_konter'].push(newRow);
-                gasRun('getData', 'DB_konter').then(d => { window.BGL2_CACHE['DB_konter'] = d; loadTableData(false); }).catch(e=>console.log("Background load failed", e));
+                if(window.saveCacheToLocal) window.saveCacheToLocal();
+                gasRun('getData', 'DB_konter').then(d => { window.BGL2_CACHE['DB_konter'] = d; if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false); }).catch(e=>console.log("Background load failed", e));
             } else {
                 var originalId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
                 res = await gasRun('editKonterTransaction', currentIndex, payload, originalId);
@@ -576,6 +579,7 @@
                 var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
                 var updatedRow = [originalId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), originalDate];
                 window.BGL2_CACHE['DB_konter'][currentIndex] = updatedRow;
+                if(window.saveCacheToLocal) window.saveCacheToLocal();
             }
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             loadTableData(false); 
@@ -701,6 +705,7 @@
                     await gasRun('deleteData', 'DB_konter', safeIdx, itemId); 
                     if(window.BGL2_CACHE['DB_konter']) {
                         window.BGL2_CACHE['DB_konter'].splice(safeIdx, 1);
+                        if(window.saveCacheToLocal) window.saveCacheToLocal();
                     }
                     loadTableData(false);
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
@@ -729,6 +734,7 @@
                     localStorage.removeItem('bgl2_dropdown_cache'); 
                     if(window.BGL2_CACHE[actualSheet]) {
                         window.BGL2_CACHE[actualSheet].splice(safeIdx, 1);
+                        if(window.saveCacheToLocal) window.saveCacheToLocal();
                     }
                     loadTableData(false);
                     
@@ -788,11 +794,13 @@
                 await gasRun('saveData', currentConfig.sheet, arr);
                 if (!window.BGL2_CACHE[currentConfig.sheet]) window.BGL2_CACHE[currentConfig.sheet] = [];
                 window.BGL2_CACHE[currentConfig.sheet].push(arr);
-                gasRun('getData', currentConfig.sheet).then(d => { window.BGL2_CACHE[currentConfig.sheet] = d; loadTableData(false); }).catch(e=>console.log(e));
+                if(window.saveCacheToLocal) window.saveCacheToLocal();
+                gasRun('getData', currentConfig.sheet).then(d => { window.BGL2_CACHE[currentConfig.sheet] = d; if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false); }).catch(e=>console.log(e));
             } else {
                 await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
                 if(window.BGL2_CACHE[currentConfig.sheet] && window.BGL2_CACHE[currentConfig.sheet][currentIndex]) {
                     window.BGL2_CACHE[currentConfig.sheet][currentIndex] = arr;
+                    if(window.saveCacheToLocal) window.saveCacheToLocal();
                 }
             }
             window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache');

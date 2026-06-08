@@ -148,6 +148,17 @@ function switchPage(key, title) {
         
         loadTableData(false); 
         
+        var activeSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+        if (activeSheet && typeof gasRun !== 'undefined') {
+            gasRun('getData', activeSheet).then(d => { 
+                if(JSON.stringify(window.BGL2_CACHE[activeSheet]) !== JSON.stringify(d)) {
+                    window.BGL2_CACHE[activeSheet] = d; 
+                    if(window.saveCacheToLocal) window.saveCacheToLocal();
+                    loadTableData(false);
+                }
+            }).catch(e=>{});
+        }
+
         if(window.innerWidth < 768 && isSidebarOpen) toggleSidebar();
     } catch(e) { console.error(e); }
 }

@@ -7,7 +7,16 @@ window.currentFilterDate = new Date();
 try {
     var savedDrop = localStorage.getItem('bgl2_dropdown_cache');
     if (savedDrop) window.BGL2_DROPDOWN_CACHE = JSON.parse(savedDrop);
+
+    var savedTable = localStorage.getItem('bgl2_table_cache');
+    if (savedTable) window.BGL2_CACHE = JSON.parse(savedTable);
 } catch(e) {}
+
+window.saveCacheToLocal = function() {
+    try {
+        localStorage.setItem('bgl2_table_cache', JSON.stringify(window.BGL2_CACHE));
+    } catch(e) { console.error("Gagal simpan cache:", e); }
+};
 
 var isSidebarOpen = false;
 var isKonterMode = true; 
