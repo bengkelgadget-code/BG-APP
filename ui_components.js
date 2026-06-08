@@ -160,12 +160,16 @@ function switchPage(key, title) {
         }
 
         var activeSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
-        if (activeSheet && typeof gasRun !== 'undefined') {
-            gasRun('getData', activeSheet).then(d => { 
-                if(JSON.stringify(window.BGL2_CACHE[activeSheet]) !== JSON.stringify(d)) {
+        if (activeSheet && typeof window.listenToCollection === 'function') {
+            window.listenToCollection(activeSheet, function(d) {
+                // Hapus _timestamp dan stringify untuk perbandingan murni
+                var cleanCache = (window.BGL2_CACHE[activeSheet] || []).map(r => { var n = [...r]; delete n._docId; delete n._timestamp; return n; });
+                var cleanNew = d.map(r => { var n = [...r]; delete n._docId; delete n._timestamp; return n; });
+
+                if(JSON.stringify(cleanCache) !== JSON.stringify(cleanNew)) {
                     window.BGL2_CACHE[activeSheet] = d; 
                     if(window.saveCacheToLocal) window.saveCacheToLocal();
-                    // ZETTBOT FIX: Update UI otomatis jika ada perubahan dari device lain
+                    
                     var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
                     if(currentRenderedSheet === activeSheet && key !== 'Dashboard') {
                         loadTableData(false);
@@ -173,7 +177,7 @@ function switchPage(key, title) {
                         if(typeof window.renderDashboardPage === 'function') window.renderDashboardPage();
                     }
                 }
-            }).catch(e=>{});
+            });
         }
         
         if(window.innerWidth < 768 && isSidebarOpen) toggleSidebar();

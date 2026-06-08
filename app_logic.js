@@ -72,6 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.BGL2_CACHE[targetSheet] = sheetData;
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
                 
+                var docId = sheetData[itemIndex]._docId;
+                if (docId) {
+                    updateInFirebase(targetSheet, docId, sheetData[itemIndex]).catch(e => console.log("Gagal update stok Firebase", e));
+                }
+
                 if(typeof gasRun !== 'undefined') {
                     gasRun('updateData', targetSheet, itemIndex, sheetData[itemIndex]).catch(e => console.log("Gagal update stok GS", e));
                 }
@@ -168,13 +173,13 @@ document.addEventListener('DOMContentLoaded', function() {
             var activeSheet = isKonterMode ? 'DB_konter' : currentConfig.sheet;
             
             if (activeSheet) {
-                let singleData = await gasRun('getData', activeSheet);
+                let singleData = await getFromFirebase(activeSheet);
                 window.BGL2_CACHE[activeSheet] = Array.isArray(singleData) ? singleData : [];
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
             }
 
             if (!window.BGL2_CACHE['Pengaturan_Margin'] && currentSheet !== 'Margin') {
-                window.BGL2_CACHE['Pengaturan_Margin'] = await gasRun('getData', 'Pengaturan_Margin') || [];
+                window.BGL2_CACHE['Pengaturan_Margin'] = await getFromFirebase('Pengaturan_Margin') || [];
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
             }
             var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers || [] : []);
@@ -223,9 +228,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             if(editIdx === -1) {
-                await gasRun('saveData', 'Pengaturan_Umum', arr);
+                await saveToFirebase('Pengaturan_Umum', arr);
+                gasRun('saveData', 'Pengaturan_Umum', arr).catch(e=>{});
             } else {
-                await gasRun('updateData', 'Pengaturan_Umum', editIdx, arr);
+                var rowData = window.BGL2_CACHE['Pengaturan_Umum'][editIdx];
+                var docId = rowData ? rowData._docId : null;
+                if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
+                await updateInFirebase('Pengaturan_Umum', docId, arr);
+                gasRun('updateData', 'Pengaturan_Umum', editIdx, arr).catch(e=>{});
             }
             Swal.fire({title: 'Sukses', text:'Pengaturan berhasil disimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
             refreshActiveData(false);
@@ -287,13 +297,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if(payload.length === 0) throw new Error("Tidak ada data valid yang bisa diekstrak.");
 
-            var res = await gasRun('batchSaveScrapedData', currentSheet, payload);
-            if(res && res.status === 'error') {
-                if(res.message.includes('appendRow')) {
-                    throw new Error("Backend Code.gs Anda belum diperbarui sepenuhnya! Tabel 'KategoriGame' belum tercetak di Spreadsheet. Silakan perbarui file Code.gs Anda.");
-                }
-                throw new Error(res.message);
-            }
+            await batchSaveToFirebase(currentSheet, payload);
+            gasRun('batchSaveScrapedData', currentSheet, payload).catch(e=>{});
 
             closeSmartPasteModal();
             Swal.fire({ title: 'Sukses!', html: `Berhasil memproses data ${currentSheet}.`, icon: 'success' });
@@ -310,10 +315,10 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.disabled = true; btn.innerText = "Menyimpan...";
         
         try {
-            var res = await gasRun('saveData', 'KategoriACC', ["", namaKat]);
-            if(res && res.status === 'error') throw new Error(res.message);
+            var newId = 'K-' + new Date().getTime().toString().slice(-6);
+            await saveToFirebase('KategoriACC', [newId, namaKat]);
+            gasRun('saveData', 'KategoriACC', [newId, namaKat]).catch(e=>{});
             
-
             localStorage.removeItem('bgl2_dropdown_cache');
             var db = await gasRun('getDropdownData');
             window.BGL2_DROPDOWN_CACHE = db;
@@ -339,10 +344,10 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.disabled = true; btn.innerText = "Menyimpan...";
         
         try {
-            var res = await gasRun('saveData', 'Provider', ["", namaProv]);
-            if(res && res.status === 'error') throw new Error(res.message);
+            var newId = 'P-' + new Date().getTime().toString().slice(-6);
+            await saveToFirebase('Provider', [newId, namaProv]);
+            gasRun('saveData', 'Provider', [newId, namaProv]).catch(e=>{});
             
-
             localStorage.removeItem('bgl2_dropdown_cache');
             var db = await gasRun('getDropdownData');
             window.BGL2_DROPDOWN_CACHE = db;
@@ -599,47 +604,53 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             let res;
             if(currentIndex === -1) {
-                res = await gasRun('saveKonterTransaction', payload);
-                if (res && res.status === 'error') throw new Error(res.message);
-                var fakeId = 'TRX-PENDING-' + new Date().getTime().toString().slice(-4);
+                var newId = 'KNT-' + new Date().getTime().toString().slice(-6);
                 var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
-                var newRow = [fakeId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), new Date().toLocaleDateString('id-ID')];
+                var newRow = [newId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), new Date().toLocaleDateString('id-ID')];
+                
+                await saveToFirebase('DB_konter', newRow);
+                
                 if (!window.BGL2_CACHE['DB_konter']) window.BGL2_CACHE['DB_konter'] = [];
+                // Listener Firebase onSnapshot otomatis akan memperbarui tabel, tapi kita update lokal dulu agar instan
+                newRow._docId = "pending"; // akan tertimpa listener
                 window.BGL2_CACHE['DB_konter'].push(newRow);
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
                 window.adjustStock(payload.jenis, payload.detail, -1);
                 loadTableData(false);
+
+                // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
+                payload.id_override = newId; // jika Code.gs mendukung
+                gasRun('saveKonterTransaction', payload).catch(e=>console.error(e));
+
             } else {
-                var originalId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
-                var oldJenis = window.BGL2_CACHE['DB_konter'][currentIndex][2];
-                var oldDetail = window.BGL2_CACHE['DB_konter'][currentIndex][3];
+                var rowData = window.BGL2_CACHE['DB_konter'][currentIndex];
+                var originalId = rowData[0];
+                var oldJenis = rowData[2];
+                var oldDetail = rowData[3];
+                var docId = rowData._docId;
                 
-                res = await gasRun('editKonterTransaction', currentIndex, payload, originalId);
-                if (res && res.status === 'error') throw new Error(res.message);
-                var originalDate = window.BGL2_CACHE['DB_konter'][currentIndex][7];
+                if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
+
+                var originalDate = rowData[7];
                 var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
                 var updatedRow = [originalId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), originalDate];
+                
+                await updateInFirebase('DB_konter', docId, updatedRow);
+
+                updatedRow._docId = docId;
                 window.BGL2_CACHE['DB_konter'][currentIndex] = updatedRow;
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
                 
-                if (oldJenis === payload.jenis && oldDetail === payload.detail) {
-                    // Item did not change, no stock adjustment needed
-                } else {
+                if (oldJenis !== payload.jenis || oldDetail !== payload.detail) {
                     window.adjustStock(oldJenis, oldDetail, 1);
                     window.adjustStock(payload.jenis, payload.detail, -1);
                 }
+
+                // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
+                gasRun('editKonterTransaction', currentIndex, payload, originalId).catch(e=>console.error(e));
             }
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
-            loadTableData(false); 
-
-            // ZETTBOT FIX: Silent background sync to ensure data consistency with other devices
-            gasRun('getData', 'DB_konter').then(d => {
-                if(JSON.stringify(window.BGL2_CACHE['DB_konter']) !== JSON.stringify(d)) {
-                    window.BGL2_CACHE['DB_konter'] = d;
-                    if(window.saveCacheToLocal) window.saveCacheToLocal();
-                    if(isKonterMode) loadTableData(false);
-                }
-            }).catch(e=>{});
+            loadTableData(false);
 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
     }
@@ -751,18 +762,24 @@ document.addEventListener('DOMContentLoaded', function() {
     function delKonter(idx) { 
         if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
 
-        Swal.fire({title: 'Hapus?', text: "Data tidak bisa balik!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444'}).then(async function(r) {
-            if(r.isConfirmed) {
-                Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                try { 
+        Swal.fire({
+            title: 'Hapus Transaksi?', text: "Data tidak bisa dikembalikan!", icon: 'warning', showCancelButton: true,
+            confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Hapus!', cancelButtonText: 'Batal'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({title: 'Menghapus...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading()});
+                try {
                     var safeIdx = parseInt(idx, 10);
-                    // ZETTBOT FIX: Mendapatkan ID item (TRX-...) untuk dikirim ke API Firebase
                     var rowData = window.BGL2_CACHE['DB_konter'][safeIdx];
                     var itemId = rowData ? rowData[0] : null;
                     var delJenis = rowData ? rowData[2] : null;
                     var delDetail = rowData ? rowData[3] : null;
+                    var docId = rowData ? rowData._docId : null;
 
-                    await gasRun('deleteData', 'DB_konter', safeIdx, itemId); 
+                    if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
+
+                    await deleteFromFirebase('DB_konter', docId); 
+                    
                     if(window.BGL2_CACHE['DB_konter']) {
                         window.BGL2_CACHE['DB_konter'].splice(safeIdx, 1);
                         if(window.saveCacheToLocal) window.saveCacheToLocal();
@@ -771,14 +788,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     loadTableData(false);
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
 
-                    // ZETTBOT FIX: Silent background sync
-                    gasRun('getData', 'DB_konter').then(d => {
-                        if(JSON.stringify(window.BGL2_CACHE['DB_konter']) !== JSON.stringify(d)) {
-                            window.BGL2_CACHE['DB_konter'] = d;
-                            if(window.saveCacheToLocal) window.saveCacheToLocal();
-                            if(isKonterMode) loadTableData(false);
-                        }
-                    }).catch(e=>{});
+                    // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
+                    gasRun('deleteData', 'DB_konter', safeIdx, itemId).catch(e=>{console.error("Backup Error:", e)});
                 } catch(err) { Swal.fire('Error', String(err), 'error'); }
             }
         });
@@ -794,13 +805,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     var safeIdx = parseInt(idx, 10);
                     var actualSheet = (currentConfig && currentConfig.sheet) ? currentConfig.sheet : (pageConfigs[sheetKey] ? pageConfigs[sheetKey].sheet : sheetKey);
                     
-                    // ZETTBOT FIX: Mendapatkan ID unik item untuk dikirim ke API Firebase
                     var rowData = window.BGL2_CACHE[actualSheet][safeIdx];
                     var itemId = rowData ? rowData[0] : null;
+                    var docId = rowData ? rowData._docId : null;
 
-                    await gasRun('deleteData', actualSheet, safeIdx, itemId); 
+                    if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
+
+                    await deleteFromFirebase(actualSheet, docId); 
                     
-
                     localStorage.removeItem('bgl2_dropdown_cache'); 
                     if(window.BGL2_CACHE[actualSheet]) {
                         window.BGL2_CACHE[actualSheet].splice(safeIdx, 1);
@@ -810,15 +822,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
 
-                    // ZETTBOT FIX: Silent background sync to prevent cache divergence with other devices
-                    gasRun('getData', actualSheet).then(d => {
-                        if(JSON.stringify(window.BGL2_CACHE[actualSheet]) !== JSON.stringify(d)) {
-                            window.BGL2_CACHE[actualSheet] = d;
-                            if(window.saveCacheToLocal) window.saveCacheToLocal();
-                            var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
-                            if(currentRenderedSheet === actualSheet) loadTableData(false);
-                        }
-                    }).catch(e=>{});
+                    // ZETTBOT FIX: Silent background sync to Google Sheet
+                    gasRun('deleteData', actualSheet, safeIdx, itemId).catch(e=>{});
                 } catch(err) { 
                     Swal.fire('Error', String(err), 'error'); 
                 }
@@ -871,31 +876,39 @@ document.addEventListener('DOMContentLoaded', function() {
         Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
         try {
             if(currentIndex === -1) {
-                await gasRun('saveData', currentConfig.sheet, arr);
+                var newId = 'M-' + new Date().getTime().toString().slice(-6);
+                if (currentConfig.fields[0] && currentConfig.fields[0].id.toLowerCase().includes('id')) {
+                    arr[0] = newId; 
+                }
+
+                await saveToFirebase(currentConfig.sheet, arr);
+
                 if (!window.BGL2_CACHE[currentConfig.sheet]) window.BGL2_CACHE[currentConfig.sheet] = [];
+                arr._docId = "pending";
                 window.BGL2_CACHE[currentConfig.sheet].push(arr);
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
                 loadTableData(false);
+
+                gasRun('saveData', currentConfig.sheet, arr).catch(e=>{});
             } else {
-                await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
+                var rowData = window.BGL2_CACHE[currentConfig.sheet][currentIndex];
+                var docId = rowData._docId;
+
+                if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
+
+                await updateInFirebase(currentConfig.sheet, docId, arr);
+                arr._docId = docId;
+
                 if(window.BGL2_CACHE[currentConfig.sheet] && window.BGL2_CACHE[currentConfig.sheet][currentIndex]) {
                     window.BGL2_CACHE[currentConfig.sheet][currentIndex] = arr;
                     if(window.saveCacheToLocal) window.saveCacheToLocal();
                 }
+
+                gasRun('updateData', currentConfig.sheet, currentIndex, arr).catch(e=>{});
             }
 
             Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
             loadTableData(false); 
-
-            // ZETTBOT FIX: Silent background sync to ensure data consistency with other devices
-            gasRun('getData', currentConfig.sheet).then(d => {
-                if(JSON.stringify(window.BGL2_CACHE[currentConfig.sheet]) !== JSON.stringify(d)) {
-                    window.BGL2_CACHE[currentConfig.sheet] = d;
-                    if(window.saveCacheToLocal) window.saveCacheToLocal();
-                    var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
-                    if(currentRenderedSheet === currentConfig.sheet) loadTableData(false);
-                }
-            }).catch(e=>{});
 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
