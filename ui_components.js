@@ -160,16 +160,6 @@ function switchPage(key, title) {
             loadTableData(false); 
         }
         
-        var activeSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
-        if (activeSheet && typeof gasRun !== 'undefined') {
-            gasRun('getData', activeSheet).then(d => { 
-                if(JSON.stringify(window.BGL2_CACHE[activeSheet]) !== JSON.stringify(d)) {
-                    window.BGL2_CACHE[activeSheet] = d; 
-                    if(window.saveCacheToLocal) window.saveCacheToLocal();
-                    loadTableData(false);
-                }
-            }).catch(e=>{});
-        }
 
         if(window.innerWidth < 768 && isSidebarOpen) toggleSidebar();
     } catch(e) { console.error(e); }
@@ -202,17 +192,24 @@ function loadTableData(forceRefresh = false) {
             return;
         }
 
-        var html = '<table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="dataTable">';
-        html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
-        html += '<tr>';
-        for(var i=0; i<hdrs.length; i++) {
-            var thClass = "py-2.5 px-2 sm:px-4 font-bold text-center";
-            if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
-            html += '<th class="' + thClass + '">' + hdrs[i] + '</th>';
+        var needRebuild = false;
+        if (window.lastRenderedSheet !== sheet) {
+            needRebuild = true;
+            window.lastRenderedSheet = sheet;
         }
-        html += '</tr></thead><tbody class="text-[11px] sm:text-sm divide-y divide-slate-100" id="dataTableBody"></tbody></table>';
-        
-        tableContainer.innerHTML = html;
+
+        if (needRebuild || !document.getElementById('dataTableBody')) {
+            var html = '<table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="dataTable">';
+            html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
+            html += '<tr>';
+            for(var i=0; i<hdrs.length; i++) {
+                var thClass = "py-2.5 px-2 sm:px-4 font-bold text-center";
+                if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
+                html += '<th class="' + thClass + '">' + hdrs[i] + '</th>';
+            }
+            html += '</tr></thead><tbody class="text-[11px] sm:text-sm divide-y divide-slate-100" id="dataTableBody"></tbody></table>';
+            tableContainer.innerHTML = html;
+        }
         var tbody = document.getElementById('dataTableBody');
 
         if (forceRefresh || !window.BGL2_CACHE[sheet] || window.BGL2_CACHE[sheet].length === 0) {

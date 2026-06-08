@@ -37,8 +37,6 @@
             }
             Swal.fire('Oops!', fieldName + ' wajib diisi atau dipilih!', 'warning');
         }, true); 
-        window.BGL2_CACHE = {};
-        window.BGL2_DROPDOWN_CACHE = null;
 
         switchPage('Konter', 'Konter HP');
     });
@@ -304,7 +302,7 @@
             var res = await gasRun('saveData', 'KategoriACC', ["", namaKat]);
             if(res && res.status === 'error') throw new Error(res.message);
             
-            window.BGL2_DROPDOWN_CACHE = null;
+
             localStorage.removeItem('bgl2_dropdown_cache');
             var db = await gasRun('getDropdownData');
             window.BGL2_DROPDOWN_CACHE = db;
@@ -333,7 +331,7 @@
             var res = await gasRun('saveData', 'Provider', ["", namaProv]);
             if(res && res.status === 'error') throw new Error(res.message);
             
-            window.BGL2_DROPDOWN_CACHE = null;
+
             localStorage.removeItem('bgl2_dropdown_cache');
             var db = await gasRun('getDropdownData');
             window.BGL2_DROPDOWN_CACHE = db;
@@ -373,7 +371,7 @@
                 throw new Error(res.message);
             }
             
-            window.BGL2_DROPDOWN_CACHE = null;
+
             localStorage.removeItem('bgl2_dropdown_cache');
             var db = await gasRun('getDropdownData');
             window.BGL2_DROPDOWN_CACHE = db;
@@ -599,7 +597,8 @@
                 window.BGL2_CACHE['DB_konter'].push(newRow);
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
                 window.adjustStock(payload.jenis, payload.detail, -1);
-                gasRun('getData', 'DB_konter').then(d => { window.BGL2_CACHE['DB_konter'] = d; if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false); }).catch(e=>console.log("Background load failed", e));
+                // gasRun background fetch dihapus untuk mencegah double-render
+                if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false);
             } else {
                 var originalId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
                 var oldJenis = window.BGL2_CACHE['DB_konter'][currentIndex][2];
@@ -772,7 +771,7 @@
 
                     await gasRun('deleteData', actualSheet, safeIdx, itemId); 
                     
-                    window.BGL2_DROPDOWN_CACHE = null; 
+
                     localStorage.removeItem('bgl2_dropdown_cache'); 
                     if(window.BGL2_CACHE[actualSheet]) {
                         window.BGL2_CACHE[actualSheet].splice(safeIdx, 1);
@@ -837,7 +836,8 @@
                 if (!window.BGL2_CACHE[currentConfig.sheet]) window.BGL2_CACHE[currentConfig.sheet] = [];
                 window.BGL2_CACHE[currentConfig.sheet].push(arr);
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
-                gasRun('getData', currentConfig.sheet).then(d => { window.BGL2_CACHE[currentConfig.sheet] = d; if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false); }).catch(e=>console.log(e));
+                // gasRun background fetch dihapus untuk mencegah double-render
+                if(window.saveCacheToLocal) window.saveCacheToLocal(); loadTableData(false);
             } else {
                 await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
                 if(window.BGL2_CACHE[currentConfig.sheet] && window.BGL2_CACHE[currentConfig.sheet][currentIndex]) {
@@ -845,7 +845,7 @@
                     if(window.saveCacheToLocal) window.saveCacheToLocal();
                 }
             }
-            window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache');
+
             Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
             loadTableData(false); 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
