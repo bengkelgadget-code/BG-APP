@@ -4,10 +4,13 @@ window.renderDashboardPage = async function() {
     var container = document.getElementById('dashboardPageContainer');
     if(!container) return;
 
-    if (!window.BGL2_CACHE['DB_konter']) {
-        if(typeof gasRun !== 'undefined') window.BGL2_CACHE['DB_konter'] = await gasRun('getData', 'DB_konter');
-        else window.BGL2_CACHE['DB_konter'] = [];
-    }
+    container.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center pt-20"><i class="fa-solid fa-spinner fa-spin text-4xl text-pink-500 mb-4"></i><p class="text-slate-500 font-medium">Menganalisa & Mengumpulkan Data...</p></div>';
+
+    try {
+        if (!window.BGL2_CACHE['DB_konter']) {
+            if(typeof gasRun !== 'undefined') window.BGL2_CACHE['DB_konter'] = await gasRun('getData', 'DB_konter');
+            else window.BGL2_CACHE['DB_konter'] = [];
+        }
 
     const loadStock = async (sheet) => {
         if (!window.BGL2_CACHE[sheet]) {
@@ -81,6 +84,7 @@ window.renderDashboardPage = async function() {
 
     var lowStock = [];
     const checkLow = (arr, jenis) => {
+        if(!Array.isArray(arr)) return;
         arr.forEach(r => {
             let st = parseInt(r[5]) || 0;
             if(st < 1) lowStock.push({ name: r[2], type: jenis });
@@ -236,6 +240,10 @@ window.renderDashboardPage = async function() {
                 }
             }
         });
+    }
+    } catch(err) {
+        console.error("Dashboard render error:", err);
+        container.innerHTML = '<div class="w-full h-full flex flex-col items-center justify-center pt-20"><i class="fa-solid fa-triangle-exclamation text-4xl text-red-500 mb-4"></i><p class="text-slate-600 font-medium">Gagal memuat Dashboard</p><p class="text-xs text-red-400 mt-2">' + err.message + '</p></div>';
     }
 };
 
