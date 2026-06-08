@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ZETTBOT FIX: Menggunakan 100dvh & Fill-Available agar bottom navigation mengunci layar dan tidak terpotong address bar HP */
+html, body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #f8fafc; 
+    margin: 0; 
+    padding: 0; 
+    width: 100%;
+    height: 100%;
+    height: -webkit-fill-available;
+    height: 100dvh; 
+    overflow: hidden !important; 
+}
+
+.dropdown-content { max-height: 0; opacity: 0; overflow: hidden; transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; transform: translateY(-5px); }
+.menu-container:hover .dropdown-content { max-height: 500px; opacity: 1; transform: translateY(0); }
+.chevron-icon { transition: transform 0.3s ease; }
+.menu-container:hover .chevron-icon { transform: rotate(180deg); }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.fade-in { animation: fadeIn 0.3s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+#mainContainer { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.main-active-modal { transform: scale(0.97) translateY(10px); opacity: 0.5; pointer-events: none; }
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+.select2-container--default .select2-selection--single { height: 42px !important; border-color: #cbd5e1 !important; border-radius: 0.5rem !important; display: flex !important; align-items: center !important; padding: 0 0.75rem !important; background-color: #ffffff !important; }
+.select2-container--default .select2-selection--single .select2-selection__rendered { color: #1e293b !important; font-size: 0.875rem !important; line-height: 1.25rem !important; padding-left: 0 !important; }
+.select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; right: 10px !important; }
+
+.select2-container--default .select2-selection--multiple { border-color: #cbd5e1 !important; border-radius: 0.5rem !important; min-height: 42px !important; padding: 4px 8px !important; background-color: #ffffff !important; display: flex !important; align-items: center !important; }
+.select2-container--default.select2-container--focus .select2-selection--multiple { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
+.select2-container--default .select2-selection--multiple .select2-selection__rendered { display: flex !important; flex-wrap: wrap !important; width: 100% !important; margin: 0 !important; padding: 0 !important; align-items: center !important; gap: 6px !important; }
+.select2-container--default .select2-search--inline .select2-search__field { margin-top: 0 !important; font-family: inherit !important; font-size: 0.875rem !important; color: #475569 !important; line-height: 1.5 !important; }
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice { background-color: #f8fafc !important; border: 1px solid #cbd5e1 !important; border-radius: 9999px !important; padding: 4px 8px 4px 12px !important; margin: 0 !important; font-size: 0.75rem !important; font-weight: 700 !important; color: #334155 !important; display: flex !important; flex-direction: row-reverse !important; align-items: center !important; gap: 8px !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: #ffffff !important; background-color: #ef4444 !important; border: none !important; border-radius: 50% !important; width: 18px !important; height: 18px !important; display: flex !important; align-items: center !important; justify-content: center !important; font-weight: bold !important; font-size: 13px !important; line-height: 1 !important; padding: 0 !important; margin: 0 !important; cursor: pointer !important; transition: all 0.2s ease !important; position: relative !important; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { background-color: #dc2626 !important; transform: scale(1.1); }
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display { padding: 0 !important; margin: 0 !important; }
+
+.select2-search__field { border-radius: 0.25rem !important; border-color: #cbd5e1 !important; font-size: 0.875rem !important; padding: 0.5rem !important; outline: none !important; color: #1e293b !important; }
+.select2-search__field:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 1px #3b82f6 !important; }
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable { background-color: #eff6ff !important; color: #1d4ed8 !important; }
+.select2-results__option { font-size: 0.875rem !important; padding: 0.5rem 0.75rem !important; color: #1e293b !important; }
+.select2-dropdown { background-color: #ffffff !important; border-color: #cbd5e1 !important; }
+.select2-container--open { z-index: 99999 !important; }
+
+/* ====================================================================
+   ZETTBOT FIX: App-Like Constraints (Mencegah Layar Tembus Bawah)
+==================================================================== */
+#mainTableWrapper {
+    min-height: 0 !important;
+    overflow: hidden !important; 
+}
+#dataTableContainer {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+#datePaginationWrap {
+    flex-shrink: 0 !important; /* Paksa navigasi menetap & tidak ikut tergencet scroll vertikal/horizontal */
+}
+
+/* ====================================================================
+   ZETTBOT FIX: Modal Keyboard Overlay & Mobile Optimizations 
+==================================================================== */
+@media (max-width: 640px) {
+    /* 1. Memaksa semua modal naik ke atas saat di HP agar tidak tertutup virtual keyboard */
+    #modalKonter, #modalGeneric, #modalSmartPaste, #modalAddKategori, #modalAddProvider, #modalAddKategoriGame {
+        align-items: flex-start !important;
+        padding-top: 1.5rem !important;
+    }
+    
+    /* 2. Fitur scroll responsif pada isi modal */
+    #modalKonterContent, #modalGenericContent, #modalSmartPasteContent, #modalAddKategoriContent, #modalAddProviderContent, #modalAddKategoriGameContent {
+        max-height: calc(100vh - 3rem) !important;
+        max-height: calc(-webkit-fill-available - 3rem) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 3. Menjaga pop-up dropdown Select2 agar selalu tampil paling depan */
+    .select2-container--open {
+        z-index: 999999 !important;
+    }
+}
