@@ -779,14 +779,15 @@
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
 
-    window.handleLogin = handleLogin; window.logout = logout;
+    window.handleLogin = handleLogin; window.logout = logout; window.toggleSidebar = toggleSidebar; window.switchPage = switchPage; window.toggleForm = toggleForm; 
+    window.openModal = openModal; window.closeModal = closeModal;
+    window.openGenericModal = openGenericModal; window.closeGenericModal = closeGenericModal; window.openKonterModal = openKonterModal; window.closeKonterModal = closeKonterModal;
     window.kntJenisChange = kntJenisChange; window.kntDetailChange = kntDetailChange; window.editKonterData = editKonterData;
     window.editDataGen = editDataGen; window.initGenericForm = initGenericForm; 
-    window.delKonter = delKonter; window.delGen = delGen;
-    window.submitAddKategori = submitAddKategori;
-    window.submitAddProvider = submitAddProvider;
-    window.submitAddKategoriGame = submitAddKategoriGame;
-    window.submitSmartPaste = submitSmartPaste;
-    window.submitPengaturanUmum = submitPengaturanUmum;
-    window.handleFormSubmit = handleFormSubmit;
-    window.submitKonterForm = submitKonterForm;
+    window.loadTableData = loadTableData; window.delKonter = delKonter; window.delGen = delGen;
+    window.renderMiniDashboard = renderMiniDashboard; window.filterTable = filterTable;
+    window.openAddKategoriModal = openAddKategoriModal; window.closeAddKategoriModal = closeAddKategoriModal; window.submitAddKategori = submitAddKategori;
+    window.openAddProviderModal = openAddProviderModal; window.closeAddProviderModal = closeAddProviderModal; window.submitAddProvider = submitAddProvider;
+    window.openAddKategoriGameModal = openAddKategoriGameModal; window.closeAddKategoriGameModal = closeAddKategoriGameModal; window.submitAddKategoriGame = submitAddKategoriGame;
+    window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
+    window.populateUmumSettings = populateUmumSettings; window.previewUmumLogo = previewUmumLogo; window.submitPengaturanUmum = submitPengaturanUmum;
