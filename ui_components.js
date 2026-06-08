@@ -155,12 +155,21 @@ function switchPage(key, title) {
             if(dash) { dash.classList.add('hidden'); dash.classList.remove('flex'); }
             if(dashboardPage) { dashboardPage.classList.add('hidden'); dashboardPage.classList.remove('flex'); }
         }
-        
         if (key !== 'Dashboard') {
             loadTableData(false); 
         }
-        
 
+        var activeSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+        if (activeSheet && typeof gasRun !== 'undefined') {
+            gasRun('getData', activeSheet).then(d => { 
+                if(JSON.stringify(window.BGL2_CACHE[activeSheet]) !== JSON.stringify(d)) {
+                    window.BGL2_CACHE[activeSheet] = d; 
+                    if(window.saveCacheToLocal) window.saveCacheToLocal();
+                    // ZETTBOT FIX: Update cache di background tanpa memicu re-render yang mengganggu (Sesuai opsi B)
+                }
+            }).catch(e=>{});
+        }
+        
         if(window.innerWidth < 768 && isSidebarOpen) toggleSidebar();
     } catch(e) { console.error(e); }
 }
