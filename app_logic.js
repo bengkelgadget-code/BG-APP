@@ -561,14 +561,24 @@
             let res;
             if(currentIndex === -1) {
                 res = await gasRun('saveKonterTransaction', payload);
+                if (res && res.status === 'error') throw new Error(res.message);
+                var fakeId = 'TRX-PENDING-' + new Date().getTime().toString().slice(-4);
+                var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
+                var newRow = [fakeId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), new Date().toLocaleDateString('id-ID')];
+                if (!window.BGL2_CACHE['DB_konter']) window.BGL2_CACHE['DB_konter'] = [];
+                window.BGL2_CACHE['DB_konter'].push(newRow);
+                gasRun('getData', 'DB_konter').then(d => { window.BGL2_CACHE['DB_konter'] = d; loadTableData(false); }).catch(e=>console.log("Background load failed", e));
             } else {
-                // ZETTBOT FIX: Ambil ID Transaksi asli dari cache untuk dikirim ke API Firebase
                 var originalId = window.BGL2_CACHE['DB_konter'][currentIndex][0];
                 res = await gasRun('editKonterTransaction', currentIndex, payload, originalId);
+                if (res && res.status === 'error') throw new Error(res.message);
+                var originalDate = window.BGL2_CACHE['DB_konter'][currentIndex][7];
+                var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
+                var updatedRow = [originalId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), originalDate];
+                window.BGL2_CACHE['DB_konter'][currentIndex] = updatedRow;
             }
-            if (res && res.status === 'error') throw new Error(res.message);
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
-            refreshActiveData(false); 
+            loadTableData(false); 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
     }
 
@@ -689,7 +699,10 @@
                     var itemId = rowData ? rowData[0] : null;
 
                     await gasRun('deleteData', 'DB_konter', safeIdx, itemId); 
-                    await refreshActiveData(true); 
+                    if(window.BGL2_CACHE['DB_konter']) {
+                        window.BGL2_CACHE['DB_konter'].splice(safeIdx, 1);
+                    }
+                    loadTableData(false);
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
                 } catch(err) { Swal.fire('Error', String(err), 'error'); }
             }
@@ -714,7 +727,10 @@
                     
                     window.BGL2_DROPDOWN_CACHE = null; 
                     localStorage.removeItem('bgl2_dropdown_cache'); 
-                    await refreshActiveData(true); 
+                    if(window.BGL2_CACHE[actualSheet]) {
+                        window.BGL2_CACHE[actualSheet].splice(safeIdx, 1);
+                    }
+                    loadTableData(false);
                     
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
                 } catch(err) { 
@@ -770,12 +786,18 @@
         try {
             if(currentIndex === -1) {
                 await gasRun('saveData', currentConfig.sheet, arr);
+                if (!window.BGL2_CACHE[currentConfig.sheet]) window.BGL2_CACHE[currentConfig.sheet] = [];
+                window.BGL2_CACHE[currentConfig.sheet].push(arr);
+                gasRun('getData', currentConfig.sheet).then(d => { window.BGL2_CACHE[currentConfig.sheet] = d; loadTableData(false); }).catch(e=>console.log(e));
             } else {
                 await gasRun('updateData', currentConfig.sheet, currentIndex, arr);
+                if(window.BGL2_CACHE[currentConfig.sheet] && window.BGL2_CACHE[currentConfig.sheet][currentIndex]) {
+                    window.BGL2_CACHE[currentConfig.sheet][currentIndex] = arr;
+                }
             }
             window.BGL2_DROPDOWN_CACHE = null; localStorage.removeItem('bgl2_dropdown_cache');
             Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-            refreshActiveData(false); 
+            loadTableData(false); 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
 

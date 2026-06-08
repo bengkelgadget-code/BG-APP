@@ -59,25 +59,37 @@ function renderMiniDashboard() {
     if(elProf) elProf.innerText = 'Profit ' + lblPeriode;
 }
 
-function filterTable() {
-    var input = document.getElementById("searchInput");
-    if(!input) return;
-    var filter = input.value.toLowerCase();
-    var tbody = document.getElementById("dataTableBody");
-    if(!tbody) return;
-    var trs = tbody.getElementsByTagName("tr");
+window.searchTimeout = null;
+window.currentPageGen = 1;
+window.itemsPerPageGen = 50;
 
-    for (var i = 0; i < trs.length; i++) {
-        if (trs[i].getElementsByTagName("td")[0] && trs[i].getElementsByTagName("td")[0].colSpan > 1) continue; 
-        var tds = trs[i].getElementsByTagName("td");
-        var showRow = false;
-        for (var j = 0; j < tds.length; j++) {
-            if (tds[j]) {
-                if (tds[j].innerText.toLowerCase().indexOf(filter) > -1) { showRow = true; break; }
+function filterTable() {
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(function() {
+        if (!isKonterMode) {
+            window.currentPageGen = 1;
+            loadTableData(false); 
+        } else {
+            var input = document.getElementById("searchInput");
+            if(!input) return;
+            var filter = input.value.toLowerCase();
+            var tbody = document.getElementById("dataTableBody");
+            if(!tbody) return;
+            var trs = tbody.getElementsByTagName("tr");
+
+            for (var i = 0; i < trs.length; i++) {
+                if (trs[i].getElementsByTagName("td")[0] && trs[i].getElementsByTagName("td")[0].colSpan > 1) continue; 
+                var tds = trs[i].getElementsByTagName("td");
+                var showRow = false;
+                for (var j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        if (tds[j].innerText.toLowerCase().indexOf(filter) > -1) { showRow = true; break; }
+                    }
+                }
+                trs[i].style.display = showRow ? "" : "none";
             }
         }
-        trs[i].style.display = showRow ? "" : "none";
-    }
+    }, 300);
 }
 
 function toggleSidebar() {
@@ -627,7 +639,11 @@ function renderKonterTable(data, colCount) {
 function renderGenericTable(data, colCount) {
     var btnTambah = document.getElementById('btnTambahData');
     var tbody = document.getElementById('dataTableBody');
+    var wrapper = document.getElementById('mainTableWrapper');
     
+    var existingPag = document.getElementById('genPaginationWrap');
+    if (existingPag) existingPag.remove();
+
     if(!tbody || !data || data.length === 0) {
         if(btnTambah) btnTambah.classList.remove('hidden');
         if(tbody) tbody.innerHTML = '<tr><td colspan="'+colCount+'" class="p-8 text-center text-slate-500 italic">Belum ada data tersedia.</td></tr>';
@@ -636,13 +652,36 @@ function renderGenericTable(data, colCount) {
 
     var reversedData = [];
     for (var k = data.length - 1; k >= 0; k--) { if(data[k] && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k}); }
-    currentTableData = reversedData;
+
+    var input = document.getElementById("searchInput");
+    var filterText = (input ? input.value.toLowerCase() : "");
+    if(filterText !== "") {
+        reversedData = reversedData.filter(function(item) {
+            return item.row.some(function(cell) {
+                return String(cell).toLowerCase().indexOf(filterText) > -1;
+            });
+        });
+    }
 
     if (btnTambah) {
         btnTambah.classList.remove('hidden');
     }
 
-    var rowsHtml = reversedData.map((d, i) => {
+    var totalPages = Math.ceil(reversedData.length / window.itemsPerPageGen) || 1;
+    if (window.currentPageGen > totalPages) window.currentPageGen = totalPages;
+    if (window.currentPageGen < 1) window.currentPageGen = 1;
+    
+    var startIndex = (window.currentPageGen - 1) * window.itemsPerPageGen;
+    var paginatedData = reversedData.slice(startIndex, startIndex + window.itemsPerPageGen);
+    
+    currentTableData = paginatedData; 
+
+    if (paginatedData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="${colCount}" class="p-8 text-center text-slate-500 italic">Data tidak ditemukan.</td></tr>`;
+        return;
+    }
+
+    var rowsHtml = paginatedData.map((d, i) => {
         var r = d.row; var o = d.originalIndex;
         var cells = '';
 
@@ -688,7 +727,19 @@ function renderGenericTable(data, colCount) {
 
         return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">${cells}<td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
     });
+    
+    rowsHtml.push(`<tr class="md:hidden"><td colspan="${colCount}" style="height: 140px; border: none;"></td></tr>`);
     tbody.innerHTML = rowsHtml.join('');
+
+    if (totalPages > 1) {
+        var pagHtml = `
+        <div id="genPaginationWrap" class="fixed bottom-0 left-0 right-0 md:static md:bottom-auto w-full flex justify-between items-center p-2 sm:p-3 bg-white border-t border-slate-200 shadow-[0_-4px_10px_-1px_rgba(0,0,0,0.1)] md:shadow-sm z-[60] md:rounded-b-xl" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+            <button type="button" onclick="window.currentPageGen--; loadTableData(false);" ${window.currentPageGen === 1 ? 'disabled' : ''} class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i class="fa-solid fa-chevron-left mr-1"></i> <span class="hidden sm:inline">Prev</span></button>
+            <span class="text-xs font-bold text-slate-500">Hal ${window.currentPageGen} / ${totalPages}</span>
+            <button type="button" onclick="window.currentPageGen++; loadTableData(false);" ${window.currentPageGen === totalPages ? 'disabled' : ''} class="px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg hover:bg-slate-200 text-slate-700 font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><span class="hidden sm:inline">Next</span> <i class="fa-solid fa-chevron-right ml-1"></i></button>
+        </div>`;
+        if(wrapper) wrapper.insertAdjacentHTML('beforeend', pagHtml);
+    }
 }
 
 window.formatRupiahUI = function(element) {
