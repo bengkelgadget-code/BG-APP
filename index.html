@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- ZETTBOT: Pemanggilan Modular CSS untuk GitHub Pages -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=20260608">
 </head>
 
 <body style="display: flex; flex-direction: column; height: 100vh; overflow: hidden;">
@@ -217,22 +217,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <div id="umumSettingsContainer" class="hidden flex-col w-full h-full bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative">
-                <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-sliders text-teal-500 mr-2"></i>Pengaturan Umum</h2>
-                        <p class="text-xs text-slate-500 mt-1">Konfigurasi toko dan informasi dasar</p>
-                    </div>
                 </div>
-                <div class="p-6 overflow-y-auto custom-scrollbar flex-1" id="umumSettingsContent">
-                </div>
-            </div>
 
-            <!-- DASHBOARD CONTAINER -->
-            <div id="dashboardPageContainer" class="hidden flex-col w-full h-full bg-slate-50/50 overflow-y-auto custom-scrollbar relative space-y-6 pb-20">
-                <!-- Dashboard content will be injected here by ui_components.js -->
-            </div>
+                <!-- DASHBOARD CONTAINER -->
+                <div id="dashboardPageContainer" class="hidden flex-col w-full h-full bg-slate-50/50 overflow-y-auto custom-scrollbar relative space-y-6 pb-20">
+                    <!-- Dashboard content will be injected here by ui_components.js -->
+                </div>
 
             <div id="mainTableWrapper" class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col flex-1 min-h-0 relative">
                     
@@ -490,12 +480,11 @@
     </div>
 
     <!-- PENGATURAN GITHUB PAGES: Memanggil JS Eksternal -->
-    <!-- ZETTBOT: Persiapan Modul Firebase Database -->
-    <script type="module" src="firebase_config.js"></script>
-    <script src="config.js"></script>
-    <script src="api.js"></script>
-    <script src="dashboard_logic.js"></script>
-    <script src="ui_components.js"></script>
-    <script src="app_logic.js"></script>
+    <script type="module" src="firebase_config.js?v=20260608"></script>
+    <script src="config.js?v=20260608"></script>
+    <script src="api.js?v=20260608"></script>
+    <script src="dashboard_logic.js?v=20260608"></script>
+    <script src="ui_components.js?v=20260608"></script>
+    <script src="app_logic.js?v=20260608"></script>
 </body>
 </html>

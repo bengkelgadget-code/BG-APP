@@ -26,8 +26,24 @@ window.renderDashboardPage = async function() {
 
     var allKonter = window.BGL2_CACHE['DB_konter'] || [];
 
-    var dStr = window.dashFilterDate.toLocaleDateString('id-ID', {day:'2-digit', month:'2-digit', year:'numeric'});
-    var mStr = window.dashFilterDate.toLocaleDateString('id-ID', {month:'2-digit', year:'numeric'});
+    // Robust date parsing helper
+    var parseDateComponents = function(dateStr) {
+        if (!dateStr) return null;
+        var cleanStr = String(dateStr).replace(/-/g, '/').replace(/\s+/g, '').trim();
+        var parts = cleanStr.split('/');
+        if (parts.length < 3) return null;
+        var d = parseInt(parts[0], 10);
+        var m = parseInt(parts[1], 10);
+        var y = parseInt(parts[2], 10);
+        if (isNaN(d) || isNaN(m) || isNaN(y)) return null;
+        return { day: d, month: m, year: y };
+    };
+
+    var targetDay = window.dashFilterDate.getDate();
+    var targetMonth = window.dashFilterDate.getMonth() + 1;
+    var targetYear = window.dashFilterDate.getFullYear();
+
+    var displayDateStr = window.dashFilterDate.toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
 
     var todayTrx = 0;
     var todayIncome = 0;
@@ -38,11 +54,12 @@ window.renderDashboardPage = async function() {
 
     // For chart: last 3 months
     var chartLabels = [];
-    var chartDataArr = [];
+    var chartDataArr = [0, 0, 0];
+    var monthsInfo = [];
     for(let i=2; i>=0; i--) {
         let d = new Date(window.dashFilterDate.getFullYear(), window.dashFilterDate.getMonth() - i, 1);
         chartLabels.push(d.toLocaleDateString('id-ID', {month:'short', year:'numeric'}));
-        chartDataArr.push(0);
+        monthsInfo.push({ month: d.getMonth() + 1, year: d.getFullYear() });
     }
 
     allKonter.forEach(row => {
@@ -50,32 +67,31 @@ window.renderDashboardPage = async function() {
         let rowMargin = parseInt(String(row[6]).replace(/[^0-9-]/g, '')) || 0;
         let rowDetail = row[3] || row[2];
 
-        if (rowDateStr === dStr) {
-            todayTrx++;
-            todayIncome += rowMargin;
-        }
+        var p = parseDateComponents(rowDateStr);
+        if (p) {
+            if (p.day === targetDay && p.month === targetMonth && p.year === targetYear) {
+                todayTrx++;
+                todayIncome += rowMargin;
+            }
 
-        let rowMStr = rowDateStr.substring(3); // MM/YYYY
-        if (rowMStr === mStr) {
-            monthTrx++;
-            monthIncome += rowMargin;
+            if (p.month === targetMonth && p.year === targetYear) {
+                monthTrx++;
+                monthIncome += rowMargin;
+            }
+
+            // Chart 3 months
+            for(let i=0; i<3; i++) {
+                if (p.month === monthsInfo[i].month && p.year === monthsInfo[i].year) {
+                    chartDataArr[i] += rowMargin;
+                }
+            }
         }
 
         // Top 10
-        if (!itemCounts[rowDetail]) itemCounts[rowDetail] = { count: 0, income: 0 };
-        itemCounts[rowDetail].count++;
-        itemCounts[rowDetail].income += rowMargin;
-
-        // Chart 3 months
-        let parts = rowDateStr.split('/'); // [DD, MM, YYYY]
-        if(parts.length === 3) {
-            let rd = new Date(parts[2], parts[1]-1, parts[0]);
-            for(let i=2; i>=0; i--) {
-                let dTarget = new Date(window.dashFilterDate.getFullYear(), window.dashFilterDate.getMonth() - i, 1);
-                if (rd.getMonth() === dTarget.getMonth() && rd.getFullYear() === dTarget.getFullYear()) {
-                    chartDataArr[2-i] += rowMargin;
-                }
-            }
+        if (rowDetail) {
+            if (!itemCounts[rowDetail]) itemCounts[rowDetail] = { count: 0, income: 0 };
+            itemCounts[rowDetail].count++;
+            itemCounts[rowDetail].income += rowMargin;
         }
     });
 
@@ -104,7 +120,7 @@ window.renderDashboardPage = async function() {
             </div>
             <div class="mt-4 sm:mt-0 flex items-center bg-slate-100 rounded-lg p-1 shadow-inner border border-slate-200">
                 <button onclick="changeDashDate(-1)" class="w-8 h-8 rounded text-slate-600 hover:bg-white hover:text-pink-600 hover:shadow transition-all"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                <div class="px-4 py-1 text-sm font-bold text-slate-700 w-32 text-center" id="dashDateDisplay">${dStr}</div>
+                <div class="px-4 py-1 text-sm font-bold text-slate-700 w-36 text-center" id="dashDateDisplay">${displayDateStr}</div>
                 <button onclick="changeDashDate(1)" class="w-8 h-8 rounded text-slate-600 hover:bg-white hover:text-pink-600 hover:shadow transition-all"><i class="fa-solid fa-chevron-right text-xs"></i></button>
             </div>
         </div>
