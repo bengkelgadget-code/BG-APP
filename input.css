@@ -91,3 +91,8 @@ input[type="number"] { -moz-appearance: textfield; }
         z-index: 999999 !important;
     }
 }
+/* ZETTBOT FIX: SweetAlert2 Buttons */ 
+ .swal2-container .swal2-actions { display: flex !important; gap: 10px; margin-top: 20px !important; } 
+ .swal2-container .swal2-styled { padding: 8px 24px !important; font-weight: bold !important; border-radius: 8px !important; color: #fff !important; display: inline-block !important; font-size: 14px !important; } 
+ .swal2-container .swal2-confirm { background-color: #ef4444 !important; } 
+ .swal2-container .swal2-cancel { background-color: #94a3b8 !important; }
