@@ -21,6 +21,50 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(function() { loader.style.display = 'none'; }, 300); 
         }
 
+        // ZETTBOT TEMPORARY: Tombol Migrasi Firebase
+        var migBtn = document.createElement('button');
+        migBtn.innerHTML = '<i class="fa-solid fa-database mr-2"></i>Mulai Migrasi Google Sheets ke Firebase';
+        migBtn.className = 'fixed bottom-4 right-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-full shadow-lg font-bold z-50 text-sm flex items-center transition-transform hover:scale-105';
+        migBtn.onclick = async function() {
+            var sheets = ['DB_konter', 'Perdana', 'Voucher', 'ACC', 'Pengaturan_Umum', 'Pengaturan_Margin', 'KategoriACC', 'Provider', 'Users'];
+            Swal.fire({
+                title: 'Mulai Migrasi?',
+                text: 'Ini akan menyedot semua data dari Google Sheets dan menimpanya ke Firebase. Proses ini butuh waktu sekitar 10-30 detik.',
+                icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Migrasi Sekarang!'
+            }).then(async (res) => {
+                if(res.isConfirmed) {
+                    Swal.fire({ title: 'Menyedot Data...', html: 'Jangan tutup halaman ini!', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    try {
+                        for (var i = 0; i < sheets.length; i++) {
+                            var sheet = sheets[i];
+                            var gsData = await gasRun('getData', sheet);
+                            if (gsData && gsData.length > 0) {
+                                // 1. Hapus data lama di Firebase
+                                var snapshot = await firebase.firestore().collection(sheet).get();
+                                var batchDelete = firebase.firestore().batch();
+                                snapshot.forEach(doc => batchDelete.delete(doc.ref));
+                                await batchDelete.commit();
+
+                                // 2. Masukkan data baru dari GS
+                                var batchInsert = firebase.firestore().batch();
+                                var count = 0;
+                                for (var j = 0; j < gsData.length; j++) {
+                                    var docRef = firebase.firestore().collection(sheet).doc();
+                                    batchInsert.set(docRef, { rowArray: gsData[j], timestamp: Date.now() + j });
+                                    count++;
+                                    if (count % 400 === 0) { await batchInsert.commit(); batchInsert = firebase.firestore().batch(); }
+                                }
+                                if (count % 400 !== 0) { await batchInsert.commit(); }
+                            }
+                        }
+                        migBtn.remove();
+                        Swal.fire('Sukses!', 'Seluruh data berhasil bermigrasi ke Firebase! Halaman akan dimuat ulang.', 'success').then(() => location.reload());
+                    } catch(e) { Swal.fire('Error', String(e), 'error'); }
+                }
+            });
+        };
+        document.body.appendChild(migBtn);
+
         // ZETTBOT FIX: Penjaga Global (Safety Guard) jika api.js gagal dimuat karena Syntax Error
         if (typeof gasRun === 'undefined') {
             console.error("ZETTBOT CRITICAL: gasRun tidak terdefinisi. Kemungkinan besar file api.js memiliki Syntax Error sehingga gagal dieksekusi browser.");
