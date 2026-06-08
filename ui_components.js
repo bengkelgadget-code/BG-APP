@@ -156,7 +156,9 @@ function switchPage(key, title) {
             if(dashboardPage) { dashboardPage.classList.add('hidden'); dashboardPage.classList.remove('flex'); }
         }
         
-        loadTableData(false); 
+        if (key !== 'Dashboard') {
+            loadTableData(false); 
+        }
         
         var activeSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
         if (activeSheet && typeof gasRun !== 'undefined') {

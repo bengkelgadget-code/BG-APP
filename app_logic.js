@@ -168,8 +168,7 @@
                 window.BGL2_CACHE['Pengaturan_Margin'] = await gasRun('getData', 'Pengaturan_Margin') || [];
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
             }
-            
-            var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig.headers || []);
+            var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers || [] : []);
                        
             if (isKonterMode) {
                 renderKonterTable(window.BGL2_CACHE['DB_konter'], hdrs.length);
