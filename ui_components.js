@@ -225,7 +225,7 @@ function loadTableData(forceRefresh = false) {
             html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
             html += '<tr>';
             for(var i=0; i<hdrs.length; i++) {
-                var thClass = "py-2.5 px-2 sm:px-4 font-bold text-center";
+                var thClass = "py-2.5 px-0.5 sm:px-4 font-bold text-center";
                 if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
                 if (hdrs[i] === 'Aksi') thClass += " hidden md:table-cell";
                 
@@ -829,10 +829,10 @@ function renderKonterTable(data, colCount) {
 
             return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 hover:bg-slate-50 transition-transform duration-200 swipeable-row bg-white relative z-20" data-index="${o}" data-type="konter">
                 <td class="py-2.5 px-1 sm:px-3 font-mono font-bold text-center hidden md:table-cell">${r[0]||'-'}</td>
-                <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
+                <td class="py-2.5 pl-0.5 pr-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${jenisDetailHtml}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${sumberBayarHtml}</td>
-                <td class="py-2.5 px-1 sm:px-3 font-bold text-emerald-600 text-center whitespace-normal break-words">${r[5]||'-'}</td>
+                <td class="py-2.5 pr-0.5 pl-1 sm:px-3 font-bold text-emerald-600 text-center whitespace-normal break-words">${r[5]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 align-middle hidden md:table-cell"><div class="flex space-x-1 sm:space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-[10px] sm:text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-[10px] sm:text-xs"></i></button></div></td>
             </tr>`;
         });
@@ -982,7 +982,7 @@ function renderGenericTable(data, colCount) {
         } else {
             for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
                 var c = r[idx] || '';
-                cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
+                cells += `<td class="py-1.5 px-0.5 sm:px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
             }
         }
 
