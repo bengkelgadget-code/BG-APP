@@ -291,6 +291,13 @@ async function toggleForm(forceShow) {
             var vcOptions = '<option value="">-- Pilih Voucher --</option>' + vcData.map(v => `<option value="${v[2]}" data-beli="${String(v[3] || '').replace(/[^0-9]/g, '')}">${v[1]} - ${v[2]} (Stok: ${v[5]})</option>`).join('');
             document.getElementById('mutasiVoucher').innerHTML = vcOptions;
 
+            if(window.jQuery) {
+                $('#mutasiJenis').select2({ width: '100%' });
+                $('#mutasiAsal').select2({ width: '100%' });
+                $('#mutasiTujuan').select2({ width: '100%' });
+                $('#mutasiVoucher').select2({ width: '100%' });
+            }
+
             openMutasiModal();
         } else { closeMutasiModal(); }
     } 
