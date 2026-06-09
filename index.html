@@ -444,28 +444,86 @@
                     </div>
                 </div>
 
-                <div class="relative" id="kntDetailSection">
-                    <div class="flex justify-between items-end mb-1">
-                        <label class="block text-xs font-semibold text-slate-700">Detail Transaksi</label>
-                        <div id="kntStokWrapper" class="items-center space-x-1" style="display: none;">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Stok:</span>
-                            <span id="kntStokLabel" class="text-xs text-indigo-700 font-bold bg-indigo-100 px-2 py-0.5 rounded-md">0</span>
+                <div class="grid grid-cols-2 gap-4" id="kntDetailAndSumberSection">
+                    <div class="relative" id="kntDetailSection">
+                        <div class="flex justify-between items-end mb-1">
+                            <label class="block text-xs font-semibold text-slate-700">Detail Transaksi</label>
+                            <div id="kntStokWrapper" class="items-center space-x-1" style="display: none;">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Stok:</span>
+                                <span id="kntStokLabel" class="text-xs text-indigo-700 font-bold bg-indigo-100 px-2 py-0.5 rounded-md">0</span>
+                            </div>
+                        </div>
+                        <div id="dynamicDetailContainer">
+                            <select id="kntDetailSelect" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-400 outline-none" disabled>
+                                <option>-- Pilih Jenis Dulu --</option>
+                            </select>
                         </div>
                     </div>
-                    <div id="dynamicDetailContainer">
-                        <select id="kntDetailSelect" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-400 outline-none" disabled>
-                            <option>-- Pilih Jenis Dulu --</option>
+
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-700">Sumber Modal / Asal Uang</label>
+                        <select id="kntSumberDana" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                            <option value="">-- Pilih Akun --</option>
                         </select>
                     </div>
                 </div>
 
-                <div>
-                    <label id="lblKntNominal" class="block text-xs font-semibold mb-1 text-slate-700">Nominal</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
-                        <input type="tel" autocomplete="off" id="kntNominal" required oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="0">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label id="lblKntNominal" class="block text-xs font-semibold mb-1 text-slate-700">Nominal</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
+                            <input type="tel" autocomplete="off" id="kntNominal" required oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none placeholder-slate-300/50" placeholder="0">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex justify-between items-end mb-1">
+                            <label class="block text-xs font-semibold text-slate-700">Metode Pembayaran</label>
+                        </div>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <label class="flex items-center cursor-pointer">
+                                <div class="relative">
+                                    <input type="checkbox" id="kntMetodeBayar" class="sr-only" onchange="toggleMetodeBayar()">
+                                    <div class="block bg-slate-300 w-10 h-6 rounded-full transition-colors" id="kntMetodeBg"></div>
+                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform" id="kntMetodeDot"></div>
+                                </div>
+                                <span class="ml-2 text-xs font-bold text-slate-600" id="kntMetodeText">Tunai</span>
+                            </label>
+                        </div>
+                        <div id="kntTerimaDiWrapper" class="mt-2 hidden">
+                            <select id="kntTerimaDi" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                                <option value="">-- Diterima Di --</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
+
+                <script>
+                function toggleMetodeBayar() {
+                    var cb = document.getElementById('kntMetodeBayar');
+                    var bg = document.getElementById('kntMetodeBg');
+                    var dot = document.getElementById('kntMetodeDot');
+                    var txt = document.getElementById('kntMetodeText');
+                    var wrapper = document.getElementById('kntTerimaDiWrapper');
+                    var sel = document.getElementById('kntTerimaDi');
+                    
+                    if(cb.checked) {
+                        bg.classList.remove('bg-slate-300'); bg.classList.add('bg-blue-500');
+                        dot.style.transform = 'translateX(100%)';
+                        txt.innerText = 'Non-Tunai';
+                        wrapper.classList.remove('hidden');
+                        sel.required = true;
+                    } else {
+                        bg.classList.add('bg-slate-300'); bg.classList.remove('bg-blue-500');
+                        dot.style.transform = 'translateX(0)';
+                        txt.innerText = 'Tunai';
+                        wrapper.classList.add('hidden');
+                        sel.required = false;
+                        sel.value = "";
+                    }
+                }
+                </script>
 
                 <div id="kntMarginSection" style="display: none;">
                     <label class="block text-xs font-semibold mb-1 text-slate-700">Margin (Kosong = 5000)</label>

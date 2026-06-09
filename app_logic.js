@@ -52,6 +52,65 @@ document.addEventListener('DOMContentLoaded', function() {
         switchPage('Konter', 'Konter HP');
     });
 
+    window.updateBalances = async function(jenis, sumberDanaId, diterimaDiId, hargaBeli, hargaJual, multiplier) {
+        if (!sumberDanaId || sumberDanaId === "") return;
+        
+        var sdData = window.BGL2_CACHE['Sumber_Dana'] || [];
+        var kasirId = diterimaDiId || '';
+
+        var sDocId = null, sSaldo = 0, sIdx = -1, sRow = null;
+        var kDocId = null, kSaldo = 0, kIdx = -1, kRow = null;
+
+        // Cari ID untuk Laci Kasir jika nilainya string "Laci Kasir"
+        if (kasirId === 'Laci Kasir') {
+            for (var j = 0; j < sdData.length; j++) {
+                if (sdData[j][2] === 'Uang Tunai') {
+                    kasirId = sdData[j][0];
+                    break;
+                }
+            }
+        }
+
+        for (var i = 0; i < sdData.length; i++) {
+            if (sdData[i][0] === sumberDanaId) { sIdx = i; sRow = sdData[i]; sDocId = sRow._docId; sSaldo = parseInt(String(sRow[3]||'0').replace(/[^0-9]/g, '')) || 0; }
+            if (kasirId !== "" && sdData[i][0] === kasirId) { kIdx = i; kRow = sdData[i]; kDocId = kRow._docId; kSaldo = parseInt(String(kRow[3]||'0').replace(/[^0-9]/g, '')) || 0; }
+        }
+
+        if (!sDocId) return; // if sumber dana not found, do nothing
+
+        // Helper function for format
+        var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
+
+        var deltaS = 0;
+        var deltaK = 0;
+
+        if (jenis === 'TARIK TUNAI') {
+            // Customer transfer ke Sumber Dana (+ Harga Jual), kita beri Cash (- Harga Beli/Modal)
+            deltaS = hargaJual * multiplier;
+            deltaK = -hargaBeli * multiplier;
+        } else if (jenis === 'JASA TRANSFER' || jenis === 'TRANSFER') {
+            // Kita transfer dari Sumber Dana (- Harga Beli/Modal), pelanggan beri Cash (+ Harga Jual)
+            deltaS = -hargaBeli * multiplier;
+            deltaK = hargaJual * multiplier;
+        } else {
+            // Jualan Digital: Sumber Dana (- Modal), Cash (+ Harga Jual)
+            deltaS = -hargaBeli * multiplier;
+            deltaK = hargaJual * multiplier;
+        }
+
+        // Update Sumber Dana
+        sSaldo += deltaS;
+        var newSRow = [...sRow]; newSRow[3] = fRupiah(sSaldo);
+        await updateInFirebase('Sumber_Dana', sDocId, newSRow);
+
+        // Update Kasir (Diterima Di)
+        if (kDocId && kDocId !== sDocId && kasirId !== "") {
+            kSaldo += deltaK;
+            var newKRow = [...kRow]; newKRow[3] = fRupiah(kSaldo);
+            await updateInFirebase('Sumber_Dana', kDocId, newKRow);
+        }
+    };
+
     window.adjustStock = async function(jenis, detail, amount) {
         if (!['VOUCHER', 'PERDANA', 'ACC'].includes(jenis)) return;
         
@@ -579,6 +638,11 @@ document.addEventListener('DOMContentLoaded', function() {
         var hJual = parseInt(String(getVal('#kntHargaJualDB')).replace(/[^0-9]/g, '')) || 0;
         var marginVal = getVal('#kntMarginInput'); 
 
+        var sdVal = getVal('#kntSumberDana');
+        var methodCbx = formEl.querySelector('#kntMetodeBayar');
+        var isNonTunai = methodCbx ? methodCbx.checked : false;
+        var tdVal = isNonTunai ? getVal('#kntTerimaDi') : 'Laci Kasir';
+
         var dynamicMargin = calculateDynamicMargin(jenisVal, nominal);
 
         if (dynamicMargin !== null) {
@@ -595,7 +659,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        var payload = { tanggal: getVal('#kntTanggal'), jenis: jenisVal, detail: detailVal, nominal: nomVal, hargaBeliDB: hBeli, hargaJualDB: hJual };
+        var payload = { 
+            tanggal: getVal('#kntTanggal'), 
+            jenis: jenisVal, 
+            detail: detailVal, 
+            nominal: nomVal, 
+            hargaBeliDB: hBeli, 
+            hargaJualDB: hJual,
+            sumberDana: sdVal,
+            diterimaDi: tdVal
+        };
         
         var currentIndex = parseInt(editIndex, 10); 
         closeKonterModal(); 
@@ -606,12 +679,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if(currentIndex === -1) {
                 var newId = 'KNT-' + new Date().getTime().toString().slice(-6);
                 var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
-                var newRow = [newId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), new Date().toLocaleDateString('id-ID')];
+                var newRow = [
+                    newId, payload.tanggal, payload.jenis, payload.detail, 
+                    fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), 
+                    fRupiah(payload.hargaJualDB - payload.hargaBeliDB), 
+                    new Date().toLocaleDateString('id-ID'),
+                    payload.sumberDana, payload.diterimaDi
+                ];
                 
                 await saveToFirebase('DB_konter', newRow);
                 
                 // Listener Firebase akan memperbarui tabel otomatis
                 window.adjustStock(payload.jenis, payload.detail, -1);
+                
+                // Execute Balance Update
+                await window.updateBalances(payload.jenis, payload.sumberDana, payload.diterimaDi, payload.hargaBeliDB, payload.hargaJualDB, 1);
 
                 // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
                 payload.id_override = newId; // jika Code.gs mendukung
@@ -622,13 +704,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 var originalId = rowData[0];
                 var oldJenis = rowData[2];
                 var oldDetail = rowData[3];
+                var oldHBeli = parseInt(String(rowData[4]||'0').replace(/[^0-9]/g, '')) || 0;
+                var oldHJual = parseInt(String(rowData[5]||'0').replace(/[^0-9]/g, '')) || 0;
+                var oldSumber = rowData[8];
+                var oldDiterima = rowData[9];
                 var docId = rowData._docId;
                 
                 if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
 
                 var originalDate = rowData[7];
                 var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
-                var updatedRow = [originalId, payload.tanggal, payload.jenis, payload.detail, fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), fRupiah(payload.hargaJualDB - payload.hargaBeliDB), originalDate];
+                var updatedRow = [
+                    originalId, payload.tanggal, payload.jenis, payload.detail, 
+                    fRupiah(payload.hargaBeliDB), fRupiah(payload.hargaJualDB), 
+                    fRupiah(payload.hargaJualDB - payload.hargaBeliDB), 
+                    originalDate,
+                    payload.sumberDana, payload.diterimaDi
+                ];
                 
                 await updateInFirebase('DB_konter', docId, updatedRow);
 
@@ -638,6 +730,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.adjustStock(oldJenis, oldDetail, 1);
                     window.adjustStock(payload.jenis, payload.detail, -1);
                 }
+                
+                // Revert old balance, apply new balance
+                await window.updateBalances(oldJenis, oldSumber, oldDiterima, oldHBeli, oldHJual, -1);
+                await window.updateBalances(payload.jenis, payload.sumberDana, payload.diterimaDi, payload.hargaBeliDB, payload.hargaJualDB, 1);
+            }
 
                 // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
                 gasRun('editKonterTransaction', currentIndex, payload, originalId).catch(e=>console.error(e));

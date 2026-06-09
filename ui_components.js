@@ -204,7 +204,7 @@ function loadTableData(forceRefresh = false) {
         }
 
         if(!tableContainer) return;
-        var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers : []);
+        var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Sumber/Bayar', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers : []);
         
         if (!hdrs || hdrs.length === 0) {
             tableContainer.innerHTML = '<table class="w-full"><tr><td class="p-8 text-center text-slate-500 italic">Silakan pilih menu.</td></tr></table>';
@@ -517,6 +517,32 @@ function openKonterModal() {
     document.querySelectorAll('#modalKonterContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
     document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
 
+    // Populate Sumber Dana dropdowns
+    var sdData = window.BGL2_CACHE['Sumber_Dana'] || [];
+    var categories = {};
+    for (var i = 0; i < sdData.length; i++) {
+        var row = sdData[i];
+        if(!row || !row[1]) continue;
+        var kat = row[2] || 'Lainnya';
+        if (!categories[kat]) categories[kat] = [];
+        categories[kat].push({ id: row[0], name: row[1] });
+    }
+    
+    var htmlOpts = '<option value="">-- Pilih --</option>';
+    for (var kat in categories) {
+        htmlOpts += '<optgroup label="' + kat + '">';
+        for(var j=0; j < categories[kat].length; j++) {
+            htmlOpts += '<option value="' + categories[kat][j].id + '">' + categories[kat][j].name + '</option>';
+        }
+        htmlOpts += '</optgroup>';
+    }
+
+    var sdSelect = document.getElementById('kntSumberDana');
+    if (sdSelect) { sdSelect.innerHTML = htmlOpts; }
+    
+    var tdSelect = document.getElementById('kntTerimaDi');
+    if (tdSelect) { tdSelect.innerHTML = htmlOpts; }
+
     setTimeout(() => {
         if(window.jQuery && $('#kntJenis').length) {
             $('#kntJenis').select2('open');
@@ -533,7 +559,20 @@ function closeKonterModal() {
     document.querySelectorAll('#kntFormTitle').forEach(title => title.innerText = 'Transaksi Konter');
     document.querySelectorAll('#btnSubmitKonter').forEach(btn => btn.innerText = 'Simpan Transaksi');
     
-    if(window.jQuery) $('select#kntJenis').val('').trigger('change.select2');
+    if(window.jQuery) {
+        $('select#kntJenis').val('').trigger('change.select2');
+        $('select#kntSumberDana').val('').trigger('change');
+        $('select#kntTerimaDi').val('').trigger('change');
+    } else {
+        var sdSelect = document.getElementById('kntSumberDana'); if(sdSelect) sdSelect.value = '';
+        var tdSelect = document.getElementById('kntTerimaDi'); if(tdSelect) tdSelect.value = '';
+    }
+
+    var cb = document.getElementById('kntMetodeBayar');
+    if (cb && cb.checked) {
+        cb.checked = false;
+        if(typeof toggleMetodeBayar === 'function') toggleMetodeBayar();
+    }
 
     document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'block');
     document.querySelectorAll('#kntMarginSection').forEach(el => el.style.display = 'none'); 
@@ -663,11 +702,27 @@ function renderKonterTable(data, colCount) {
     } else {
         var rowsHtml = filteredData.map(d => {
             var r = d.row; var o = d.originalIndex;
+            
+            var sumberId = r[8] || '-';
+            var bayarId = r[9] || '-';
+            var sumberName = sumberId;
+            var bayarName = bayarId;
+            
+            var sdData = window.BGL2_CACHE['Sumber_Dana'] || [];
+            for(var x=0; x<sdData.length; x++) {
+                if(sdData[x][0] === sumberId) sumberName = sdData[x][1];
+                if(sdData[x][0] === bayarId) bayarName = sdData[x][1];
+            }
+            if(bayarId === 'Laci Kasir') bayarName = 'Tunai';
+
+            var sumberBayarHtml = `<div class="text-[9px]"><span class="font-bold text-slate-500">S:</span> ${sumberName}<br><span class="font-bold text-slate-500">B:</span> ${bayarName}</div>`;
+
             return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 hover:bg-slate-50 transition-colors">
                 <td class="py-2.5 px-1 sm:px-3 font-mono font-bold text-center hidden md:table-cell">${r[0]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 font-bold text-blue-700 text-center whitespace-normal break-words">${r[2]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[3]||'-'}</td>
+                <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${sumberBayarHtml}</td>
                 <td class="py-2.5 px-1 sm:px-3 font-bold text-emerald-600 text-center whitespace-normal break-words">${r[5]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 align-middle"><div class="flex space-x-1 sm:space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-[10px] sm:text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-[10px] sm:text-xs"></i></button></div></td>
             </tr>`;
