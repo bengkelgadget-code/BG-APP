@@ -36,6 +36,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('#kntJenis').select2({ width: '100%' });
                 $(document).on('select2:select', '#kntJenis', function (e) { kntJenisChange(); });
                 $(document).on('select2:select', '#kntDetailSelect', function (e) { kntDetailChange(); });
+
+                // Fitur: Buka dropdown otomatis saat difokuskan (Tab/Klik area aktif) tanpa perlu diklik manual
+                $(document).on('select2:closing', 'select', function (e) {
+                    $(e.target).data("select2-closing", true);
+                });
+                $(document).on('select2:close', 'select', function (e) {
+                    setTimeout(function() { $(e.target).removeData("select2-closing"); }, 50);
+                });
+                $(document).on('focus', '.select2-selection.select2-selection--single', function (e) {
+                    var $select = $(this).closest(".select2-container").siblings('select:enabled');
+                    if ($select.length && !$select.data('select2-closing') && !$select.data('select2').isOpen()) {
+                        $select.select2('open');
+                    }
+                });
             }
         } catch(e) { console.error("Select2 Error:", e); }
 

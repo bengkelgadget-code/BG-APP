@@ -724,9 +724,16 @@ function renderKonterTable(data, colCount) {
             }
             if(bayarId === 'Laci Kasir') bayarName = 'Tunai';
 
+            var jenis = r[2] || '-';
+            
+            if (jenis === 'TARIK TUNAI') {
+                var temp = sumberName;
+                sumberName = bayarName;
+                bayarName = temp;
+            }
+
             var sumberBayarHtml = `<div class="text-[9px]"><span class="font-bold text-slate-500">S:</span> ${sumberName}<br><span class="font-bold text-slate-500">B:</span> ${bayarName}</div>`;
 
-            var jenis = r[2] || '-';
             var detail = r[3] || '-';
             var jenisDetailHtml = (detail !== '-' && detail !== '') ? 
                 `<div class="font-bold text-blue-700">${jenis}</div><div class="text-[9px] text-slate-500 mt-0.5">${detail}</div>` : 
