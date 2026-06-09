@@ -1083,7 +1083,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 gasRun('saveData', currentConfig.sheet, arr).catch(e=>{});
             } else {
                 var rowData = window.BGL2_CACHE[currentConfig.sheet][currentIndex];
-                var docId = rowData._docId;
+                var docId = rowData ? rowData._docId : null;
+                var itemId = rowData ? rowData[0] : null;
+
+                if (!docId && itemId) {
+                    try {
+                        let snapshot = await db.collection(currentConfig.sheet).get();
+                        snapshot.forEach(doc => {
+                            let data = doc.data();
+                            if (data && data.rowArray && data.rowArray[0] === itemId) docId = doc.id;
+                        });
+                    } catch(e) { console.error(e); }
+                }
 
                 if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
 
