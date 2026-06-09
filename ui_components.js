@@ -227,6 +227,7 @@ function loadTableData(forceRefresh = false) {
             for(var i=0; i<hdrs.length; i++) {
                 var thClass = "py-2.5 px-2 sm:px-4 font-bold text-center";
                 if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
+                if (hdrs[i] === 'Aksi') thClass += " hidden md:table-cell";
                 
                 if (hdrs[i] !== 'Aksi') {
                     thClass += " cursor-pointer hover:bg-white/10 select-none group transition-colors";
@@ -812,13 +813,13 @@ function renderKonterTable(data, colCount) {
                 `<div class="font-bold text-blue-700">${jenis}</div><div class="text-[9px] text-slate-500 mt-0.5">${detail}</div>` : 
                 `<div class="font-bold text-blue-700">${jenis}</div>`;
 
-            return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 hover:bg-slate-50 transition-colors">
+            return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 hover:bg-slate-50 transition-transform duration-200 swipeable-row bg-white relative z-20" data-index="${o}" data-type="konter">
                 <td class="py-2.5 px-1 sm:px-3 font-mono font-bold text-center hidden md:table-cell">${r[0]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${jenisDetailHtml}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${sumberBayarHtml}</td>
                 <td class="py-2.5 px-1 sm:px-3 font-bold text-emerald-600 text-center whitespace-normal break-words">${r[5]||'-'}</td>
-                <td class="py-2.5 px-1 sm:px-3 align-middle"><div class="flex space-x-1 sm:space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-[10px] sm:text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-[10px] sm:text-xs"></i></button></div></td>
+                <td class="py-2.5 px-1 sm:px-3 align-middle hidden md:table-cell"><div class="flex space-x-1 sm:space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-[10px] sm:text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-[10px] sm:text-xs"></i></button></div></td>
             </tr>`;
         });
         
@@ -971,7 +972,7 @@ function renderGenericTable(data, colCount) {
             }
         }
 
-        return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-colors">${cells}<td class="py-1.5 px-3 align-middle"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
+        return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-transform duration-200 swipeable-row bg-white relative z-20" data-index="${o}" data-array-index="${i}" data-type="gen">${cells}<td class="py-1.5 px-3 align-middle hidden md:table-cell"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
     });
     
     rowsHtml.push(`<tr class="md:hidden"><td colspan="${colCount}" style="height: 140px; border: none;"></td></tr>`);
@@ -1017,6 +1018,135 @@ window.setFilterDate = function(val) {
         loadTableData(false); 
     }
 };
+
+// ZETTBOT: Logika Swipe-to-Reveal untuk tabel
+(function() {
+    var startX = 0, startY = 0;
+    var activeRow = null;
+    var swipeMenu = null;
+    var isSwiping = false;
+
+    function initSwipeMenu() {
+        if (!document.getElementById('mobileSwipeMenu')) {
+            swipeMenu = document.createElement('div');
+            swipeMenu.id = 'mobileSwipeMenu';
+            swipeMenu.className = 'absolute right-0 flex items-center justify-end pr-2 sm:pr-4 space-x-1.5 z-10 transition-opacity duration-200 opacity-0 pointer-events-none bg-slate-100/80 backdrop-blur-sm border-l border-slate-200';
+            swipeMenu.innerHTML = `
+                <button id="swipeBtnEdit" type="button" class="bg-amber-100 text-amber-700 h-[30px] w-[30px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
+                <button id="swipeBtnDelete" type="button" class="bg-red-100 text-red-700 h-[30px] w-[30px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-trash text-[11px]"></i></button>
+            `;
+            
+            var tc = document.getElementById('dataTableContainer');
+            if(tc) {
+                tc.style.position = 'relative';
+                tc.style.overflowX = 'hidden'; // Ensure no horizontal scrolling overall
+                tc.appendChild(swipeMenu);
+            }
+        } else {
+            swipeMenu = document.getElementById('mobileSwipeMenu');
+        }
+    }
+
+    function resetSwipe() {
+        if (activeRow) {
+            activeRow.style.transform = 'translateX(0)';
+            activeRow = null;
+        }
+        if (swipeMenu) {
+            swipeMenu.classList.remove('opacity-100', 'pointer-events-auto');
+            swipeMenu.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { if(!activeRow && swipeMenu) swipeMenu.style.display = 'none'; }, 200);
+        }
+    }
+
+    // Dengarkan klik di luar untuk menutup swipe
+    document.addEventListener('click', function(e) {
+        if (activeRow && !e.target.closest('.swipeable-row') && !e.target.closest('#mobileSwipeMenu')) {
+            resetSwipe();
+        }
+    });
+
+    document.addEventListener('touchstart', function(e) {
+        // Jangan aktifkan swipe jika di layar besar (md / >768px)
+        if (window.innerWidth >= 768) return;
+        
+        var tr = e.target.closest('.swipeable-row');
+        if (!tr) return;
+        
+        if (activeRow && activeRow !== tr) {
+            resetSwipe();
+        }
+        
+        activeRow = tr;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isSwiping = false;
+        
+        initSwipeMenu();
+        if (swipeMenu) swipeMenu.style.display = 'none';
+    }, {passive: true});
+
+    document.addEventListener('touchmove', function(e) {
+        if (!activeRow || window.innerWidth >= 768) return;
+        var diffX = startX - e.touches[0].clientX;
+        var diffY = Math.abs(startY - e.touches[0].clientY);
+        
+        // Cek apakah dominan geser horizontal
+        if (diffX > 10 && diffX > diffY) {
+            isSwiping = true;
+            var translateX = Math.min(diffX, 85); 
+            activeRow.style.transform = `translateX(-${translateX}px)`;
+            
+            if (swipeMenu && swipeMenu.style.display === 'none') {
+                var tc = document.getElementById('dataTableContainer');
+                var trRect = activeRow.getBoundingClientRect();
+                var tcRect = tc.getBoundingClientRect();
+                
+                swipeMenu.style.display = 'flex';
+                swipeMenu.style.top = (trRect.top - tcRect.top + tc.scrollTop) + 'px';
+                swipeMenu.style.height = trRect.height + 'px';
+                swipeMenu.style.width = '100px';
+                
+                var idx = activeRow.getAttribute('data-index');
+                var type = activeRow.getAttribute('data-type');
+                
+                document.getElementById('swipeBtnEdit').onclick = function() {
+                    resetSwipe();
+                    if(type === 'konter') editKonterData(idx);
+                    else editDataGen(activeRow.getAttribute('data-array-index'));
+                };
+                document.getElementById('swipeBtnDelete').onclick = function() {
+                    resetSwipe();
+                    if(type === 'konter') delKonter(idx);
+                    else delGen(idx, window.currentSheet);
+                };
+            }
+        } else if (diffX < -10 && isSwiping) {
+            activeRow.style.transform = 'translateX(0)';
+            if(swipeMenu) swipeMenu.style.display = 'none';
+        }
+    }, {passive: true});
+
+    document.addEventListener('touchend', function(e) {
+        if (!activeRow || !isSwiping) return;
+        var diffX = startX - e.changedTouches[0].clientX;
+        
+        if (diffX > 35) {
+            // Biarkan terbuka
+            activeRow.style.transform = 'translateX(-85px)';
+            if(swipeMenu) {
+                swipeMenu.classList.remove('opacity-0', 'pointer-events-none');
+                swipeMenu.classList.add('opacity-100', 'pointer-events-auto');
+                swipeMenu.style.display = 'flex';
+            }
+        } else {
+            // Tutup kembali jika geseran kurang kuat
+            resetSwipe();
+        }
+        isSwiping = false;
+    });
+
+})();
 
 window.toggleMarginFields = function(el) {
     var val = el ? el.value : (document.getElementById('tipe_margin') ? document.getElementById('tipe_margin').value : 'Range Nominal');
