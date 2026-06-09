@@ -564,6 +564,11 @@ document.addEventListener('DOMContentLoaded', function() {
             lblNominal.innerText = ['VOUCHER', 'PERDANA', 'ACC', 'PULSA', 'GAME'].includes(jenis) ? 'Harga' : 'Nominal';
         }
 
+        if(['VOUCHER', 'PERDANA', 'ACC'].includes(jenis)) {
+            if(sdSection) sdSection.style.display = 'none';
+            if(sdInput) sdInput.required = false;
+        }
+
         if(jenis === '') {
             document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
                 container.innerHTML = '<select id="kntDetailSelect" class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-400 outline-none" disabled><option>-- Pilih Jenis Dulu --</option></select>';

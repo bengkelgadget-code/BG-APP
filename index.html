@@ -486,7 +486,7 @@
                         <div class="flex justify-between items-end mb-1">
                             <label class="block text-xs font-semibold text-slate-700">Metode Pembayaran</label>
                         </div>
-                        <div class="flex items-center space-x-2 mt-1">
+                        <div class="flex items-center space-x-2 mt-1" id="kntMetodeToggleWrapper">
                             <label class="flex items-center cursor-pointer">
                                 <div class="relative">
                                     <input type="checkbox" id="kntMetodeBayar" class="sr-only" onchange="toggleMetodeBayar()">
@@ -496,10 +496,13 @@
                                 <span class="ml-2 text-xs font-bold text-slate-600" id="kntMetodeText">Tunai</span>
                             </label>
                         </div>
-                        <div id="kntTerimaDiWrapper" class="mt-2 hidden">
-                            <select id="kntTerimaDi" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                        <div id="kntTerimaDiWrapper" class="mt-1 hidden relative">
+                            <select id="kntTerimaDi" class="w-full bg-white border border-slate-300 rounded-lg pl-3 pr-10 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                                 <option value="">-- Diterima Di --</option>
                             </select>
+                            <button type="button" onclick="cancelMetodeBayar()" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Batal Non-Tunai">
+                                <i class="fa-solid fa-xmark text-lg"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -507,25 +510,26 @@
                 <script>
                 function toggleMetodeBayar() {
                     var cb = document.getElementById('kntMetodeBayar');
-                    var bg = document.getElementById('kntMetodeBg');
-                    var dot = document.getElementById('kntMetodeDot');
-                    var txt = document.getElementById('kntMetodeText');
+                    var toggleWrapper = document.getElementById('kntMetodeToggleWrapper');
                     var wrapper = document.getElementById('kntTerimaDiWrapper');
                     var sel = document.getElementById('kntTerimaDi');
                     
                     if(cb.checked) {
-                        bg.classList.remove('bg-slate-300'); bg.classList.add('bg-blue-500');
-                        dot.style.transform = 'translateX(100%)';
-                        txt.innerText = 'Non-Tunai';
+                        if (toggleWrapper) toggleWrapper.classList.add('hidden');
                         wrapper.classList.remove('hidden');
                         sel.required = true;
                     } else {
-                        bg.classList.add('bg-slate-300'); bg.classList.remove('bg-blue-500');
-                        dot.style.transform = 'translateX(0)';
-                        txt.innerText = 'Tunai';
+                        if (toggleWrapper) toggleWrapper.classList.remove('hidden');
                         wrapper.classList.add('hidden');
                         sel.required = false;
                         sel.value = "";
+                    }
+                }
+                function cancelMetodeBayar() {
+                    var cb = document.getElementById('kntMetodeBayar');
+                    if(cb) {
+                        cb.checked = false;
+                        toggleMetodeBayar();
                     }
                 }
                 </script>
