@@ -540,6 +540,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        if(jenis === 'TOKEN PLN') {
+            if(mbSection) mbSection.style.display = 'none';
+            if(cb && cb.checked) { cb.checked = false; if(typeof toggleMetodeBayar === 'function') toggleMetodeBayar(); }
+        }
+
         if(jenis === 'KUOTA INTERNET') {
             document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'none');
             document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
@@ -746,6 +751,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 var oldDiterima = rowData[9];
                 var docId = rowData._docId;
                 
+                if (!docId) {
+                    // Fallback: Cari docId berdasarkan ID TRX (originalId)
+                    try {
+                        let snapshot = await db.collection('DB_konter').get();
+                        snapshot.forEach(doc => {
+                            let data = doc.data();
+                            if (data && data.rowArray && data.rowArray[0] === originalId) {
+                                docId = doc.id;
+                            }
+                        });
+                    } catch(e) {
+                        console.error("Gagal fallback mencari docId", e);
+                    }
+                }
+
                 if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
 
                 var originalDate = rowData[7];
@@ -901,6 +921,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     var delDetail = rowData ? rowData[3] : null;
                     var docId = rowData ? rowData._docId : null;
 
+                    if (!docId && itemId) {
+                        try {
+                            let snapshot = await db.collection('DB_konter').get();
+                            snapshot.forEach(doc => {
+                                let data = doc.data();
+                                if (data && data.rowArray && data.rowArray[0] === itemId) docId = doc.id;
+                            });
+                        } catch(e) { console.error(e); }
+                    }
+
                     if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
 
                     await deleteFromFirebase('DB_konter', docId); 
@@ -929,6 +959,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     var rowData = window.BGL2_CACHE[actualSheet][safeIdx];
                     var itemId = rowData ? rowData[0] : null;
                     var docId = rowData ? rowData._docId : null;
+
+                    if (!docId && itemId) {
+                        try {
+                            let snapshot = await db.collection(actualSheet).get();
+                            snapshot.forEach(doc => {
+                                let data = doc.data();
+                                if (data && data.rowArray && data.rowArray[0] === itemId) docId = doc.id;
+                            });
+                        } catch(e) { console.error(e); }
+                    }
 
                     if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
 
