@@ -1044,7 +1044,7 @@ window.setFilterDate = function(val) {
         if (!document.getElementById('mobileSwipeMenu')) {
             swipeMenu = document.createElement('div');
             swipeMenu.id = 'mobileSwipeMenu';
-            swipeMenu.className = 'absolute right-0 flex items-center justify-end pr-2 sm:pr-4 space-x-1.5 z-10 transition-opacity duration-200 opacity-0 pointer-events-none bg-slate-100/80 backdrop-blur-sm border-l border-slate-200';
+            swipeMenu.className = 'absolute right-0 flex items-center justify-end pr-3 sm:pr-4 space-x-3 z-10 transition-opacity duration-200 opacity-0 pointer-events-none bg-slate-100/80 backdrop-blur-sm border-l border-slate-200';
             swipeMenu.innerHTML = `
                 <button id="swipeBtnEdit" type="button" class="bg-amber-100 text-amber-700 h-[40px] w-[40px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-pen-to-square text-base"></i></button>
                 <button id="swipeBtnDelete" type="button" class="bg-red-100 text-red-700 h-[40px] w-[40px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-trash text-base"></i></button>
@@ -1109,7 +1109,7 @@ window.setFilterDate = function(val) {
         // Cek apakah dominan geser horizontal
         if (diffX > 10 && diffX > diffY) {
             isSwiping = true;
-            var translateX = Math.min(diffX, 105); 
+            var translateX = Math.min(diffX, 125); 
             activeRow.style.transform = `translateX(-${translateX}px)`;
             
             if (swipeMenu && swipeMenu.style.display === 'none') {
@@ -1121,7 +1121,7 @@ window.setFilterDate = function(val) {
                 swipeMenu.style.display = 'flex';
                 swipeMenu.style.top = (trRect.top - tcRect.top + tc.scrollTop) + 'px';
                 swipeMenu.style.height = trRect.height + 'px';
-                swipeMenu.style.width = '120px';
+                swipeMenu.style.width = '140px';
                 
                 var idx = activeRow.getAttribute('data-index');
                 var type = activeRow.getAttribute('data-type');
@@ -1149,7 +1149,7 @@ window.setFilterDate = function(val) {
         
         if (diffX > 45) {
             // Biarkan terbuka
-            activeRow.style.transform = 'translateX(-105px)';
+            activeRow.style.transform = 'translateX(-125px)';
             if(swipeMenu) {
                 swipeMenu.classList.remove('opacity-0', 'pointer-events-none');
                 swipeMenu.classList.add('opacity-100', 'pointer-events-auto');
