@@ -63,6 +63,7 @@ var pageConfigs = {
             { id: 'persentase_val', label: 'Besaran Persentase', type: 'text_pct', required: false, hidden: true }, 
             { id: 'max_nom', label: 'Nominal Akhir (<) (Boleh kosong)', type: 'rupiah', required: false }, 
             { id: 'val_margin', label: 'Margin / Keuntungan (IDR)', type: 'rupiah', required: true }
+        ]
     },
     'Mutasi': { sheet: 'DB_mutasi', prefix: 'MT', headers: ['No Trx', 'Tanggal', 'Jenis', 'Asal / Tujuan', 'Keterangan', 'Nominal', 'Aksi'], fields: [] },
     'Service': { sheet: 'DB_service', prefix: 'SV', headers: ['No Nota', 'Tanggal', 'ID Cust', 'Seri HP', 'PIN/Pola', 'Kerusakan', 'Kelengkapan', 'Garansi', 'Ket Tambahan', 'Total Biaya', 'Ket Bayar', 'Foto', 'Status', 'Updated At', 'Aksi'], fields: [] }
