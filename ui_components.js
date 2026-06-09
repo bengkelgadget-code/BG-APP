@@ -222,7 +222,7 @@ function loadTableData(forceRefresh = false) {
 
         if (needRebuild || !document.getElementById('dataTableBody')) {
             var html = '<table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="dataTable">';
-            html += '<thead class="sticky top-0 z-20 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
+            html += '<thead class="sticky top-0 z-30 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
             html += '<tr>';
             for(var i=0; i<hdrs.length; i++) {
                 var thClass = "py-2.5 px-0.5 sm:px-4 font-bold text-center";
