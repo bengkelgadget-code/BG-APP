@@ -99,8 +99,27 @@ document.addEventListener('DOMContentLoaded', function() {
             if (kasirId !== "" && sdData[i][0] === kasirId) { kIdx = i; kRow = sdData[i]; kDocId = kRow._docId; kSaldo = parseInt(String(kRow[3]||'0').replace(/[^0-9]/g, '')) || 0; }
         }
 
+        // Fallback: Jika sDocId atau kDocId hilang dari cache (JSON.stringify issue), fetch dari Firebase
+        if ((sRow && !sDocId) || (kRow && !kDocId)) {
+            try {
+                var db = firebase.firestore();
+                var snapshot = await db.collection('Sumber_Dana').get();
+                snapshot.forEach(doc => {
+                    var idSd = doc.data().data ? doc.data().data[0] : null;
+                    if (sRow && !sDocId && idSd === sumberDanaId) {
+                        sDocId = doc.id;
+                        sRow._docId = doc.id;
+                    }
+                    if (kRow && !kDocId && idSd === kasirId) {
+                        kDocId = doc.id;
+                        kRow._docId = doc.id;
+                    }
+                });
+            } catch (e) { console.warn("Fallback query failed for updateBalances", e); }
+        }
+
         // if sumber dana not found and NOT Jasa Transfer, do nothing
-        if (!sDocId && jenis !== 'JASA TRANSFER') return; 
+        if (!sDocId && jenis !== 'JASA TRANSFER') return;  
 
         // Helper function for format
         var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
@@ -162,8 +181,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 if(window.saveCacheToLocal) window.saveCacheToLocal();
                 
                 var docId = sheetData[itemIndex]._docId;
+                if (!docId) {
+                    try {
+                        var idBarang = sheetData[itemIndex][0];
+                        var db = firebase.firestore();
+                        var snapshot = await db.collection(targetSheet).get();
+                        snapshot.forEach(doc => {
+                            if (doc.data().data && doc.data().data[0] === idBarang) {
+                                docId = doc.id;
+                                sheetData[itemIndex]._docId = doc.id;
+                            }
+                        });
+                    } catch (e) { console.warn("Fallback docId query failed for adjustStock", e); }
+                }
+
                 if (docId) {
                     updateInFirebase(targetSheet, docId, sheetData[itemIndex]).catch(e => console.log("Gagal update stok Firebase", e));
+                } else {
+                    console.error("Critical: docId not found for adjustStock even after fallback", targetSheet, detail);
                 }
 
                 if(typeof gasRun !== 'undefined') {
