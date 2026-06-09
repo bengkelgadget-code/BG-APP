@@ -261,8 +261,26 @@ function loadTableData(forceRefresh = false) {
 }
 
 async function toggleForm(forceShow) {
+    var mKnt = document.getElementById('modalKonter');
+    var mMut = document.getElementById('modalMutasi');
+    var isOpeningKonter = isKonterMode && (forceShow === true || (mKnt && mKnt.classList.contains('opacity-0')));
+    var isOpeningMutasi = (currentSheet === 'Mutasi') && (forceShow === true || (mMut && mMut.classList.contains('opacity-0')));
+    
+    if (isOpeningKonter || isOpeningMutasi) {
+        if (!window.BGL2_CACHE['Sumber_Dana'] || !window.BGL2_CACHE['Voucher']) {
+            if (typeof Swal !== 'undefined') Swal.fire({ title: 'Menyiapkan Form...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
+            try {
+                if (!window.BGL2_CACHE['Sumber_Dana']) window.BGL2_CACHE['Sumber_Dana'] = await getFromFirebase('Sumber_Dana') || [];
+                if (!window.BGL2_CACHE['Voucher']) window.BGL2_CACHE['Voucher'] = await getFromFirebase('Voucher') || [];
+                if (!window.BGL2_CACHE['Perdana']) window.BGL2_CACHE['Perdana'] = await getFromFirebase('Perdana') || [];
+                if (!window.BGL2_CACHE['ACC']) window.BGL2_CACHE['ACC'] = await getFromFirebase('ACC') || [];
+            } catch(e) { console.error("Gagal memuat cache dependensi form", e); }
+            if (typeof Swal !== 'undefined') Swal.close();
+        }
+    }
+
     if (isKonterMode) {
-        var m = getEl('modalKonter');
+        var m = mKnt || getEl('modalKonter');
         if (forceShow === true || (m && m.classList.contains('opacity-0'))) {
             if(editIndex === -1) {
                 document.querySelectorAll('#kntTanggal').forEach(el => el.value = new Date().toLocaleDateString('id-ID'));
