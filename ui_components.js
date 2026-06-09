@@ -162,21 +162,23 @@ function switchPage(key, title) {
         var activeSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
         if (activeSheet && typeof window.listenToCollection === 'function') {
             window.listenToCollection(activeSheet, function(d) {
-                // Hapus _timestamp dan stringify untuk perbandingan murni
-                var cleanCache = (window.BGL2_CACHE[activeSheet] || []).map(r => { var n = [...r]; delete n._docId; delete n._timestamp; return n; });
-                var cleanNew = d.map(r => { var n = [...r]; delete n._docId; delete n._timestamp; return n; });
+                if (window.bgl2ListenerTimer) clearTimeout(window.bgl2ListenerTimer);
+                window.bgl2ListenerTimer = setTimeout(() => {
+                    var cleanCache = (window.BGL2_CACHE[activeSheet] || []).map(r => { var n = [...r]; delete n._docId; delete n._timestamp; return n; });
+                    var cleanNew = d.map(r => { var n = [...r]; delete n._docId; delete n._timestamp; return n; });
 
-                if(JSON.stringify(cleanCache) !== JSON.stringify(cleanNew)) {
-                    window.BGL2_CACHE[activeSheet] = d; 
-                    if(window.saveCacheToLocal) window.saveCacheToLocal();
-                    
-                    var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
-                    if(currentRenderedSheet === activeSheet && key !== 'Dashboard') {
-                        loadTableData(false);
-                    } else if (key === 'Dashboard') {
-                        if(typeof window.renderDashboardPage === 'function') window.renderDashboardPage();
+                    if(JSON.stringify(cleanCache) !== JSON.stringify(cleanNew)) {
+                        window.BGL2_CACHE[activeSheet] = d; 
+                        if(window.saveCacheToLocal) window.saveCacheToLocal();
+                        
+                        var currentRenderedSheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+                        if(currentRenderedSheet === activeSheet && key !== 'Dashboard') {
+                            loadTableData(false);
+                        } else if (key === 'Dashboard') {
+                            if(typeof window.renderDashboardPage === 'function') window.renderDashboardPage();
+                        }
                     }
-                }
+                }, 400); // 400ms debounce to stabilize rapid Firebase snapshot bursts
             });
         }
         

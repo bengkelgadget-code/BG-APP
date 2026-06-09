@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 var db = firebase.firestore();
                 var snapshot = await db.collection('Sumber_Dana').get();
                 snapshot.forEach(doc => {
-                    var idSd = doc.data().data ? doc.data().data[0] : null;
+                    var idSd = doc.data().rowArray ? doc.data().rowArray[0] : null;
                     if (sRow && !sDocId && idSd === sumberDanaId) {
                         sDocId = doc.id;
                         sRow._docId = doc.id;
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         var db = firebase.firestore();
                         var snapshot = await db.collection(targetSheet).get();
                         snapshot.forEach(doc => {
-                            if (doc.data().data && doc.data().data[0] === idBarang) {
+                            if (doc.data().rowArray && doc.data().rowArray[0] === idBarang) {
                                 docId = doc.id;
                                 sheetData[itemIndex]._docId = doc.id;
                             }
