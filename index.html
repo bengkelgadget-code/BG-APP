@@ -552,8 +552,8 @@
     <!-- MODAL MUTASI SALDO -->
     <div id="modalMutasi" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeMutasiModal()"></div>
-        <div id="modalMutasiContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 scale-95 transition-transform duration-300 flex flex-col max-h-full">
-            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center shrink-0 bg-slate-50/50 rounded-t-2xl">
+        <div id="modalMutasiContent" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]">
+            <div class="px-5 py-3 border-b border-slate-100 flex justify-between items-center shrink-0 bg-slate-50/50 rounded-t-2xl">
                 <h3 class="text-lg font-black text-slate-800 flex items-center">
                     <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center mr-3 shadow-inner"><i class="fa-solid fa-arrow-right-arrow-left text-sm"></i></div>
                     <span id="mutasiFormTitle">Form Mutasi Saldo</span>
@@ -561,15 +561,15 @@
                 <button onclick="closeMutasiModal()" class="w-8 h-8 flex items-center justify-center rounded-xl text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <form id="mutasiForm" onsubmit="submitMutasiForm(event, this)" class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-4">
-                <div class="grid grid-cols-2 gap-4">
+            <form id="mutasiForm" onsubmit="submitMutasiForm(event, this)" class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-3">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-slate-700">Tanggal</label>
-                        <input type="text" id="mutasiTanggal" readonly class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-500 cursor-not-allowed">
+                        <input type="text" id="mutasiTanggal" readonly class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold text-slate-500 cursor-not-allowed">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-slate-700">Jenis Mutasi</label>
-                        <select id="mutasiJenis" required onchange="mutasiJenisChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none">
+                        <select id="mutasiJenis" required onchange="mutasiJenisChange()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none">
                             <option value="">-- Pilih Jenis --</option>
                             <option value="Pindah Dana">Pindah Dana</option>
                             <option value="Topup Server Pulsa">Topup Server Pulsa</option>
@@ -579,38 +579,38 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4" id="mutasiAkunSection">
+                <div class="grid grid-cols-2 gap-3" id="mutasiAkunSection">
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-slate-700">Sumber Asal (-)</label>
-                        <select id="mutasiAsal" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none">
+                        <select id="mutasiAsal" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none">
                             <option value="">-- Pilih Akun --</option>
                         </select>
                     </div>
                     <div id="mutasiTujuanWrapper">
                         <label class="block text-xs font-semibold mb-1 text-slate-700">Sumber Tujuan (+)</label>
-                        <select id="mutasiTujuan" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none">
+                        <select id="mutasiTujuan" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none">
                             <option value="">-- Pilih Akun --</option>
                         </select>
                     </div>
                 </div>
                 
-                <div id="mutasiVoucherSection" class="hidden space-y-4">
+                <div id="mutasiVoucherSection" class="hidden space-y-3">
                     <div>
                         <label class="block text-xs font-semibold mb-1 text-slate-700">Pilih Data Voucher Tujuan (+ Stok)</label>
-                        <select id="mutasiVoucher" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none">
+                        <select id="mutasiVoucher" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none">
                             <option value="">-- Pilih Voucher --</option>
                         </select>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold mb-1 text-slate-700">Qty (Lembar)</label>
-                            <input type="number" id="mutasiQty" min="1" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="Misal: 5">
+                            <input type="number" id="mutasiQty" min="1" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="Misal: 5">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold mb-1 text-slate-700" title="Potongan modal fisik per lembar (XL/Axis: 250, ISAT/Tri: 600)">Harga Fisik Vcr / pcs</label>
                             <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
-                                <input type="tel" id="mutasiFisikCost" oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="250">
+                                <span class="absolute left-3 top-2 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
+                                <input type="tel" id="mutasiFisikCost" oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="250">
                             </div>
                         </div>
                     </div>
@@ -619,19 +619,19 @@
                 <div>
                     <label id="lblMutasiNominal" class="block text-xs font-semibold mb-1 text-slate-700">Total Nominal / Biaya</label>
                     <div class="relative">
-                        <span class="absolute left-3 top-2.5 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
-                        <input type="tel" autocomplete="off" id="mutasiNominal" required oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none placeholder-slate-300/50" placeholder="0">
+                        <span class="absolute left-3 top-2 text-sm text-slate-400 font-bold pointer-events-none">Rp</span>
+                        <input type="tel" autocomplete="off" id="mutasiNominal" required oninput="formatRupiahUI(this)" class="w-full bg-white pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm font-bold text-slate-800 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none placeholder-slate-300/50" placeholder="0">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold mb-1 text-slate-700">Keterangan</label>
-                    <input type="text" id="mutasiKeterangan" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="Contoh: Topup Digi 500k">
+                    <input type="text" id="mutasiKeterangan" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="Contoh: Topup Digi 500k (Opsional)">
                 </div>
 
-                <div class="flex justify-end pt-4 border-t border-slate-100 space-x-3 mt-4">
-                    <button type="button" onclick="closeMutasiModal()" class="px-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors shadow-sm">Batal</button>
-                    <button type="submit" id="btnSubmitMutasi" class="px-6 py-2.5 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-lg shadow-md transition-colors">Proses Mutasi</button>
+                <div class="flex justify-end pt-3 border-t border-slate-100 space-x-2 mt-3">
+                    <button type="button" onclick="closeMutasiModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors shadow-sm">Batal</button>
+                    <button type="submit" id="btnSubmitMutasi" class="px-4 py-2 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-lg shadow-md transition-colors">Proses Mutasi</button>
                 </div>
             </form>
         </div>
