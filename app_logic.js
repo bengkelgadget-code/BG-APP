@@ -848,6 +848,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             openKonterModal();
+
+            // Set Sumber Dana dan Terima Di (setelah modal & dropdown options dirender)
+            setTimeout(() => {
+                var oldSumber = rowData[8];
+                var oldDiterima = rowData[9];
+                
+                var sdSelect = document.getElementById('kntSumberDana');
+                if (sdSelect && oldSumber) {
+                    sdSelect.value = oldSumber;
+                    if(window.jQuery) $(sdSelect).trigger('change.select2');
+                }
+                
+                var cb = document.getElementById('kntMetodeBayar');
+                if (oldDiterima && oldDiterima !== 'Laci Kasir' && oldDiterima !== '-') {
+                    if(cb && !cb.checked) { cb.checked = true; toggleMetodeBayar(); }
+                    var tdSelect = document.getElementById('kntTerimaDi');
+                    if (tdSelect) {
+                        tdSelect.value = oldDiterima;
+                        if(window.jQuery) $(tdSelect).trigger('change.select2');
+                    }
+                } else {
+                    if(cb && cb.checked) { cb.checked = false; toggleMetodeBayar(); }
+                }
+            }, 400);
+
         } catch(err) { console.error(err); }
     }
 

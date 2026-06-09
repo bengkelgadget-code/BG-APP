@@ -544,8 +544,11 @@ function openKonterModal() {
     if (tdSelect) { tdSelect.innerHTML = htmlOpts; }
 
     setTimeout(() => {
-        if(window.jQuery && $('#kntJenis').length) {
-            $('#kntJenis').select2('open');
+        if(window.jQuery) {
+            var $kntJenis = $('#kntJenis');
+            if($kntJenis.length) $kntJenis.select2('open');
+            $('#kntSumberDana').select2({ width: '100%', dropdownParent: $('#modalKonter') });
+            $('#kntTerimaDi').select2({ width: '100%', dropdownParent: $('#modalKonter') });
         } else {
             var jenis = document.getElementById('kntJenis');
             if(jenis) jenis.focus();
@@ -561,8 +564,8 @@ function closeKonterModal() {
     
     if(window.jQuery) {
         $('select#kntJenis').val('').trigger('change.select2');
-        $('select#kntSumberDana').val('').trigger('change');
-        $('select#kntTerimaDi').val('').trigger('change');
+        $('select#kntSumberDana').val('').trigger('change.select2');
+        $('select#kntTerimaDi').val('').trigger('change.select2');
     } else {
         var sdSelect = document.getElementById('kntSumberDana'); if(sdSelect) sdSelect.value = '';
         var tdSelect = document.getElementById('kntTerimaDi'); if(tdSelect) tdSelect.value = '';
