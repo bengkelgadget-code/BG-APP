@@ -814,6 +814,104 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
     }
 
+    window.mutasiJenisChange = function() {
+        var jenis = document.getElementById('mutasiJenis').value;
+        var vcSection = document.getElementById('mutasiVoucherSection');
+        var tjWrapper = document.getElementById('mutasiTujuanWrapper');
+        var tujuan = document.getElementById('mutasiTujuan');
+        var lblNom = document.getElementById('lblMutasiNominal');
+
+        if (jenis === 'Tembak Voucher') {
+            vcSection.classList.remove('hidden');
+            tjWrapper.classList.add('hidden');
+            tujuan.required = false;
+            tujuan.value = '';
+            lblNom.innerText = 'Total Biaya Saldo (-)';
+        } else {
+            vcSection.classList.add('hidden');
+            tjWrapper.classList.remove('hidden');
+            tujuan.required = true;
+            lblNom.innerText = 'Total Nominal Mutasi';
+        }
+
+        var vcSelect = document.getElementById('mutasiVoucher');
+        if (jenis === 'Tembak Voucher' && vcSelect) {
+            vcSelect.onchange = function() {
+                var opt = vcSelect.options[vcSelect.selectedIndex];
+                var txt = opt ? opt.text.toLowerCase() : '';
+                var costInp = document.getElementById('mutasiFisikCost');
+                if (txt.includes('xl') || txt.includes('axis')) {
+                    costInp.value = '250';
+                } else if (txt.includes('im3') || txt.includes('indosat') || txt.includes('tri') || txt.includes(' 3 ')) {
+                    costInp.value = '600';
+                } else {
+                    costInp.value = '0';
+                }
+                window.formatRupiahUI(costInp);
+            };
+        }
+    };
+
+    window.isSubmittingMutasi = false;
+    window.submitMutasiForm = async function(e, formEl) {
+        e.preventDefault();
+        if(window.isSubmittingMutasi) return;
+        window.isSubmittingMutasi = true;
+
+        var tanggal = document.getElementById('mutasiTanggal').value;
+        var jenis = document.getElementById('mutasiJenis').value;
+        var asal = document.getElementById('mutasiAsal').value;
+        var tujuan = document.getElementById('mutasiTujuan').value;
+        var nomInp = document.getElementById('mutasiNominal').value;
+        var nominal = parseInt(nomInp.replace(/[^0-9]/g, '')) || 0;
+        var ket = document.getElementById('mutasiKeterangan').value;
+        
+        var voucherId = document.getElementById('mutasiVoucher').value;
+        var qty = parseInt(document.getElementById('mutasiQty').value) || 0;
+        var fisikInp = document.getElementById('mutasiFisikCost').value;
+        var fisikCost = parseInt(fisikInp.replace(/[^0-9]/g, '')) || 0;
+
+        if (jenis === 'Tembak Voucher') {
+            if (!voucherId) { Swal.fire('Oops', 'Pilih Voucher Tujuan!', 'warning'); window.isSubmittingMutasi = false; return; }
+            if (qty < 1) { Swal.fire('Oops', 'Qty tidak boleh kosong!', 'warning'); window.isSubmittingMutasi = false; return; }
+        }
+
+        Swal.fire({ title: 'Memproses...', toast: true, position: 'top-end', showConfirmButton: false, timerProgressBar: true, didOpen: () => Swal.showLoading() });
+
+        try {
+            var newId = 'MT-' + new Date().getTime().toString().slice(-6);
+            var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
+            
+            var rowTujuan = tujuan || voucherId;
+            var newRow = [
+                newId, tanggal, jenis, `${asal} -> ${rowTujuan}`, ket, fRupiah(nominal), new Date().toLocaleDateString('id-ID')
+            ];
+
+            await saveToFirebase('DB_mutasi', newRow);
+
+            if (jenis === 'Tembak Voucher') {
+                var debitAsal = nominal - (fisikCost * qty);
+                await window.updateBalances('TRANSFER', asal, '', debitAsal, 0, 1);
+                
+                var vcData = window.BGL2_CACHE['Voucher'] || [];
+                var vcItem = vcData.find(v => v[2] === voucherId);
+                if(vcItem) {
+                    await window.adjustStock('VOUCHER', voucherId, qty);
+                }
+            } else {
+                await window.updateBalances('TRANSFER', asal, tujuan, nominal, nominal, 1);
+            }
+
+            closeMutasiModal();
+            Swal.fire({ title: 'Mutasi Berhasil!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+
+        } catch(err) { 
+            Swal.fire('Error', String(err), 'error'); 
+        } finally { 
+            window.isSubmittingMutasi = false; 
+        }
+    };
+
     async function editKonterData(origIdx) {
         try {
             var rowData = null;

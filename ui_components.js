@@ -268,6 +268,31 @@ async function toggleForm(forceShow) {
             }
             openKonterModal();
         } else { closeKonterModal(); }
+    } else if (currentSheet === 'Mutasi') {
+        var mMut = getEl('modalMutasi');
+        if (forceShow === true || (mMut && mMut.classList.contains('opacity-0'))) {
+            if(editIndex === -1) {
+                document.getElementById('mutasiTanggal').value = new Date().toLocaleDateString('id-ID');
+                if(window.jQuery) {
+                    $('select#mutasiJenis').val('').trigger('change.select2');
+                    $('select#mutasiAsal').val('').trigger('change.select2');
+                    $('select#mutasiTujuan').val('').trigger('change.select2');
+                    $('select#mutasiVoucher').val('').trigger('change.select2');
+                }
+            }
+            // Populasi dropdown Sumber Dana
+            var sdData = window.BGL2_CACHE['Sumber_Dana'] || [];
+            var sdOptions = '<option value="">-- Pilih Akun --</option>' + sdData.map(v => `<option value="${v[0]}">${v[1]}</option>`).join('');
+            document.getElementById('mutasiAsal').innerHTML = sdOptions;
+            document.getElementById('mutasiTujuan').innerHTML = sdOptions;
+
+            // Populasi dropdown Voucher
+            var vcData = window.BGL2_CACHE['Voucher'] || [];
+            var vcOptions = '<option value="">-- Pilih Voucher --</option>' + vcData.map(v => `<option value="${v[2]}">${v[1]} - ${v[2]} (Stok: ${v[5]})</option>`).join('');
+            document.getElementById('mutasiVoucher').innerHTML = vcOptions;
+
+            openMutasiModal();
+        } else { closeMutasiModal(); }
     } 
     else {
         var mGen = getEl('modalGeneric');
@@ -300,6 +325,27 @@ async function toggleForm(forceShow) {
 
 function openModal(id) { var m = getEl(id); if(m) m.classList.remove('hidden'); }
 function closeModal(id) { var m = getEl(id); if(m) m.classList.add('hidden'); }
+
+window.openMutasiModal = function() {
+    document.querySelectorAll('#modalMutasi').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
+    document.querySelectorAll('#modalMutasiContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
+    document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
+    setTimeout(() => { if(window.jQuery) $('#mutasiJenis').select2('open'); }, 300);
+}
+
+window.closeMutasiModal = function() {
+    editIndex = -1;
+    document.getElementById('mutasiForm').reset();
+    document.getElementById('mutasiFormTitle').innerText = 'Form Mutasi Saldo';
+    document.getElementById('btnSubmitMutasi').innerText = 'Proses Mutasi';
+    if(window.jQuery) {
+        $('#mutasiForm select').val(null).trigger('change.select2');
+    }
+    mutasiJenisChange(); // reset layout
+    document.querySelectorAll('#modalMutasi').forEach(m => { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); });
+    document.querySelectorAll('#modalMutasiContent').forEach(mc => { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); });
+    document.querySelectorAll('#mainContainer').forEach(main => main.classList.remove('main-active-modal'));
+}
 
 function openGenericModal() {
     document.querySelectorAll('#modalGeneric').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
