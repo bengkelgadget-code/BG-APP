@@ -610,13 +610,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 await saveToFirebase('DB_konter', newRow);
                 
-                if (!window.BGL2_CACHE['DB_konter']) window.BGL2_CACHE['DB_konter'] = [];
-                // Listener Firebase onSnapshot otomatis akan memperbarui tabel, tapi kita update lokal dulu agar instan
-                newRow._docId = "pending"; // akan tertimpa listener
-                window.BGL2_CACHE['DB_konter'].push(newRow);
-                if(window.saveCacheToLocal) window.saveCacheToLocal();
+                // Listener Firebase akan memperbarui tabel otomatis
                 window.adjustStock(payload.jenis, payload.detail, -1);
-                loadTableData(false);
 
                 // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
                 payload.id_override = newId; // jika Code.gs mendukung
@@ -637,9 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 await updateInFirebase('DB_konter', docId, updatedRow);
 
-                updatedRow._docId = docId;
-                window.BGL2_CACHE['DB_konter'][currentIndex] = updatedRow;
-                if(window.saveCacheToLocal) window.saveCacheToLocal();
+                // Listener Firebase akan memperbarui tabel otomatis
                 
                 if (oldJenis !== payload.jenis || oldDetail !== payload.detail) {
                     window.adjustStock(oldJenis, oldDetail, 1);
@@ -650,7 +643,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 gasRun('editKonterTransaction', currentIndex, payload, originalId).catch(e=>console.error(e));
             }
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
-            loadTableData(false);
+            // loadTableData akan dipanggil otomatis oleh listener Firebase
 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
     }
@@ -780,12 +773,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     await deleteFromFirebase('DB_konter', docId); 
                     
-                    if(window.BGL2_CACHE['DB_konter']) {
-                        window.BGL2_CACHE['DB_konter'].splice(safeIdx, 1);
-                        if(window.saveCacheToLocal) window.saveCacheToLocal();
-                        if(delJenis && delDetail) window.adjustStock(delJenis, delDetail, 1);
-                    }
-                    loadTableData(false);
+                    if(delJenis && delDetail) window.adjustStock(delJenis, delDetail, 1);
+                    
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
 
                     // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
@@ -814,11 +803,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     await deleteFromFirebase(actualSheet, docId); 
                     
                     localStorage.removeItem('bgl2_dropdown_cache'); 
-                    if(window.BGL2_CACHE[actualSheet]) {
-                        window.BGL2_CACHE[actualSheet].splice(safeIdx, 1);
-                        if(window.saveCacheToLocal) window.saveCacheToLocal();
-                    }
-                    loadTableData(false);
                     
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
 
@@ -883,12 +867,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 await saveToFirebase(currentConfig.sheet, arr);
 
-                if (!window.BGL2_CACHE[currentConfig.sheet]) window.BGL2_CACHE[currentConfig.sheet] = [];
-                arr._docId = "pending";
-                window.BGL2_CACHE[currentConfig.sheet].push(arr);
-                if(window.saveCacheToLocal) window.saveCacheToLocal();
-                loadTableData(false);
-
+                // Listener Firebase akan memperbarui tabel otomatis
+                
                 gasRun('saveData', currentConfig.sheet, arr).catch(e=>{});
             } else {
                 var rowData = window.BGL2_CACHE[currentConfig.sheet][currentIndex];
@@ -897,18 +877,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!docId) throw new Error("Document ID tidak ditemukan. Harap refresh data.");
 
                 await updateInFirebase(currentConfig.sheet, docId, arr);
-                arr._docId = docId;
-
-                if(window.BGL2_CACHE[currentConfig.sheet] && window.BGL2_CACHE[currentConfig.sheet][currentIndex]) {
-                    window.BGL2_CACHE[currentConfig.sheet][currentIndex] = arr;
-                    if(window.saveCacheToLocal) window.saveCacheToLocal();
-                }
 
                 gasRun('updateData', currentConfig.sheet, currentIndex, arr).catch(e=>{});
             }
 
-            Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
-            loadTableData(false); 
+            Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false}); 
 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
