@@ -204,7 +204,7 @@ function loadTableData(forceRefresh = false) {
         }
 
         if(!tableContainer) return;
-        var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis', 'Detail', 'Sumber/Bayar', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers : []);
+        var hdrs = isKonterMode ? ['ID TRX', 'Tanggal', 'Jenis/Keterangan', 'Sumber/Bayar', 'Harga Jual', 'Aksi'] : (currentConfig ? currentConfig.headers : []);
         
         if (!hdrs || hdrs.length === 0) {
             tableContainer.innerHTML = '<table class="w-full"><tr><td class="p-8 text-center text-slate-500 italic">Silakan pilih menu.</td></tr></table>';
@@ -679,8 +679,14 @@ function renderKonterTable(data, colCount) {
     if (sortStr) {
         var sortObj = JSON.parse(sortStr);
         filteredData.sort(function(a, b) {
-            var valA = String(a.row[sortObj.col] || '').toLowerCase();
-            var valB = String(b.row[sortObj.col] || '').toLowerCase();
+            // Map table column index to data row index
+            var dataCol = sortObj.col;
+            if (sortObj.col === 2) dataCol = 2; // Jenis/Keterangan -> sort by Jenis (2)
+            else if (sortObj.col === 3) dataCol = 8; // Sumber/Bayar -> sort by SumberDana (8)
+            else if (sortObj.col === 4) dataCol = 5; // Harga Jual -> sort by Harga Jual DB (5)
+
+            var valA = String(a.row[dataCol] || '').toLowerCase();
+            var valB = String(b.row[dataCol] || '').toLowerCase();
             
             var numA = parseInt(valA.replace(/[^0-9]/g, ''));
             var numB = parseInt(valB.replace(/[^0-9]/g, ''));
@@ -717,11 +723,16 @@ function renderKonterTable(data, colCount) {
 
             var sumberBayarHtml = `<div class="text-[9px]"><span class="font-bold text-slate-500">S:</span> ${sumberName}<br><span class="font-bold text-slate-500">B:</span> ${bayarName}</div>`;
 
+            var jenis = r[2] || '-';
+            var detail = r[3] || '-';
+            var jenisDetailHtml = (detail !== '-' && detail !== '') ? 
+                `<div class="font-bold text-blue-700">${jenis}</div><div class="text-[9px] text-slate-500 mt-0.5">${detail}</div>` : 
+                `<div class="font-bold text-blue-700">${jenis}</div>`;
+
             return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 hover:bg-slate-50 transition-colors">
                 <td class="py-2.5 px-1 sm:px-3 font-mono font-bold text-center hidden md:table-cell">${r[0]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
-                <td class="py-2.5 px-1 sm:px-3 font-bold text-blue-700 text-center whitespace-normal break-words">${r[2]||'-'}</td>
-                <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${r[3]||'-'}</td>
+                <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${jenisDetailHtml}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${sumberBayarHtml}</td>
                 <td class="py-2.5 px-1 sm:px-3 font-bold text-emerald-600 text-center whitespace-normal break-words">${r[5]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 align-middle"><div class="flex space-x-1 sm:space-x-1.5 justify-center"><button type="button" onclick="editKonterData(${o})" class="bg-amber-100 text-amber-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-[10px] sm:text-xs"></i></button><button type="button" onclick="delKonter(${o})" class="bg-red-100 text-red-700 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-[10px] sm:text-xs"></i></button></div></td>
