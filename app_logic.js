@@ -734,7 +734,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Revert old balance, apply new balance
                 await window.updateBalances(oldJenis, oldSumber, oldDiterima, oldHBeli, oldHJual, -1);
                 await window.updateBalances(payload.jenis, payload.sumberDana, payload.diterimaDi, payload.hargaBeliDB, payload.hargaJualDB, 1);
-            }
 
                 // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
                 gasRun('editKonterTransaction', currentIndex, payload, originalId).catch(e=>console.error(e));
