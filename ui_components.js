@@ -212,9 +212,10 @@ function loadTableData(forceRefresh = false) {
         }
 
         var needRebuild = false;
-        if (window.lastRenderedSheet !== sheet) {
+        if (window.lastRenderedSheet !== sheet || window.forceRebuildHeader) {
             needRebuild = true;
             window.lastRenderedSheet = sheet;
+            window.forceRebuildHeader = false;
         }
 
         if (needRebuild || !document.getElementById('dataTableBody')) {
@@ -224,7 +225,22 @@ function loadTableData(forceRefresh = false) {
             for(var i=0; i<hdrs.length; i++) {
                 var thClass = "py-2.5 px-2 sm:px-4 font-bold text-center";
                 if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
-                html += '<th class="' + thClass + '">' + hdrs[i] + '</th>';
+                
+                if (hdrs[i] !== 'Aksi') {
+                    thClass += " cursor-pointer hover:bg-white/10 select-none group transition-colors";
+                    var sortIcon = '<i class="fa-solid fa-sort opacity-30 group-hover:opacity-100 ml-1.5 text-[10px]"></i>';
+                    
+                    var sortStr = localStorage.getItem('sortState_' + sheet);
+                    if(sortStr) {
+                        var sortObj = JSON.parse(sortStr);
+                        if(sortObj.col === i) {
+                            sortIcon = sortObj.asc ? '<i class="fa-solid fa-sort-up ml-1.5 text-[12px] opacity-100 text-yellow-300"></i>' : '<i class="fa-solid fa-sort-down ml-1.5 text-[12px] opacity-100 text-yellow-300"></i>';
+                        }
+                    }
+                    html += '<th class="' + thClass + '" onclick="sortTable(' + i + ')"><div class="flex items-center justify-center">' + hdrs[i] + sortIcon + '</div></th>';
+                } else {
+                    html += '<th class="' + thClass + '">' + hdrs[i] + '</th>';
+                }
             }
             html += '</tr></thead><tbody class="text-[11px] sm:text-sm divide-y divide-slate-100" id="dataTableBody"></tbody></table>';
             tableContainer.innerHTML = html;
@@ -619,6 +635,27 @@ function renderKonterTable(data, colCount) {
         } 
     }
 
+    var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+    var sortStr = localStorage.getItem('sortState_' + sheet);
+    if (sortStr) {
+        var sortObj = JSON.parse(sortStr);
+        filteredData.sort(function(a, b) {
+            var valA = String(a.row[sortObj.col] || '').toLowerCase();
+            var valB = String(b.row[sortObj.col] || '').toLowerCase();
+            
+            var numA = parseInt(valA.replace(/[^0-9]/g, ''));
+            var numB = parseInt(valB.replace(/[^0-9]/g, ''));
+            
+            if(!isNaN(numA) && !isNaN(numB) && valA.includes('rp')) {
+                return sortObj.asc ? numA - numB : numB - numA;
+            } else if (!isNaN(parseInt(valA)) && !isNaN(parseInt(valB)) && /^\d+$/.test(valA) && /^\d+$/.test(valB)) {
+                return sortObj.asc ? parseInt(valA) - parseInt(valB) : parseInt(valB) - parseInt(valA);
+            }
+            
+            return sortObj.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        });
+    }
+
     currentTableData = filteredData;
 
     if(!filteredData || filteredData.length === 0) { 
@@ -691,6 +728,27 @@ function renderGenericTable(data, colCount) {
 
     var reversedData = [];
     for (var k = data.length - 1; k >= 0; k--) { if(data[k] && data[k][0] !== "") reversedData.push({row: data[k], originalIndex: k}); }
+
+    var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+    var sortStr = localStorage.getItem('sortState_' + sheet);
+    if (sortStr) {
+        var sortObj = JSON.parse(sortStr);
+        reversedData.sort(function(a, b) {
+            var valA = String(a.row[sortObj.col] || '').toLowerCase();
+            var valB = String(b.row[sortObj.col] || '').toLowerCase();
+            
+            var numA = parseInt(valA.replace(/[^0-9]/g, ''));
+            var numB = parseInt(valB.replace(/[^0-9]/g, ''));
+            
+            if(!isNaN(numA) && !isNaN(numB) && valA.includes('rp')) {
+                return sortObj.asc ? numA - numB : numB - numA;
+            } else if (!isNaN(parseInt(valA)) && !isNaN(parseInt(valB)) && /^\d+$/.test(valA) && /^\d+$/.test(valB)) {
+                return sortObj.asc ? parseInt(valA) - parseInt(valB) : parseInt(valB) - parseInt(valA);
+            }
+            
+            return sortObj.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        });
+    }
 
     var input = document.getElementById("searchInput");
     var filterText = (input ? input.value.toLowerCase() : "");
@@ -846,3 +904,19 @@ window.toggleMarginFields = function(el) {
 };
 
 console.log("ui_components berhasil dimuat 100% tanpa terpotong!");
+
+window.sortTable = function(colIndex) {
+    var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
+    if(!sheet) return;
+    var sortStr = localStorage.getItem('sortState_' + sheet);
+    var sortObj = sortStr ? JSON.parse(sortStr) : { col: -1, asc: true };
+    if (sortObj.col === colIndex) {
+        sortObj.asc = !sortObj.asc;
+    } else {
+        sortObj.col = colIndex;
+        sortObj.asc = true;
+    }
+    localStorage.setItem('sortState_' + sheet, JSON.stringify(sortObj));
+    window.forceRebuildHeader = true;
+    loadTableData(false);
+};
