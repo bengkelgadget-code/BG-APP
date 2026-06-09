@@ -288,7 +288,7 @@ async function toggleForm(forceShow) {
 
             // Populasi dropdown Voucher
             var vcData = window.BGL2_CACHE['Voucher'] || [];
-            var vcOptions = '<option value="">-- Pilih Voucher --</option>' + vcData.map(v => `<option value="${v[2]}">${v[1]} - ${v[2]} (Stok: ${v[5]})</option>`).join('');
+            var vcOptions = '<option value="">-- Pilih Voucher --</option>' + vcData.map(v => `<option value="${v[2]}" data-beli="${String(v[3] || '').replace(/[^0-9]/g, '')}">${v[1]} - ${v[2]} (Stok: ${v[5]})</option>`).join('');
             document.getElementById('mutasiVoucher').innerHTML = vcOptions;
 
             openMutasiModal();

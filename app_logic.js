@@ -36,6 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('#kntJenis').select2({ width: '100%' });
                 $(document).on('select2:select', '#kntJenis', function (e) { kntJenisChange(); });
                 $(document).on('select2:select', '#kntDetailSelect', function (e) { kntDetailChange(); });
+                $(document).on('select2:select', '#mutasiJenis', function (e) { if(window.mutasiJenisChange) window.mutasiJenisChange(); });
+                // We don't need a specific mutasiVoucher listener if we bind .onchange directly, but Select2 doesn't always fire the native onchange, so let's fire it manually
+                $(document).on('select2:select', '#mutasiVoucher', function (e) {
+                    var el = document.getElementById('mutasiVoucher');
+                    if (el && el.onchange) el.onchange();
+                });
 
                 // Fitur: Buka dropdown otomatis saat difokuskan (Tab/Klik area aktif) tanpa perlu diklik manual
                 $(document).on('select2:closing', 'select', function (e) {
@@ -835,6 +841,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         var vcSelect = document.getElementById('mutasiVoucher');
+        var qtyInput = document.getElementById('mutasiQty');
+        var nominalInput = document.getElementById('mutasiNominal');
+
+        function calcVoucherCost() {
+            if (!vcSelect || !qtyInput || !nominalInput) return;
+            var opt = vcSelect.options[vcSelect.selectedIndex];
+            if (!opt || opt.value === "") {
+                nominalInput.value = '';
+                return;
+            }
+            var hargaBeli = parseInt(opt.getAttribute('data-beli')) || 0;
+            var qty = parseInt(qtyInput.value) || 0;
+            
+            if (hargaBeli > 0 && qty > 0) {
+                nominalInput.value = (hargaBeli * qty).toString();
+                window.formatRupiahUI(nominalInput);
+            } else {
+                nominalInput.value = '';
+            }
+        }
+
         if (jenis === 'Tembak Voucher' && vcSelect) {
             vcSelect.onchange = function() {
                 var opt = vcSelect.options[vcSelect.selectedIndex];
@@ -848,7 +875,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     costInp.value = '0';
                 }
                 window.formatRupiahUI(costInp);
+                calcVoucherCost();
             };
+
+            if (qtyInput) {
+                qtyInput.oninput = calcVoucherCost;
+            }
         }
     };
 
