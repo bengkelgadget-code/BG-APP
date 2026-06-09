@@ -39,6 +39,17 @@ var pageConfigs = {
     'Token': { sheet: 'Token', prefix: 'TK', headers: ['ID Token', 'Nominal Token', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'token', fields: [{ id: 'id_token', label: 'ID Token', type: 'text', disabled: true }, { id: 'nama_token', label: 'Nominal Token', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
     'Game': { sheet: 'Game', prefix: 'GM', headers: ['ID Game', 'Nama Game', 'Item / Nominal', 'Harga Beli', 'Harga Jual', 'Updated At', 'Aksi'], idType: 'game', fields: [{ id: 'id_game', label: 'ID Game', type: 'text', disabled: true }, { id: 'kategori_game', label: 'Nama Game', type: 'select_dynamic_add', source: 'kategoriGameData', required: true }, { id: 'nama_item', label: 'Item / Nominal', type: 'text', required: true }, { id: 'harga_beli', label: 'Harga Beli (IDR)', type: 'rupiah', required: true }, { id: 'harga_jual', label: 'Harga Jual (IDR)', type: 'rupiah', required: true }] },
     'Umum': { sheet: 'Pengaturan_Umum', prefix: 'PU' },
+    'Sumber_Dana': { 
+        sheet: 'Sumber_Dana', prefix: 'SD', 
+        headers: ['ID Akun', 'Nama Akun', 'Kategori', 'Saldo Terkini', 'Aksi'], 
+        idType: 'sumber_dana', 
+        fields: [
+            { id: 'sd_id', label: 'ID Akun', type: 'text', disabled: true }, 
+            { id: 'sd_nama', label: 'Nama Akun', type: 'text', required: true, placeholder: 'Misal: Laci Kasir, BCA, DANA' }, 
+            { id: 'sd_kategori', label: 'Kategori', type: 'select', options: ['Uang Tunai', 'Rekening Bank', 'E-Wallet', 'Aplikasi Provider', 'Server Pulsa'], required: true }, 
+            { id: 'sd_saldo', label: 'Saldo Terkini (IDR)', type: 'rupiah', required: true }
+        ] 
+    },
     
     // ZETTBOT FIX: Update Header Menjadi "Nominal Awal" & "Akhir / Persentase"
     'Margin': { 
