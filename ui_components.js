@@ -280,6 +280,10 @@ async function toggleForm(forceShow) {
         }
     }
 
+    if (isOpeningMutasi && forceShow) {
+        if (window.pushOverlayState) window.pushOverlayState('modalMutasi');
+    }
+
     if (isKonterMode) {
         var m = mKnt || getEl('modalKonter');
         if (forceShow === true || (m && m.classList.contains('opacity-0'))) {
@@ -396,6 +400,7 @@ function openGenericModal() {
 }
 
 function closeGenericModal() {
+    if (window.popOverlayState) window.popOverlayState('modalGeneric');
     editIndex = -1;
     document.querySelectorAll('#dynamicForm').forEach(form => form.reset());
     document.querySelectorAll('#genFormTitle').forEach(title => title.innerText = 'Form Input');
@@ -411,6 +416,7 @@ function closeGenericModal() {
 }
 
 async function openSmartPasteModal() {
+    if (window.pushOverlayState) window.pushOverlayState('modalSmartPaste');
     var m = document.getElementById('modalSmartPaste');
     var mc = document.getElementById('modalSmartPasteContent');
     
@@ -539,6 +545,7 @@ function previewUmumLogo(input) {
 }
 
 function openAddKategoriModal() {
+    if (window.pushOverlayState) window.pushOverlayState('modalAddKategori');
     var m = document.getElementById('modalAddKategori');
     var mc = document.getElementById('modalAddKategoriContent');
     if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
@@ -547,6 +554,7 @@ function openAddKategoriModal() {
 }
 
 function closeAddKategoriModal() {
+    if (window.popOverlayState) window.popOverlayState('modalAddKategori');
     var m = document.getElementById('modalAddKategori');
     var mc = document.getElementById('modalAddKategoriContent');
     document.getElementById('formAddKategori').reset();
@@ -555,6 +563,7 @@ function closeAddKategoriModal() {
 }
 
 function openAddProviderModal() {
+    if (window.pushOverlayState) window.pushOverlayState('modalAddProvider');
     var m = document.getElementById('modalAddProvider');
     var mc = document.getElementById('modalAddProviderContent');
     if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
@@ -563,6 +572,7 @@ function openAddProviderModal() {
 }
 
 function closeAddProviderModal() {
+    if (window.popOverlayState) window.popOverlayState('modalAddProvider');
     var m = document.getElementById('modalAddProvider');
     var mc = document.getElementById('modalAddProviderContent');
     document.getElementById('formAddProvider').reset();
@@ -571,6 +581,7 @@ function closeAddProviderModal() {
 }
 
 function openAddKategoriGameModal() {
+    if (window.pushOverlayState) window.pushOverlayState('modalAddKategoriGame');
     var m = document.getElementById('modalAddKategoriGame');
     var mc = document.getElementById('modalAddKategoriGameContent');
     if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
@@ -579,6 +590,7 @@ function openAddKategoriGameModal() {
 }
 
 function closeAddKategoriGameModal() {
+    if (window.popOverlayState) window.popOverlayState('modalAddKategoriGame');
     var m = document.getElementById('modalAddKategoriGame');
     var mc = document.getElementById('modalAddKategoriGameContent');
     document.getElementById('formAddKategoriGame').reset();
@@ -587,6 +599,7 @@ function closeAddKategoriGameModal() {
 }
 
 function openKonterModal() {
+    if (window.pushOverlayState) window.pushOverlayState('modalKonter');
     document.querySelectorAll('#modalKonter').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
     document.querySelectorAll('#modalKonterContent').forEach(mc => { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); });
     document.querySelectorAll('#mainContainer').forEach(main => main.classList.add('main-active-modal'));
@@ -631,6 +644,7 @@ function openKonterModal() {
 }
 
 function closeKonterModal() {
+    if (window.popOverlayState) window.popOverlayState('modalKonter');
     editIndex = -1;
     document.querySelectorAll('#kntForm').forEach(form => form.reset());
     document.querySelectorAll('#kntFormTitle').forEach(title => title.innerText = 'Transaksi Konter');
@@ -1032,8 +1046,8 @@ window.setFilterDate = function(val) {
             swipeMenu.id = 'mobileSwipeMenu';
             swipeMenu.className = 'absolute right-0 flex items-center justify-end pr-2 sm:pr-4 space-x-1.5 z-10 transition-opacity duration-200 opacity-0 pointer-events-none bg-slate-100/80 backdrop-blur-sm border-l border-slate-200';
             swipeMenu.innerHTML = `
-                <button id="swipeBtnEdit" type="button" class="bg-amber-100 text-amber-700 h-[30px] w-[30px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-pen-to-square text-[11px]"></i></button>
-                <button id="swipeBtnDelete" type="button" class="bg-red-100 text-red-700 h-[30px] w-[30px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-trash text-[11px]"></i></button>
+                <button id="swipeBtnEdit" type="button" class="bg-amber-100 text-amber-700 h-[40px] w-[40px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-pen-to-square text-base"></i></button>
+                <button id="swipeBtnDelete" type="button" class="bg-red-100 text-red-700 h-[40px] w-[40px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-trash text-base"></i></button>
             `;
             
             var tc = document.getElementById('dataTableContainer');
@@ -1047,7 +1061,7 @@ window.setFilterDate = function(val) {
         }
     }
 
-    function resetSwipe() {
+    window.resetSwipe = function() {
         if (activeRow) {
             activeRow.style.transform = 'translateX(0)';
             activeRow = null;
@@ -1057,7 +1071,8 @@ window.setFilterDate = function(val) {
             swipeMenu.classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => { if(!activeRow && swipeMenu) swipeMenu.style.display = 'none'; }, 200);
         }
-    }
+        if (window.popOverlayState) window.popOverlayState('swipeMenu');
+    };
 
     // Dengarkan klik di luar untuk menutup swipe
     document.addEventListener('click', function(e) {
@@ -1094,10 +1109,11 @@ window.setFilterDate = function(val) {
         // Cek apakah dominan geser horizontal
         if (diffX > 10 && diffX > diffY) {
             isSwiping = true;
-            var translateX = Math.min(diffX, 85); 
+            var translateX = Math.min(diffX, 105); 
             activeRow.style.transform = `translateX(-${translateX}px)`;
             
             if (swipeMenu && swipeMenu.style.display === 'none') {
+                if (window.pushOverlayState) window.pushOverlayState('swipeMenu');
                 var tc = document.getElementById('dataTableContainer');
                 var trRect = activeRow.getBoundingClientRect();
                 var tcRect = tc.getBoundingClientRect();
@@ -1105,7 +1121,7 @@ window.setFilterDate = function(val) {
                 swipeMenu.style.display = 'flex';
                 swipeMenu.style.top = (trRect.top - tcRect.top + tc.scrollTop) + 'px';
                 swipeMenu.style.height = trRect.height + 'px';
-                swipeMenu.style.width = '100px';
+                swipeMenu.style.width = '120px';
                 
                 var idx = activeRow.getAttribute('data-index');
                 var type = activeRow.getAttribute('data-type');
@@ -1131,9 +1147,9 @@ window.setFilterDate = function(val) {
         if (!activeRow || !isSwiping) return;
         var diffX = startX - e.changedTouches[0].clientX;
         
-        if (diffX > 35) {
+        if (diffX > 45) {
             // Biarkan terbuka
-            activeRow.style.transform = 'translateX(-85px)';
+            activeRow.style.transform = 'translateX(-105px)';
             if(swipeMenu) {
                 swipeMenu.classList.remove('opacity-0', 'pointer-events-none');
                 swipeMenu.classList.add('opacity-100', 'pointer-events-auto');
@@ -1147,6 +1163,43 @@ window.setFilterDate = function(val) {
     });
 
 })();
+
+// Global History Manager for hardware back button
+window.pushOverlayState = function(id) {
+    if (!window.history.state || window.history.state.overlay !== id) {
+        window.history.pushState({ overlay: id }, "");
+    }
+};
+
+window.popOverlayState = function(id) {
+    if (window.history.state && window.history.state.overlay === id) {
+        window.__isManualPop = true;
+        window.history.back();
+    }
+};
+
+window.addEventListener('popstate', function(e) {
+    if (window.__isManualPop) {
+        window.__isManualPop = false;
+        return;
+    }
+    // Hardware back button pressed
+    if(typeof closeKonterModal === 'function') closeKonterModal();
+    if(typeof closeGenericModal === 'function') closeGenericModal();
+    if(typeof closeAddKategoriModal === 'function') closeAddKategoriModal();
+    if(typeof closeAddProviderModal === 'function') closeAddProviderModal();
+    if(typeof closeAddKategoriGameModal === 'function') closeAddKategoriGameModal();
+    if(typeof closeSmartPasteModal === 'function') closeSmartPasteModal();
+    if(typeof window.resetSwipe === 'function') window.resetSwipe();
+    
+    var mMut = document.getElementById('modalMutasi');
+    if (mMut && !mMut.classList.contains('opacity-0')) {
+        mMut.classList.add('opacity-0', 'pointer-events-none');
+        mMut.classList.remove('opacity-100', 'pointer-events-auto');
+    }
+    
+    if(typeof Swal !== 'undefined' && Swal.isVisible()) Swal.close();
+});
 
 window.toggleMarginFields = function(el) {
     var val = el ? el.value : (document.getElementById('tipe_margin') ? document.getElementById('tipe_margin').value : 'Range Nominal');
