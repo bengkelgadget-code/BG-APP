@@ -444,7 +444,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4" id="kntDetailAndSumberSection">
+                <div class="grid grid-cols-2 gap-4" id="kntDynamicGrid">
                     <div class="relative" id="kntDetailSection">
                         <div class="flex justify-between items-end mb-1">
                             <label class="block text-xs font-semibold text-slate-700">Detail Transaksi</label>
@@ -460,15 +460,13 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-700">Sumber Modal / Asal Uang</label>
+                    <div id="kntSumberDanaSection">
+                        <label id="lblKntSumberDana" class="block text-xs font-semibold mb-1 text-slate-700">Sumber Modal / Asal Uang</label>
                         <select id="kntSumberDana" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
                             <option value="">-- Pilih Akun --</option>
                         </select>
                     </div>
-                </div>
 
-                <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label id="lblKntNominal" class="block text-xs font-semibold mb-1 text-slate-700">Nominal</label>
                         <div class="relative">
@@ -477,7 +475,7 @@
                         </div>
                     </div>
                     
-                    <div>
+                    <div id="kntMetodeBayarSection">
                         <div class="flex justify-between items-end mb-1">
                             <label class="block text-xs font-semibold text-slate-700">Metode Pembayaran</label>
                         </div>

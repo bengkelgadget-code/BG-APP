@@ -58,6 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var sdData = window.BGL2_CACHE['Sumber_Dana'] || [];
         var kasirId = diterimaDiId || '';
 
+        var sdData = window.BGL2_CACHE['Sumber_Dana'] || [];
+        var kasirId = diterimaDiId || '';
+
         var sDocId = null, sSaldo = 0, sIdx = -1, sRow = null;
         var kDocId = null, kSaldo = 0, kIdx = -1, kRow = null;
 
@@ -72,11 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         for (var i = 0; i < sdData.length; i++) {
-            if (sdData[i][0] === sumberDanaId) { sIdx = i; sRow = sdData[i]; sDocId = sRow._docId; sSaldo = parseInt(String(sRow[3]||'0').replace(/[^0-9]/g, '')) || 0; }
+            if (sumberDanaId && sdData[i][0] === sumberDanaId) { sIdx = i; sRow = sdData[i]; sDocId = sRow._docId; sSaldo = parseInt(String(sRow[3]||'0').replace(/[^0-9]/g, '')) || 0; }
             if (kasirId !== "" && sdData[i][0] === kasirId) { kIdx = i; kRow = sdData[i]; kDocId = kRow._docId; kSaldo = parseInt(String(kRow[3]||'0').replace(/[^0-9]/g, '')) || 0; }
         }
 
-        if (!sDocId) return; // if sumber dana not found, do nothing
+        // if sumber dana not found and NOT Jasa Transfer, do nothing
+        if (!sDocId && jenis !== 'JASA TRANSFER') return; 
 
         // Helper function for format
         var fRupiah = (num) => "Rp " + parseInt(num).toLocaleString('id-ID').replace(/,/g, '.');
@@ -84,11 +88,15 @@ document.addEventListener('DOMContentLoaded', function() {
         var deltaS = 0;
         var deltaK = 0;
 
-        if (jenis === 'TARIK TUNAI') {
+        if (jenis === 'JASA TRANSFER') {
+            // Jasa Transfer EDC: Uang nasabah ke orang lain. Kita hanya terima biaya jasa (Profit) ke Laci Kasir
+            deltaS = 0;
+            deltaK = (hargaJual - hargaBeli) * multiplier;
+        } else if (jenis === 'TARIK TUNAI') {
             // Customer transfer ke Sumber Dana (+ Harga Jual), kita beri Cash (- Harga Beli/Modal)
             deltaS = hargaJual * multiplier;
             deltaK = -hargaBeli * multiplier;
-        } else if (jenis === 'JASA TRANSFER' || jenis === 'TRANSFER') {
+        } else if (jenis === 'TRANSFER') {
             // Kita transfer dari Sumber Dana (- Harga Beli/Modal), pelanggan beri Cash (+ Harga Jual)
             deltaS = -hargaBeli * multiplier;
             deltaK = hargaJual * multiplier;
@@ -98,10 +106,12 @@ document.addEventListener('DOMContentLoaded', function() {
             deltaK = hargaJual * multiplier;
         }
 
-        // Update Sumber Dana
-        sSaldo += deltaS;
-        var newSRow = [...sRow]; newSRow[3] = fRupiah(sSaldo);
-        await updateInFirebase('Sumber_Dana', sDocId, newSRow);
+        // Update Sumber Dana (jika ada)
+        if (sDocId) {
+            sSaldo += deltaS;
+            var newSRow = [...sRow]; newSRow[3] = fRupiah(sSaldo);
+            await updateInFirebase('Sumber_Dana', sDocId, newSRow);
+        }
 
         // Update Kasir (Diterima Di)
         if (kDocId && kDocId !== sDocId && kasirId !== "") {
@@ -474,6 +484,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if(!elJenis) return;
         var jenis = elJenis.value;
 
+        var sdSection = document.getElementById('kntSumberDanaSection');
+        var sdInput = document.getElementById('kntSumberDana');
+        var mbSection = document.getElementById('kntMetodeBayarSection');
+        var lblSd = document.getElementById('lblKntSumberDana');
+        var cb = document.getElementById('kntMetodeBayar');
+
+        if(sdSection) sdSection.style.display = 'block';
+        if(sdInput) sdInput.required = true;
+        if(mbSection) mbSection.style.display = 'block';
+        if(lblSd) lblSd.innerText = 'Sumber Modal / Asal Uang';
+
         document.querySelectorAll('#kntStokWrapper').forEach(w => w.style.display = 'none');
         document.querySelectorAll('#kntNominal').forEach(n => { n.value = ''; n.readOnly = false; });
         document.querySelectorAll('#kntHargaBeliDB').forEach(b => b.value = '');
@@ -501,6 +522,21 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
                 container.innerHTML = '<input type="hidden" id="kntDetailInput" value="-">';
             });
+            if(sdSection) sdSection.style.display = 'none';
+            if(sdInput) sdInput.required = false;
+            if(mbSection) mbSection.style.display = 'none';
+            if(cb && cb.checked) { cb.checked = false; if(typeof toggleMetodeBayar === 'function') toggleMetodeBayar(); }
+            return;
+        }
+
+        if(['TRANSFER', 'E-WALLET', 'TARIK TUNAI'].includes(jenis)) {
+            document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
+                container.innerHTML = '<input type="hidden" id="kntDetailInput" value="-">';
+            });
+            if(mbSection) mbSection.style.display = 'none';
+            if(cb && cb.checked) { cb.checked = false; if(typeof toggleMetodeBayar === 'function') toggleMetodeBayar(); }
+            if(lblSd) lblSd.innerText = (jenis === 'TARIK TUNAI') ? 'Tujuan Akun' : 'Akun Sumber';
             return;
         }
 
