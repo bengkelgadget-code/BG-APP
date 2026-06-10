@@ -920,21 +920,48 @@ function renderGenericTable(data, colCount) {
                 if(lowerH.includes('provider')) idxProv = h;
                 if((lowerH.includes('nama') || lowerH.includes('nominal')) && idxName === -1) idxName = h;
             }
-            if (idxProv !== -1 && idxName !== -1) {
+            if (idxName !== -1 && sheet !== 'Sumber_Dana') {
                 reversedData.sort(function(a, b) {
-                    var provA = String(a.row[idxProv] || '').toLowerCase();
-                    var provB = String(b.row[idxProv] || '').toLowerCase();
+                    var provA = idxProv !== -1 ? String(a.row[idxProv] || '').toLowerCase() : '';
+                    var provB = idxProv !== -1 ? String(b.row[idxProv] || '').toLowerCase() : '';
                     if (provA < provB) return -1;
                     if (provA > provB) return 1;
 
                     var nameA = String(a.row[idxName] || '').toLowerCase();
                     var nameB = String(b.row[idxName] || '').toLowerCase();
-                    return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
-                });
-            } else if (idxName !== -1 && sheet !== 'Sumber_Dana') {
-                reversedData.sort(function(a, b) {
-                    var nameA = String(a.row[idxName] || '').toLowerCase();
-                    var nameB = String(b.row[idxName] || '').toLowerCase();
+
+                    if (idxProv === -1) {
+                        var prefixA = nameA.replace(/[0-9].*$/, '').trim();
+                        var prefixB = nameB.replace(/[0-9].*$/, '').trim();
+                        if (prefixA < prefixB) return -1;
+                        if (prefixA > prefixB) return 1;
+                    }
+
+                    var parseQ = function(str) {
+                        var q = 0, h = 0;
+                        var m = str.match(/(\d+(?:\.\d+)?)\s*(?:gb|mb|k|m|hari|hr|rb)?\s*\/\s*(\d+(?:\.\d+)?)/i);
+                        if (m) { 
+                            q = parseFloat(m[1]); 
+                            h = parseFloat(m[2]); 
+                        } else {
+                            var m2 = str.match(/(?:\s|^)(\d+(?:\.\d+)?)/g);
+                            if (m2 && m2.length > 0) {
+                                q = parseFloat(m2[0]);
+                                if (m2.length > 1) h = parseFloat(m2[1]);
+                            } else {
+                                var m3 = str.match(/\d+(?:\.\d+)?/g);
+                                if (m3) q = parseFloat(m3[m3.length > 1 ? 1 : 0]);
+                            }
+                        }
+                        return {q: q || 0, h: h || 0};
+                    };
+
+                    var pA = parseQ(nameA);
+                    var pB = parseQ(nameB);
+
+                    if (pA.q !== pB.q) return pA.q - pB.q;
+                    if (pA.h !== pB.h) return pA.h - pB.h;
+
                     return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
                 });
             }
