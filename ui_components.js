@@ -228,6 +228,7 @@ function loadTableData(forceRefresh = false) {
                 var thClass = "py-2.5 px-0.5 sm:px-4 font-bold text-center";
                 if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
                 if (hdrs[i] === 'Aksi') thClass += " hidden md:table-cell";
+                if (hdrs[i].toLowerCase().includes('update')) thClass += " hidden";
                 
                 if (hdrs[i] !== 'Aksi') {
                     thClass += " cursor-pointer hover:bg-white/10 select-none group transition-colors";
@@ -1049,7 +1050,9 @@ function renderGenericTable(data, colCount) {
         } else {
             for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
                 var c = r[idx] || '';
-                cells += `<td class="py-1.5 px-0.5 sm:px-3 text-center truncate max-w-[150px] hidden md:table-cell" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
+                var tdClass = "py-1.5 px-0.5 sm:px-3 text-center truncate max-w-[150px] hidden md:table-cell";
+                if (currentConfig.headers[idx].toLowerCase().includes('update')) tdClass = "hidden";
+                cells += `<td class="${tdClass}" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
             }
 
             var idxName = -1, idxBeli = -1, idxJual = -1, idxStok = -1;
