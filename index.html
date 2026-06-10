@@ -641,6 +641,23 @@
         </div>
     </div>
 
+    <!-- MODAL DETAIL GENERIC -->
+    <div id="modalDetailGen" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+        <div id="modalDetailGenContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative max-h-[85vh]">
+            <button type="button" onclick="closeDetailGenModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 shrink-0">
+                <h3 class="font-bold text-lg text-slate-800">Detail Data</h3>
+            </div>
+            <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar flex-1" id="detailGenBody">
+                <!-- Details will be injected here -->
+            </div>
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex space-x-2 shrink-0">
+                <button class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-700 py-2.5 rounded-xl font-bold transition-colors shadow-sm active:scale-95 flex items-center justify-center" id="btnEditDetailGen"><i class="fa-solid fa-pen-to-square mr-2"></i> Edit</button>
+                <button class="flex-1 bg-red-100 hover:bg-red-200 text-red-700 py-2.5 rounded-xl font-bold transition-colors shadow-sm active:scale-95 flex items-center justify-center" id="btnDelDetailGen"><i class="fa-solid fa-trash mr-2"></i> Hapus</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FIREBASE SDK (COMPAT) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>

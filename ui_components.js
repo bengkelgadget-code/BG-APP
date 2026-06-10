@@ -222,7 +222,7 @@ function loadTableData(forceRefresh = false) {
 
         if (needRebuild || !document.getElementById('dataTableBody')) {
             var html = '<table class="w-full text-left border-collapse whitespace-nowrap md:whitespace-normal" id="dataTable">';
-            html += '<thead class="sticky top-0 z-30 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
+            html += '<thead class="hidden md:table-header-group sticky top-0 z-30 shadow-md bg-gradient-to-r from-blue-700 to-indigo-600 text-white text-[10px] sm:text-sm uppercase tracking-wider">';
             html += '<tr>';
             for(var i=0; i<hdrs.length; i++) {
                 var thClass = "py-2.5 px-0.5 sm:px-4 font-bold text-center";
@@ -972,21 +972,68 @@ function renderGenericTable(data, colCount) {
                 displayKeuntungan = r[5] || '';
             }
 
-            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${idVal}</td>`;
-            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${tipeVal}</td>`;
-            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]" title="${layananVal}">${layananVal}</td>`;
-            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${minVal}</td>`;
-            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px]">${displayAkhirPct}</td>`;
-            cells += `<td class="py-1.5 px-3 text-center font-bold text-emerald-600 truncate max-w-[150px]">${displayKeuntungan}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px] hidden md:table-cell">${idVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px] hidden md:table-cell">${tipeVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px] hidden md:table-cell" title="${layananVal}">${layananVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px] hidden md:table-cell">${minVal}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px] hidden md:table-cell">${displayAkhirPct}</td>`;
+            cells += `<td class="py-1.5 px-3 text-center font-bold text-emerald-600 truncate max-w-[150px] hidden md:table-cell">${displayKeuntungan}</td>`;
+
+            cells += `<td colspan="7" class="md:hidden p-0 border-0">
+                <div class="p-3 w-full flex justify-between items-center" onclick="if(window.isSwipingMode)return; showDetailGen(${o})">
+                    <div class="flex-1 pr-2">
+                        <div class="font-bold text-xs text-slate-800 break-words whitespace-normal leading-tight">${tipeVal} - ${layananVal}</div>
+                        <div class="text-[10px] text-slate-500 mt-1">Range: <span class="font-bold text-slate-700">${minVal} s/d ${displayAkhirPct}</span></div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-xs font-bold text-emerald-600">${displayKeuntungan}</div>
+                    </div>
+                </div>
+            </td>`;
 
         } else {
             for (var idx = 0; idx < currentConfig.headers.length - 1; idx++) {
                 var c = r[idx] || '';
-                cells += `<td class="py-1.5 px-0.5 sm:px-3 text-center truncate max-w-[150px]" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
+                cells += `<td class="py-1.5 px-0.5 sm:px-3 text-center truncate max-w-[150px] hidden md:table-cell" title="${String(c).replace(/^'/,'')}">${(currentSheet === 'Users' && idx === 1) ? '••••' : String(c).replace(/^'/,'')}</td>`;
             }
+
+            var idxName = -1, idxBeli = -1, idxJual = -1, idxStok = -1;
+            for (var h = 0; h < currentConfig.headers.length - 1; h++) {
+                var lowerH = currentConfig.headers[h].toLowerCase();
+                if (lowerH.includes('nama') || lowerH.includes('nominal') || lowerH.includes('provider')) idxName = h;
+                if (lowerH.includes('beli')) idxBeli = h;
+                if (lowerH.includes('jual')) idxJual = h;
+                if (lowerH.includes('stok')) idxStok = h;
+                if (lowerH.includes('saldo') && idxStok === -1) idxStok = h; 
+            }
+
+            var nameVal = idxName !== -1 ? r[idxName] : (r[1] || r[2] || '-');
+            if (currentConfig.headers[idxName] && currentConfig.headers[idxName].toLowerCase() === 'provider' && r[idxName+1]) {
+                nameVal = r[idxName] + ' ' + r[idxName+1]; 
+            }
+
+            var beliVal = idxBeli !== -1 ? r[idxBeli] : '';
+            var jualVal = idxJual !== -1 ? r[idxJual] : '';
+            var stokVal = idxStok !== -1 ? r[idxStok] : '';
+
+            var cardHtml = `
+            <td colspan="${currentConfig.headers.length}" class="md:hidden p-0 border-0">
+                <div class="p-3 w-full flex justify-between items-center" onclick="if(window.isSwipingMode)return; showDetailGen(${o})">
+                    <div class="flex-1 pr-2">
+                        <div class="font-bold text-xs text-slate-800 break-words whitespace-normal leading-tight">${String(nameVal).replace(/^'/,'')}</div>
+                        ${stokVal ? `<div class="text-[10px] text-slate-500 mt-1">${idxStok !== -1 && currentConfig.headers[idxStok].toLowerCase().includes('saldo') ? 'Saldo:' : 'Stok:'} <span class="font-bold text-blue-600">${stokVal}</span></div>` : ''}
+                    </div>
+                    ${(jualVal || beliVal) ? `
+                    <div class="text-right shrink-0">
+                        ${jualVal ? `<div class="text-xs font-bold text-emerald-600">${jualVal}</div>` : ''}
+                        ${beliVal ? `<div class="text-[9px] text-slate-400 line-through mt-0.5">${beliVal}</div>` : ''}
+                    </div>` : ''}
+                </div>
+            </td>`;
+            cells += cardHtml;
         }
 
-        return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-transform duration-200 swipeable-row bg-white relative z-20" data-index="${o}" data-array-index="${i}" data-type="gen">${cells}<td class="py-1.5 px-3 align-middle hidden md:table-cell"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
+        return `<tr class="border-b border-slate-100 text-xs text-slate-700 hover:bg-slate-50 transition-transform duration-200 swipeable-row bg-white relative z-20 cursor-pointer md:cursor-default" data-index="${o}" data-array-index="${i}" data-type="gen">${cells}<td class="py-1.5 px-3 align-middle hidden md:table-cell"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
     });
     
     rowsHtml.push(`<tr class="md:hidden"><td colspan="${colCount}" style="height: 140px; border: none;"></td></tr>`);

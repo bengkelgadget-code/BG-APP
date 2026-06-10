@@ -1278,9 +1278,70 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
 
+    function closeDetailGenModal() {
+        var m = document.getElementById('modalDetailGen');
+        var c = document.getElementById('modalDetailGenContent');
+        if(m) {
+            m.classList.remove('opacity-100', 'pointer-events-auto');
+            m.classList.add('opacity-0', 'pointer-events-none');
+        }
+        if(c) {
+            c.classList.remove('scale-100');
+            c.classList.add('scale-95');
+        }
+        if (window.popOverlayState) window.popOverlayState('modalDetailGen');
+    }
+
+    function showDetailGen(originalIndex) {
+        if (!currentConfig || !window.BGL2_CACHE[currentConfig.sheet]) return;
+        var r = window.BGL2_CACHE[currentConfig.sheet][originalIndex];
+        if (!r) return;
+
+        var html = '';
+        for (var i = 0; i < currentConfig.headers.length - 1; i++) {
+            var val = r[i] || '-';
+            html += `
+            <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">${currentConfig.headers[i]}</div>
+                <div class="text-sm font-medium text-slate-800 break-words">${String(val).replace(/^'/,'')}</div>
+            </div>`;
+        }
+        document.getElementById('detailGenBody').innerHTML = html;
+
+        var btnEdit = document.getElementById('btnEditDetailGen');
+        var btnDel = document.getElementById('btnDelDetailGen');
+        if(btnEdit) {
+            var paginatedIndex = -1;
+            if(window.currentTableData) {
+                for(var j=0; j<window.currentTableData.length; j++) {
+                    if(window.currentTableData[j].originalIndex === originalIndex) {
+                        paginatedIndex = j; break;
+                    }
+                }
+            }
+            btnEdit.onclick = function() { closeDetailGenModal(); if(paginatedIndex > -1) editDataGen(paginatedIndex); };
+        }
+        if(btnDel) {
+            btnDel.onclick = function() { closeDetailGenModal(); delGen(originalIndex, currentConfig.sheet); };
+        }
+
+        var m = document.getElementById('modalDetailGen');
+        var c = document.getElementById('modalDetailGenContent');
+        if(m) {
+            m.classList.remove('opacity-0', 'pointer-events-none');
+            m.classList.add('opacity-100', 'pointer-events-auto');
+        }
+        if(c) {
+            c.classList.remove('scale-95');
+            c.classList.add('scale-100');
+        }
+        if (window.pushOverlayState) window.pushOverlayState('modalDetailGen');
+    }
+
     window.handleLogin = handleLogin; window.logout = logout; window.toggleSidebar = toggleSidebar; window.switchPage = switchPage; window.toggleForm = toggleForm; 
     window.openModal = openModal; window.closeModal = closeModal;
     window.openGenericModal = openGenericModal; window.closeGenericModal = closeGenericModal; window.openKonterModal = openKonterModal; window.closeKonterModal = closeKonterModal;
+    window.showDetailGen = showDetailGen; window.closeDetailGenModal = closeDetailGenModal;
     window.kntJenisChange = kntJenisChange; window.kntDetailChange = kntDetailChange; window.editKonterData = editKonterData;
     window.editDataGen = editDataGen; window.initGenericForm = initGenericForm; 
     window.loadTableData = loadTableData; window.delKonter = delKonter; window.delGen = delGen;
