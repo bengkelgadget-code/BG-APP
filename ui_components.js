@@ -910,8 +910,35 @@ function renderGenericTable(data, colCount) {
                 return sortObj.asc ? parseInt(valA) - parseInt(valB) : parseInt(valB) - parseInt(valA);
             }
             
-            return sortObj.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            return sortObj.asc ? valA.localeCompare(valB, undefined, {numeric: true, sensitivity: 'base'}) : valB.localeCompare(valA, undefined, {numeric: true, sensitivity: 'base'});
         });
+    } else {
+        if (currentConfig && currentConfig.headers && sheet !== 'Users') {
+            var idxProv = -1, idxName = -1;
+            for(var h=0; h<currentConfig.headers.length; h++) {
+                var lowerH = (currentConfig.headers[h] || '').toLowerCase();
+                if(lowerH.includes('provider')) idxProv = h;
+                if((lowerH.includes('nama') || lowerH.includes('nominal')) && idxName === -1) idxName = h;
+            }
+            if (idxProv !== -1 && idxName !== -1) {
+                reversedData.sort(function(a, b) {
+                    var provA = String(a.row[idxProv] || '').toLowerCase();
+                    var provB = String(b.row[idxProv] || '').toLowerCase();
+                    if (provA < provB) return -1;
+                    if (provA > provB) return 1;
+
+                    var nameA = String(a.row[idxName] || '').toLowerCase();
+                    var nameB = String(b.row[idxName] || '').toLowerCase();
+                    return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
+                });
+            } else if (idxName !== -1 && sheet !== 'Sumber_Dana') {
+                reversedData.sort(function(a, b) {
+                    var nameA = String(a.row[idxName] || '').toLowerCase();
+                    var nameB = String(b.row[idxName] || '').toLowerCase();
+                    return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
+                });
+            }
+        }
     }
 
     var input = document.getElementById("searchInput");
