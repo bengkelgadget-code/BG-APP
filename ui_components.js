@@ -895,7 +895,8 @@ function renderGenericTable(data, colCount) {
 
     var sheet = isKonterMode ? 'DB_konter' : (currentConfig ? currentConfig.sheet : null);
     var sortStr = localStorage.getItem('sortState_' + sheet);
-    if (sortStr) {
+    var isMobile = window.innerWidth < 768;
+    if (sortStr && !isMobile) {
         var sortObj = JSON.parse(sortStr);
         reversedData.sort(function(a, b) {
             var valA = String(a.row[sortObj.col] || '').toLowerCase();
