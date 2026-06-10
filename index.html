@@ -642,8 +642,8 @@
     </div>
 
     <!-- MODAL DETAIL GENERIC -->
-    <div id="modalDetailGen" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
-        <div id="modalDetailGenContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative max-h-[85vh]">
+    <div id="modalDetailGen" class="fixed inset-0 bg-slate-900 bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none" style="z-index: 100;">
+        <div id="modalDetailGenContent" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col overflow-hidden relative" style="max-height: 85vh;">
             <button type="button" onclick="closeDetailGenModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition-colors z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
             <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 shrink-0">
                 <h3 class="font-bold text-lg text-slate-800">Detail Data</h3>
