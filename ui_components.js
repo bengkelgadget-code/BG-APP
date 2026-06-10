@@ -1186,6 +1186,8 @@ window.setFilterDate = function(val) {
         }
     });
 
+    var isVerticalScroll = false;
+
     document.addEventListener('touchstart', function(e) {
         // Jangan aktifkan swipe jika di layar besar (md / >768px)
         if (window.innerWidth >= 768) return;
@@ -1201,15 +1203,22 @@ window.setFilterDate = function(val) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         window.isSwipingMode = false;
+        isVerticalScroll = false;
         
         initSwipeMenu();
         if (swipeMenu) swipeMenu.style.display = 'none';
-    }, {passive: false});
+    }, {passive: true});
 
     document.addEventListener('touchmove', function(e) {
-        if (!activeRow || window.innerWidth >= 768) return;
+        if (!activeRow || window.innerWidth >= 768 || isVerticalScroll) return;
         var diffX = startX - e.touches[0].clientX;
         var diffY = Math.abs(startY - e.touches[0].clientY);
+        
+        // Lock as vertical scroll if Y movement is significant before X movement
+        if (diffY > 15 && diffY > Math.abs(diffX) && !window.isSwipingMode) {
+            isVerticalScroll = true;
+            return;
+        }
         
         // Cek apakah dominan geser horizontal
         if (diffX > 35 && diffX > diffY) {
@@ -1267,7 +1276,7 @@ window.setFilterDate = function(val) {
             // Tutup kembali jika geseran kurang kuat
             resetSwipe();
         }
-        isSwiping = false;
+        window.isSwipingMode = false;
     });
 
 })();
