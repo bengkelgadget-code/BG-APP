@@ -979,8 +979,8 @@ function renderGenericTable(data, colCount) {
             cells += `<td class="py-1.5 px-3 text-center truncate max-w-[150px] hidden md:table-cell">${displayAkhirPct}</td>`;
             cells += `<td class="py-1.5 px-3 text-center font-bold text-emerald-600 truncate max-w-[150px] hidden md:table-cell">${displayKeuntungan}</td>`;
 
-            cells += `<td colspan="7" class="md:hidden p-1.5 sm:p-2 border-0">
-                <div class="p-3 w-full flex justify-between items-center bg-white border border-slate-200 shadow-sm rounded-xl" onclick="if(window.isSwipingMode)return; showDetailGen(${o})">
+            cells += `<td colspan="7" class="md:hidden p-1.5 sm:p-2 border-0" onclick="if(window.isSwipingMode)return; showDetailGen(${o})">
+                <div class="p-3 w-full flex justify-between items-center bg-white border border-slate-200 shadow-sm rounded-xl">
                     <div class="flex-1 pr-2">
                         <div class="font-bold text-xs text-slate-800 break-words whitespace-normal leading-tight">${tipeVal} - ${layananVal}</div>
                         <div class="text-[10px] text-slate-500 mt-1">Range: <span class="font-bold text-slate-700">${minVal} s/d ${displayAkhirPct}</span></div>
@@ -1017,8 +1017,8 @@ function renderGenericTable(data, colCount) {
             var stokVal = idxStok !== -1 ? r[idxStok] : '';
 
             var cardHtml = `
-            <td colspan="${currentConfig.headers.length}" class="md:hidden p-1.5 sm:p-2 border-0">
-                <div class="p-3 w-full flex justify-between items-center bg-white border border-slate-200 shadow-sm rounded-xl" onclick="if(window.isSwipingMode)return; showDetailGen(${o})">
+            <td colspan="${currentConfig.headers.length}" class="md:hidden p-1.5 sm:p-2 border-0" onclick="if(window.isSwipingMode)return; showDetailGen(${o})">
+                <div class="p-3 w-full flex justify-between items-center bg-white border border-slate-200 shadow-sm rounded-xl">
                     <div class="flex-1 pr-2">
                         <div class="font-bold text-xs text-slate-800 break-words whitespace-normal leading-tight">${String(nameVal).replace(/^'/,'')}</div>
                         ${stokVal ? `<div class="text-[10px] text-slate-500 mt-1">${idxStok !== -1 && currentConfig.headers[idxStok].toLowerCase().includes('saldo') ? 'Saldo:' : 'Stok:'} <span class="font-bold text-blue-600">${stokVal}</span></div>` : ''}
@@ -1154,7 +1154,7 @@ window.setFilterDate = function(val) {
         var diffY = Math.abs(startY - e.touches[0].clientY);
         
         // Cek apakah dominan geser horizontal
-        if (diffX > 10 && diffX > diffY) {
+        if (diffX > 15 && diffX > diffY) {
             window.isSwipingMode = true;
             if (e.cancelable) e.preventDefault(); // Mencegah scroll saat swipe
             
