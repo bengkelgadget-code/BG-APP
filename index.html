@@ -479,6 +479,17 @@
                         </select>
                     </div>
 
+                    <div class="col-span-2 hidden" id="kntPotongDalamWrapper">
+                        <label class="flex items-center cursor-pointer mb-2">
+                            <div class="relative">
+                                <input type="checkbox" id="kntPotongDalam" class="sr-only" onchange="togglePotongDalam()">
+                                <div class="block bg-slate-300 w-10 h-6 rounded-full transition-colors" id="kntPotongDalamBg"></div>
+                                <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform" id="kntPotongDalamDot"></div>
+                            </div>
+                            <span class="ml-2 text-xs font-bold text-blue-600" id="kntPotongDalamText">Admin Di Luar (Tunai)</span>
+                        </label>
+                    </div>
+
                     <div>
                         <label id="lblKntNominal" class="block text-xs font-semibold mb-1 text-slate-700">Nominal</label>
                         <div class="relative">
@@ -513,6 +524,23 @@
                 </div>
 
                 <script>
+                function togglePotongDalam() {
+                    var cb = document.getElementById('kntPotongDalam');
+                    var bg = document.getElementById('kntPotongDalamBg');
+                    var dot = document.getElementById('kntPotongDalamDot');
+                    var txt = document.getElementById('kntPotongDalamText');
+                    
+                    if(cb.checked) {
+                        bg.classList.remove('bg-slate-300'); bg.classList.add('bg-blue-500');
+                        dot.classList.add('translate-x-4');
+                        txt.textContent = 'Potong Dalam';
+                    } else {
+                        bg.classList.remove('bg-blue-500'); bg.classList.add('bg-slate-300');
+                        dot.classList.remove('translate-x-4');
+                        txt.textContent = 'Admin Di Luar (Tunai)';
+                    }
+                }
+
                 function toggleMetodeBayar() {
                     var cb = document.getElementById('kntMetodeBayar');
                     var toggleWrapper = document.getElementById('kntMetodeToggleWrapper');

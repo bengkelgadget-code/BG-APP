@@ -544,11 +544,17 @@ document.addEventListener('DOMContentLoaded', function() {
         var mbSection = document.getElementById('kntMetodeBayarSection');
         var lblSd = document.getElementById('lblKntSumberDana');
         var cb = document.getElementById('kntMetodeBayar');
+        var pdWrapper = document.getElementById('kntPotongDalamWrapper');
 
         if(sdSection) sdSection.style.display = 'block';
         if(sdInput) sdInput.required = true;
         if(mbSection) mbSection.style.display = 'block';
         if(lblSd) lblSd.innerText = 'Sumber Modal / Asal Uang';
+        if(pdWrapper) {
+            pdWrapper.classList.add('hidden');
+            var pdCb = document.getElementById('kntPotongDalam');
+            if(pdCb && pdCb.checked) { pdCb.checked = false; if(typeof togglePotongDalam === 'function') togglePotongDalam(); }
+        }
 
         document.querySelectorAll('#kntStokWrapper').forEach(w => w.style.display = 'none');
         document.querySelectorAll('#kntNominal').forEach(n => { n.value = ''; n.readOnly = false; });
@@ -586,6 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(sdInput) sdInput.required = false;
             if(mbSection) mbSection.style.display = 'none';
             if(cb && cb.checked) { cb.checked = false; if(typeof toggleMetodeBayar === 'function') toggleMetodeBayar(); }
+            if(pdWrapper) pdWrapper.classList.remove('hidden');
             return;
         }
 
@@ -597,6 +604,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if(mbSection) mbSection.style.display = 'none';
             if(cb && cb.checked) { cb.checked = false; if(typeof toggleMetodeBayar === 'function') toggleMetodeBayar(); }
             if(lblSd) lblSd.innerText = (jenis === 'TARIK TUNAI') ? 'Tujuan Akun' : 'Akun Sumber';
+            if(pdWrapper && (jenis === 'TRANSFER' || jenis === 'TARIK TUNAI')) pdWrapper.classList.remove('hidden');
             return;
         }
 
@@ -745,18 +753,28 @@ document.addEventListener('DOMContentLoaded', function() {
         var tdVal = isNonTunai ? getVal('#kntTerimaDi') : 'Laci Kasir';
 
         var dynamicMargin = calculateDynamicMargin(jenisVal, nominal);
+        
+        var isPotongDalam = formEl.querySelector('#kntPotongDalam') ? formEl.querySelector('#kntPotongDalam').checked : false;
 
         if (dynamicMargin !== null) {
-            if (hBeli === 0) hBeli = nominal;
-            hJual = hBeli + dynamicMargin;
+            if (hBeli === 0) {
+                if (isPotongDalam) { hBeli = nominal - dynamicMargin; hJual = nominal; }
+                else { hBeli = nominal; hJual = nominal + dynamicMargin; }
+            } else {
+                if (isPotongDalam) { hJual = hBeli + dynamicMargin; } // Manual hBeli edge case
+                else { hJual = hBeli + dynamicMargin; }
+            }
         } else {
             if (jenisVal === 'JASA TRANSFER') {
-                hBeli = nominal; hJual = nominal + 5000;
+                if (isPotongDalam) { hBeli = nominal - 5000; hJual = nominal; }
+                else { hBeli = nominal; hJual = nominal + 5000; }
             } else if (jenisVal === 'KUOTA INTERNET') {
                 var mInt = parseInt(marginVal.replace(/[^0-9]/g, '')) || 5000;
                 hBeli = nominal; hJual = nominal + mInt;
             } else if (['TRANSFER', 'TARIK TUNAI', 'E-WALLET', 'PPOB', 'TOKEN PLN'].includes(jenisVal)) {
-                if (hBeli === 0) { hBeli = nominal; hJual = nominal; }
+                if (hBeli === 0) { 
+                    hBeli = nominal; hJual = nominal; 
+                }
             }
         }
 
