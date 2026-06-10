@@ -960,8 +960,8 @@ function renderGenericTable(data, colCount) {
                     var pA = parseQ(nameA);
                     var pB = parseQ(nameB);
 
-                    if (pA.q !== pB.q) return pA.q - pB.q;
                     if (pA.h !== pB.h) return pA.h - pB.h;
+                    if (pA.q !== pB.q) return pA.q - pB.q;
 
                     return nameA.localeCompare(nameB, undefined, {numeric: true, sensitivity: 'base'});
                 });
