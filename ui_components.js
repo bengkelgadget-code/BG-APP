@@ -1209,7 +1209,7 @@ window.setFilterDate = function(val) {
         var diffY = Math.abs(startY - e.touches[0].clientY);
         
         // Cek apakah dominan geser horizontal
-        if (diffX > 15 && diffX > diffY) {
+        if (diffX > 35 && diffX > diffY) {
             window.isSwipingMode = true;
             if (e.cancelable) e.preventDefault(); // Mencegah scroll saat swipe
             
