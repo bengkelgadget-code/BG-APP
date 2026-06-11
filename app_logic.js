@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
             lblNominal.innerText = ['VOUCHER', 'PERDANA', 'ACC', 'PULSA', 'GAME'].includes(jenis) ? 'Harga' : 'Nominal';
         }
 
-        if(['VOUCHER', 'PERDANA', 'ACC'].includes(jenis)) {
+        if(['VOUCHER', 'PERDANA', 'ACC', 'PULSA', 'GAME', 'TOKEN PLN', 'PPOB', 'KUOTA INTERNET'].includes(jenis)) {
             if(sdSection) sdSection.style.display = 'none';
             if(sdInput) sdInput.required = false;
         }
