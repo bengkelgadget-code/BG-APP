@@ -828,7 +828,7 @@ function renderKonterTable(data, colCount) {
                 `<div class="font-bold text-blue-700">${jenis}</div><div class="text-[9px] text-slate-500 mt-0.5">${detail}</div>` : 
                 `<div class="font-bold text-blue-700">${jenis}</div>`;
 
-            return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 md:hover:bg-slate-50 transition-transform duration-200 swipeable-row bg-white relative z-20" data-index="${o}" data-type="konter">
+            return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 md:hover:bg-slate-50 bg-white" data-index="${o}" data-type="konter">
                 <td class="py-2.5 px-1 sm:px-3 font-mono font-bold text-center hidden md:table-cell">${r[0]||'-'}</td>
                 <td class="py-2.5 pl-0.5 pr-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${jenisDetailHtml}</td>
@@ -1091,7 +1091,7 @@ function renderGenericTable(data, colCount) {
             cells += cardHtml;
         }
 
-        return `<tr class="border-b border-slate-100 text-xs text-slate-700 md:hover:bg-slate-50 transition-transform duration-200 swipeable-row bg-white relative z-20 cursor-pointer md:cursor-default" data-index="${o}" data-array-index="${i}" data-type="gen">${cells}<td class="py-1.5 px-3 align-middle hidden md:table-cell"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
+        return `<tr class="border-b border-slate-100 text-xs text-slate-700 md:hover:bg-slate-50 bg-white cursor-pointer md:cursor-default" data-index="${o}" data-array-index="${i}" data-type="gen">${cells}<td class="py-1.5 px-3 align-middle hidden md:table-cell"><div class="flex space-x-1.5 justify-center"><button type="button" onclick="editDataGen(${i})" class="bg-amber-100 text-amber-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-pen-to-square text-xs"></i></button><button type="button" onclick="delGen(${o}, '${currentSheet}')" class="bg-red-100 text-red-700 h-7 w-7 rounded-lg flex items-center justify-center active:scale-95"><i class="fa-solid fa-trash text-xs"></i></button></div></td></tr>`;
     });
     
     rowsHtml.push(`<tr class="md:hidden"><td colspan="${colCount}" style="height: 140px; border: none;"></td></tr>`);
