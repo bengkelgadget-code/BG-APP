@@ -1201,6 +1201,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     await deleteFromFirebase(actualSheet, docId); 
                     
+                    window.BGL2_DROPDOWN_CACHE = null;
                     localStorage.removeItem('bgl2_dropdown_cache'); 
                     
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
@@ -1292,6 +1293,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false}); 
+
+            // Clear dropdown cache so next transaction popup gets fresh data
+            window.BGL2_DROPDOWN_CACHE = null;
+            localStorage.removeItem('bgl2_dropdown_cache');
 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
