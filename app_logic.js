@@ -655,22 +655,22 @@ document.addEventListener('DOMContentLoaded', function() {
             else if(jenis === 'VOUCHER') {
                 let d = window.BGL2_CACHE['Voucher'];
                 if(!d || d.length===0) { d = await window.getFromFirebase('Voucher'); window.BGL2_CACHE['Voucher'] = d; }
-                opts = (d || []).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}" data-s="${v[5]||'0'}">${v[2]} (${v[1]})</option>`);
+                opts = (d || []).filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}" data-s="${v[5]||'0'}">${v[2]} (${v[1]})</option>`);
             }
             else if(jenis === 'PERDANA') {
                 let d = window.BGL2_CACHE['Perdana'];
                 if(!d || d.length===0) { d = await window.getFromFirebase('Perdana'); window.BGL2_CACHE['Perdana'] = d; }
-                opts = (d || []).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}" data-s="${v[5]||'0'}">${v[2]} (${v[1]})</option>`);
+                opts = (d || []).filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}" data-s="${v[5]||'0'}">${v[2]} (${v[1]})</option>`);
             }
             else if(jenis === 'ACC') {
                 let d = window.BGL2_CACHE['ACC'];
                 if(!d || d.length===0) { d = await window.getFromFirebase('ACC'); window.BGL2_CACHE['ACC'] = d; }
-                opts = (d || []).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}" data-s="${v[5]||'0'}">${v[2]} (${v[1]})</option>`);
+                opts = (d || []).filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}" data-s="${v[5]||'0'}">${v[2]} (${v[1]})</option>`);
             }
             else if(jenis === 'PULSA') {
                 let d = window.BGL2_CACHE['Pulsa'];
                 if(!d || d.length===0) { d = await window.getFromFirebase('Pulsa'); window.BGL2_CACHE['Pulsa'] = d; }
-                opts = (d || []).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
+                opts = (d || []).filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
             }
             else if(jenis === 'TOKEN PLN') {
                 let tData = db.tokenData;
@@ -697,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             else if(jenis === 'GAME') {
                 let gameProd = window.BGL2_CACHE['Game'] || [];
-                opts = gameProd.map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
+                opts = gameProd.filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
             }
             
             document.querySelectorAll('#kntDetailSelect').forEach(sel => {
