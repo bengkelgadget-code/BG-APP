@@ -227,6 +227,7 @@ function loadTableData(forceRefresh = false) {
             for(var i=0; i<hdrs.length; i++) {
                 var thClass = "py-2.5 px-0.5 sm:px-4 font-bold text-center";
                 if (isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden md:table-cell";
+                if (!isKonterMode && hdrs[i] === 'ID TRX') thClass += " hidden";
                 if (hdrs[i] === 'Aksi') thClass += " hidden md:table-cell";
                 if (hdrs[i].toLowerCase().includes('update')) thClass += " hidden";
                 
@@ -828,7 +829,7 @@ function renderKonterTable(data, colCount) {
                 `<div class="font-bold text-blue-700">${jenis}</div><div class="text-[9px] text-slate-500 mt-0.5">${detail}</div>` : 
                 `<div class="font-bold text-blue-700">${jenis}</div>`;
 
-            return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 md:hover:bg-slate-50 bg-white" data-index="${o}" data-type="konter">
+            return `<tr class="border-b border-slate-100 text-[10px] sm:text-xs text-slate-700 md:hover:bg-slate-50 bg-white swipeable-row transition-transform duration-200" data-index="${o}" data-type="konter">
                 <td class="py-2.5 px-1 sm:px-3 font-mono font-bold text-center hidden md:table-cell">${r[0]||'-'}</td>
                 <td class="py-2.5 pl-0.5 pr-1 sm:px-3 text-center whitespace-normal break-words">${r[1]||'-'}</td>
                 <td class="py-2.5 px-1 sm:px-3 text-center whitespace-normal break-words">${jenisDetailHtml}</td>
@@ -1138,7 +1139,136 @@ window.setFilterDate = function(val) {
     }
 };
 
-// Removed swipe logic per user request
+// Swipe-to-Reveal untuk tabel (Hanya Konter)
+(function() {
+    var startX = 0, startY = 0;
+    var activeRow = null;
+    var swipeMenu = null;
+    window.isSwipingMode = false;
+
+    function initSwipeMenu() {
+        if (!document.getElementById('mobileSwipeMenu')) {
+            swipeMenu = document.createElement('div');
+            swipeMenu.id = 'mobileSwipeMenu';
+            swipeMenu.className = 'absolute right-0 flex items-center justify-end pr-3 sm:pr-4 space-x-3 z-10 transition-opacity duration-200 opacity-0 pointer-events-none bg-slate-100/80 backdrop-blur-sm border-l border-slate-200';
+            swipeMenu.innerHTML = `
+                <button id="swipeBtnEdit" type="button" class="bg-amber-100 text-amber-700 h-[40px] w-[40px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-pen-to-square text-base"></i></button>
+                <button id="swipeBtnDelete" type="button" class="bg-red-100 text-red-700 h-[40px] w-[40px] rounded-lg flex items-center justify-center shadow-sm active:scale-95 transition-transform"><i class="fa-solid fa-trash text-base"></i></button>
+            `;
+            
+            var tc = document.getElementById('dataTableContainer');
+            if(tc) {
+                tc.style.position = 'relative';
+                tc.style.overflowX = 'hidden'; 
+                tc.appendChild(swipeMenu);
+            }
+        } else {
+            swipeMenu = document.getElementById('mobileSwipeMenu');
+        }
+    }
+
+    window.resetSwipe = function() {
+        if (activeRow) {
+            activeRow.style.transform = 'translateX(0)';
+            activeRow = null;
+        }
+        if (swipeMenu) {
+            swipeMenu.classList.remove('opacity-100', 'pointer-events-auto');
+            swipeMenu.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { if(!activeRow && swipeMenu) swipeMenu.style.display = 'none'; }, 200);
+        }
+        if (window.popOverlayState) window.popOverlayState('swipeMenu');
+    };
+
+    document.addEventListener('click', function(e) {
+        if (activeRow && !e.target.closest('.swipeable-row') && !e.target.closest('#mobileSwipeMenu')) {
+            resetSwipe();
+        }
+    });
+
+    var isVerticalScroll = false;
+
+    document.addEventListener('touchstart', function(e) {
+        if (window.innerWidth >= 768) return;
+        
+        var tr = e.target.closest('.swipeable-row');
+        if (!tr || tr.getAttribute('data-type') !== 'konter') return;
+        
+        if (activeRow && activeRow !== tr) resetSwipe();
+        
+        activeRow = tr;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        window.isSwipingMode = false;
+        isVerticalScroll = false;
+        
+        initSwipeMenu();
+        if (swipeMenu) swipeMenu.style.display = 'none';
+    }, {passive: true});
+
+    document.addEventListener('touchmove', function(e) {
+        if (!activeRow || window.innerWidth >= 768 || isVerticalScroll) return;
+        var diffX = startX - e.touches[0].clientX;
+        var diffY = Math.abs(startY - e.touches[0].clientY);
+        
+        if (diffY > 15 && diffY > Math.abs(diffX) && !window.isSwipingMode) {
+            isVerticalScroll = true;
+            return;
+        }
+        
+        if (diffX > 35 && diffX > diffY) {
+            window.isSwipingMode = true;
+            if (e.cancelable) e.preventDefault(); 
+            
+            var translateX = Math.min(diffX, 125); 
+            activeRow.style.transform = `translateX(-${translateX}px)`;
+            
+            if (swipeMenu && swipeMenu.style.display === 'none') {
+                if (window.pushOverlayState) window.pushOverlayState('swipeMenu');
+                var tc = document.getElementById('dataTableContainer');
+                var trRect = activeRow.getBoundingClientRect();
+                var tcRect = tc.getBoundingClientRect();
+                
+                swipeMenu.style.display = 'flex';
+                swipeMenu.style.top = (trRect.top - tcRect.top + tc.scrollTop) + 'px';
+                swipeMenu.style.height = trRect.height + 'px';
+                swipeMenu.style.width = '140px';
+                
+                var idx = activeRow.getAttribute('data-index');
+                
+                document.getElementById('swipeBtnEdit').onclick = function() {
+                    resetSwipe();
+                    editKonterData(idx);
+                };
+                document.getElementById('swipeBtnDelete').onclick = function() {
+                    resetSwipe();
+                    delKonter(idx);
+                };
+            }
+        } else if (diffX < -10 && window.isSwipingMode) {
+            activeRow.style.transform = 'translateX(0)';
+            if(swipeMenu) swipeMenu.style.display = 'none';
+        }
+    }, {passive: false});
+
+    document.addEventListener('touchend', function(e) {
+        if (!activeRow || !window.isSwipingMode) return;
+        var diffX = startX - e.changedTouches[0].clientX;
+        
+        if (diffX > 45) {
+            activeRow.style.transform = 'translateX(-125px)';
+            if(swipeMenu) {
+                swipeMenu.classList.remove('opacity-0', 'pointer-events-none');
+                swipeMenu.classList.add('opacity-100', 'pointer-events-auto');
+                swipeMenu.style.display = 'flex';
+            }
+        } else {
+            resetSwipe();
+        }
+        window.isSwipingMode = false;
+    });
+
+})();
 
 // Global History Manager for hardware back button
 window.pushOverlayState = function(id) {
