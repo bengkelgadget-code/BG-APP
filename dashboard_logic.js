@@ -124,9 +124,9 @@ window.renderDashboardPage = async function() {
             </div>
         </div>
 
-        <div class="p-6 space-y-6">
+        <div class="p-4 sm:p-6 flex-1 flex flex-col min-h-0 gap-4 sm:gap-6">
             <!-- SUMMARY CARDS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
                 <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex items-center justify-between hover:shadow-md transition-shadow">
                     <div>
                         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">TRX Hari Ini</p>
@@ -157,18 +157,18 @@ window.renderDashboardPage = async function() {
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 flex-1 min-h-0">
                 
                 <!-- TOP 10 ITEMS -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-[320px]">
-                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-2">
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-[320px] lg:h-full lg:min-h-0">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-2 shrink-0">
                         <h3 class="text-sm font-bold text-slate-800 flex items-center"><i class="fa-solid fa-trophy text-orange-500 mr-2"></i>Top 10 Layanan Terlaris</h3>
                         <select onchange="setDashTop10Filter(this.value)" class="bg-slate-50 border border-slate-200 text-slate-600 text-[10px] sm:text-xs rounded px-2 py-1 outline-none focus:ring-1 focus:ring-blue-500 shadow-sm cursor-pointer font-bold">
                             <option value="all" ${window.dashTop10Filter === 'all' ? 'selected' : ''}>Semua Waktu</option>
                             <option value="month" ${window.dashTop10Filter === 'month' ? 'selected' : ''}>Bulan Ini</option>
                         </select>
                     </div>
-                    <div class="flex-1 overflow-y-auto custom-scrollbar">
+                    <div class="flex-1 overflow-y-auto custom-scrollbar min-h-0">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-200 sticky top-0">
@@ -195,9 +195,9 @@ window.renderDashboardPage = async function() {
                 </div>
 
                 <!-- OUT OF STOCK -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-[320px]">
-                    <h3 class="text-sm font-bold text-red-600 mb-4 flex items-center border-b border-slate-100 pb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Stok Habis / Kritis</h3>
-                    <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-[320px] lg:h-full lg:min-h-0">
+                    <h3 class="text-sm font-bold text-red-600 mb-4 flex items-center border-b border-slate-100 pb-2 shrink-0"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Stok Habis / Kritis</h3>
+                    <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2 min-h-0">
                         ${lowStock.length === 0 ? '<div class="text-center text-xs text-slate-400 mt-10">Semua stok aman.</div>' : 
                           lowStock.map(ls => `
                             <div class="flex items-center justify-between p-3 rounded-xl bg-red-50 border border-red-100">
