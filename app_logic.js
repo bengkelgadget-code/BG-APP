@@ -826,9 +826,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     payload.sumberDana, payload.diterimaDi
                 ];
                 
-                await saveToFirebase('DB_konter', newRow);
+                let docRef = await saveToFirebase('DB_konter', newRow);
                 
-                // Listener Firebase akan memperbarui tabel otomatis
+                // Optimistic UI Update
+                newRow._docId = docRef.id;
+                newRow._timestamp = Date.now();
+                if(!window.BGL2_CACHE['DB_konter']) window.BGL2_CACHE['DB_konter'] = [];
+                window.BGL2_CACHE['DB_konter'].push(newRow);
+                
+                // Listener Firebase akan memperbarui tabel otomatis (sebagai backup sync)
                 window.adjustStock(payload.jenis, payload.detail, -1);
                 
                 // Execute Balance Update
@@ -877,8 +883,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 ];
                 
                 await updateInFirebase('DB_konter', docId, updatedRow);
+                
+                // Optimistic UI Update
+                updatedRow._docId = docId;
+                updatedRow._timestamp = rowData._timestamp || Date.now();
+                window.BGL2_CACHE['DB_konter'][currentIndex] = updatedRow;
 
-                // Listener Firebase akan memperbarui tabel otomatis
+                // Listener Firebase akan memperbarui tabel otomatis (sebagai backup sync)
                 
                 if (oldJenis !== payload.jenis || oldDetail !== payload.detail) {
                     window.adjustStock(oldJenis, oldDetail, 1);
@@ -892,8 +903,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // ZETTBOT FIX: Silent background sync to Google Sheet (Backup)
                 gasRun('editKonterTransaction', currentIndex, payload, originalId).catch(e=>console.error(e));
             }
+            
+            if (window.saveCacheToLocal) window.saveCacheToLocal();
+            if (typeof loadTableData === 'function') loadTableData(false);
+            
             Swal.fire({ title: 'Tersimpan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
-            // loadTableData akan dipanggil otomatis oleh listener Firebase
 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingKonter = false; }
     }
