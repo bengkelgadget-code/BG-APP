@@ -825,6 +825,12 @@ function renderKonterTable(data, colCount) {
             var sumberBayarHtml = `<div class="text-[9px]"><span class="font-bold text-slate-500">S:</span> ${sumberName}<br><span class="font-bold text-slate-500">B:</span> ${bayarName}</div>`;
 
             var detail = r[3] || '-';
+            
+            if (jenis === 'E-WALLET' && detail.startsWith('EW')) {
+                let ewData = window.BGL2_CACHE && window.BGL2_CACHE['E_Wallet'] ? window.BGL2_CACHE['E_Wallet'] : [];
+                let found = ewData.find(v => v[0] === detail);
+                if (found) detail = found[1];
+            }
             var jenisDetailHtml = (detail !== '-' && detail !== '') ? 
                 `<div class="font-bold text-blue-700">${jenis}</div><div class="text-[9px] text-slate-500 mt-0.5">${detail}</div>` : 
                 `<div class="font-bold text-blue-700">${jenis}</div>`;

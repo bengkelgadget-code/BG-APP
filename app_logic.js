@@ -596,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if(['TRANSFER', 'E-WALLET', 'TARIK TUNAI'].includes(jenis)) {
+        if(['TRANSFER', 'TARIK TUNAI'].includes(jenis)) {
             document.querySelectorAll('#kntDetailSection').forEach(el => el.style.display = 'none');
             document.querySelectorAll('#dynamicDetailContainer').forEach(container => {
                 container.innerHTML = '<input type="hidden" id="kntDetailInput" value="-">';
@@ -650,7 +650,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             var opts = [];
             if(jenis === 'TRANSFER' || jenis === 'TARIK TUNAI') opts = (db.bankData || []).map(v => `<option value="${v}">${v}</option>`);
-            else if(jenis === 'E-WALLET') opts = (db.ewalletData || []).map(v => `<option value="${v}">${v}</option>`);
+            else if(jenis === 'E-WALLET') {
+                let d = window.BGL2_CACHE['E_Wallet'];
+                if(!d || d.length===0) { d = await window.getFromFirebase('E_Wallet'); window.BGL2_CACHE['E_Wallet'] = d; }
+                opts = (d || []).filter(v => v && v[0]).map(v => `<option value="${v[0]}">${v[1]}</option>`);
+            }
             else if(jenis === 'PPOB') opts = (db.ppobData || []).map(v => `<option value="${v}">${v}</option>`);
             else if(jenis === 'VOUCHER') {
                 let d = window.BGL2_CACHE['Voucher'];
