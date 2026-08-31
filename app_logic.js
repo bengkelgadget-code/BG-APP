@@ -486,6 +486,62 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Provider"; }
     }
 
+    async function submitAddSumberDana(e) {
+        e.preventDefault();
+        var btn = document.getElementById('btnSubmitSumberDana');
+        var namaAkun = document.getElementById('inputNamaAkunBaru').value;
+        var kategori = document.getElementById('inputKategoriAkunBaru').value;
+        var saldo = document.getElementById('inputSaldoAkunBaru').value.replace(/[^0-9]/g, '') || "0";
+        
+        btn.disabled = true; btn.innerText = "Menyimpan...";
+        
+        try {
+            var newId = 'SD-' + new Date().getTime().toString().slice(-6);
+            var newRow = [newId, namaAkun, kategori, parseInt(saldo)];
+            
+            await saveToFirebase('Sumber_Dana', newRow);
+            if (typeof gasRun !== 'undefined') gasRun('saveData', 'Sumber_Dana', newRow).catch(e=>{});
+            
+            if (!window.BGL2_CACHE['Sumber_Dana']) window.BGL2_CACHE['Sumber_Dana'] = [];
+            window.BGL2_CACHE['Sumber_Dana'].push(newRow);
+            
+            var selKnt = document.getElementById('kntSumberDana');
+            if (selKnt) {
+                var option = new Option(namaAkun, newId, true, true);
+                var optgroup = selKnt.querySelector(`optgroup[label="${kategori}"]`);
+                if (!optgroup) {
+                    optgroup = document.createElement('optgroup');
+                    optgroup.label = kategori;
+                    selKnt.appendChild(optgroup);
+                }
+                optgroup.appendChild(option);
+            }
+            
+            var selTerima = document.getElementById('kntTerimaDi');
+            if (selTerima) {
+                var option2 = new Option(namaAkun, newId, true, true);
+                var optgroup2 = selTerima.querySelector(`optgroup[label="${kategori}"]`);
+                if (!optgroup2) {
+                    optgroup2 = document.createElement('optgroup');
+                    optgroup2.label = kategori;
+                    selTerima.appendChild(optgroup2);
+                }
+                optgroup2.appendChild(option2);
+            }
+            
+            if(window.jQuery) {
+                if(selKnt) $(selKnt).trigger('change');
+                if(selTerima) $(selTerima).trigger('change');
+            }
+            
+            // Perbarui juga kntDetailSelect jika jenisnya adalah TRANSFER/E-WALLET
+            if(window.kntJenisChange) window.kntJenisChange();
+            
+            closeAddSumberDanaModal();
+            Swal.fire({title: 'Sukses', text: 'Akun berhasil ditambahkan!', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+        } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { btn.disabled = false; btn.innerText = "Simpan Akun"; }
+    }
+
     async function submitAddKategoriGame(e) {
         e.preventDefault();
         var btn = document.getElementById('btnSubmitKategoriGame');
@@ -1370,5 +1426,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openAddKategoriModal = openAddKategoriModal; window.closeAddKategoriModal = closeAddKategoriModal; window.submitAddKategori = submitAddKategori;
     window.openAddProviderModal = openAddProviderModal; window.closeAddProviderModal = closeAddProviderModal; window.submitAddProvider = submitAddProvider;
     window.openAddKategoriGameModal = openAddKategoriGameModal; window.closeAddKategoriGameModal = closeAddKategoriGameModal; window.submitAddKategoriGame = submitAddKategoriGame;
+    window.openAddSumberDanaModal = openAddSumberDanaModal; window.closeAddSumberDanaModal = closeAddSumberDanaModal; window.submitAddSumberDana = submitAddSumberDana;
     window.openSmartPasteModal = openSmartPasteModal; window.closeSmartPasteModal = closeSmartPasteModal; window.submitSmartPaste = submitSmartPaste;
     window.populateUmumSettings = populateUmumSettings; window.previewUmumLogo = previewUmumLogo; window.submitPengaturanUmum = submitPengaturanUmum;

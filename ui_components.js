@@ -602,6 +602,24 @@ function closeAddKategoriGameModal() {
     if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
 }
 
+function openAddSumberDanaModal() {
+    if (window.pushOverlayState) window.pushOverlayState('modalAddSumberDana');
+    var m = document.getElementById('modalAddSumberDana');
+    var mc = document.getElementById('modalAddSumberDanaContent');
+    if(m) { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); }
+    if(mc) { mc.classList.remove('scale-95'); mc.classList.add('scale-100'); }
+    setTimeout(() => document.getElementById('inputNamaAkunBaru').focus(), 100);
+}
+
+function closeAddSumberDanaModal() {
+    if (window.popOverlayState) window.popOverlayState('modalAddSumberDana');
+    var m = document.getElementById('modalAddSumberDana');
+    var mc = document.getElementById('modalAddSumberDanaContent');
+    document.getElementById('formAddSumberDana').reset();
+    if(m) { m.classList.remove('opacity-100', 'pointer-events-auto'); m.classList.add('opacity-0', 'pointer-events-none'); }
+    if(mc) { mc.classList.remove('scale-100'); mc.classList.add('scale-95'); }
+}
+
 function openKonterModal() {
     if (window.pushOverlayState) window.pushOverlayState('modalKonter');
     document.querySelectorAll('#modalKonter').forEach(m => { m.classList.remove('opacity-0', 'pointer-events-none'); m.classList.add('opacity-100', 'pointer-events-auto'); });
