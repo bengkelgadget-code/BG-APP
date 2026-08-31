@@ -638,8 +638,9 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             if (typeof gasRun === 'undefined') throw new Error("API terganggu. gasRun not defined.");
 
+            let requiresDb = ['TRANSFER', 'TARIK TUNAI', 'PPOB', 'TOKEN PLN'].includes(jenis);
             var db = window.BGL2_DROPDOWN_CACHE;
-            if(!db || !db.providerData || typeof db.pulsaData === 'undefined') { 
+            if(requiresDb && (!db || !db.bankData)) { 
                 Swal.fire({ title: 'Memuat Opsi...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
                 db = await gasRun('getDropdownData');
                 window.BGL2_DROPDOWN_CACHE = db;
@@ -832,7 +833,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 newRow._docId = docRef.id;
                 newRow._timestamp = Date.now();
                 if(!window.BGL2_CACHE['DB_konter']) window.BGL2_CACHE['DB_konter'] = [];
-                window.BGL2_CACHE['DB_konter'].push(newRow);
+                let exists = window.BGL2_CACHE['DB_konter'].findIndex(r => r[0] === newRow[0]);
+                if (exists === -1) {
+                    window.BGL2_CACHE['DB_konter'].push(newRow);
+                } else {
+                    window.BGL2_CACHE['DB_konter'][exists] = newRow;
+                }
                 
                 // Listener Firebase akan memperbarui tabel otomatis (sebagai backup sync)
                 window.adjustStock(payload.jenis, payload.detail, -1);
