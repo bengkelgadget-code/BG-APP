@@ -636,27 +636,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            if (typeof gasRun === 'undefined') throw new Error("API terganggu. gasRun not defined.");
-
-            let requiresDb = ['TRANSFER', 'TARIK TUNAI', 'PPOB', 'TOKEN PLN'].includes(jenis);
-            var db = window.BGL2_DROPDOWN_CACHE;
-            if(requiresDb && (!db || !db.bankData)) { 
-                Swal.fire({ title: 'Memuat Opsi...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
-                db = await gasRun('getDropdownData');
-                window.BGL2_DROPDOWN_CACHE = db;
-                localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
-                Swal.close();
-            }
-            if(!db) db = {}; 
-
             var opts = [];
-            if(jenis === 'TRANSFER' || jenis === 'TARIK TUNAI') opts = (db.bankData || []).map(v => `<option value="${v}">${v}</option>`);
+            
+            if(jenis === 'TRANSFER' || jenis === 'TARIK TUNAI') {
+                let d = window.BGL2_CACHE['Bank'];
+                if(!d || d.length===0) { d = await window.getFromFirebase('Bank'); window.BGL2_CACHE['Bank'] = d; }
+                opts = (d || []).filter(v => v && v[1]).map(v => `<option value="${v[1]}">${v[1]}</option>`);
+            }
             else if(jenis === 'E-WALLET') {
                 let d = window.BGL2_CACHE['E_Wallet'];
                 if(!d || d.length===0) { d = await window.getFromFirebase('E_Wallet'); window.BGL2_CACHE['E_Wallet'] = d; }
                 opts = (d || []).filter(v => v && v[0]).map(v => `<option value="${v[0]}">${v[1]}</option>`);
             }
-            else if(jenis === 'PPOB') opts = (db.ppobData || []).map(v => `<option value="${v}">${v}</option>`);
+            else if(jenis === 'PPOB') {
+                let d = window.BGL2_CACHE['PPOB'];
+                if(!d || d.length===0) { d = await window.getFromFirebase('PPOB'); window.BGL2_CACHE['PPOB'] = d; }
+                opts = (d || []).filter(v => v && v[1]).map(v => `<option value="${v[1]}">${v[1]}</option>`);
+            }
             else if(jenis === 'VOUCHER') {
                 let d = window.BGL2_CACHE['Voucher'];
                 if(!d || d.length===0) { d = await window.getFromFirebase('Voucher'); window.BGL2_CACHE['Voucher'] = d; }
@@ -678,31 +674,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 opts = (d || []).filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
             }
             else if(jenis === 'TOKEN PLN') {
-                let tData = db.tokenData;
-                if (!tData) {
-                    try {
-                        let rawToken = window.BGL2_CACHE['Token'];
-                        if(!rawToken || rawToken.length === 0) {
-                            rawToken = await gasRun('getData', 'Token');
-                            window.BGL2_CACHE['Token'] = rawToken;
-                        }
-                        tData = [];
-                        for(let i=0; i<rawToken.length; i++) {
-                            if(rawToken[i] && rawToken[i][0]) {
-                                tData.push({ 
-                                    nama: rawToken[i][1], 
-                                    beli: String(rawToken[i][2]).replace(/[^0-9]/g,''), 
-                                    jual: String(rawToken[i][3]).replace(/[^0-9]/g,'') 
-                                });
-                            }
-                        }
-                    } catch(e) { console.error("Gagal load data Token sementara:", e); tData = []; }
-                }
-                opts = tData.map(v => `<option value="${v.nama}" data-b="${v.beli}" data-j="${v.jual}">Token ${v.nama}</option>`);
+                let d = window.BGL2_CACHE['Token'];
+                if(!d || d.length===0) { d = await window.getFromFirebase('Token'); window.BGL2_CACHE['Token'] = d; }
+                opts = (d || []).filter(v => v && v[1]).map(v => `<option value="${v[1]}" data-b="${String(v[2]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[3]||'').replace(/[^0-9]/g,'')}">Token ${v[1]}</option>`);
             }
             else if(jenis === 'GAME') {
-                let gameProd = window.BGL2_CACHE['Game'] || [];
-                opts = gameProd.filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
+                let d = window.BGL2_CACHE['Game'];
+                if(!d || d.length===0) { d = await window.getFromFirebase('Game'); window.BGL2_CACHE['Game'] = d; }
+                opts = (d || []).filter(v => v && v[2]).map(v => `<option value="${v[2]}" data-b="${String(v[3]||'').replace(/[^0-9]/g,'')}" data-j="${String(v[4]||'').replace(/[^0-9]/g,'')}">${v[2]} (${v[1]})</option>`);
             }
             
             document.querySelectorAll('#kntDetailSelect').forEach(sel => {

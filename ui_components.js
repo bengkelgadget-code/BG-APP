@@ -270,13 +270,13 @@ async function toggleForm(forceShow) {
     var isOpeningMutasi = (currentSheet === 'Mutasi') && (forceShow === true || (mMut && mMut.classList.contains('opacity-0')));
     
     if (isOpeningKonter || isOpeningMutasi) {
-        if (!window.BGL2_CACHE['Sumber_Dana'] || !window.BGL2_CACHE['Voucher']) {
+        if (!window.BGL2_CACHE['Sumber_Dana'] || !window.BGL2_CACHE['Voucher'] || !window.BGL2_CACHE['Bank']) {
             if (typeof Swal !== 'undefined') Swal.fire({ title: 'Menyiapkan Form...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
             try {
-                if (!window.BGL2_CACHE['Sumber_Dana']) window.BGL2_CACHE['Sumber_Dana'] = await getFromFirebase('Sumber_Dana') || [];
-                if (!window.BGL2_CACHE['Voucher']) window.BGL2_CACHE['Voucher'] = await getFromFirebase('Voucher') || [];
-                if (!window.BGL2_CACHE['Perdana']) window.BGL2_CACHE['Perdana'] = await getFromFirebase('Perdana') || [];
-                if (!window.BGL2_CACHE['ACC']) window.BGL2_CACHE['ACC'] = await getFromFirebase('ACC') || [];
+                const deps = ['Sumber_Dana', 'Voucher', 'Perdana', 'ACC', 'Bank', 'E_Wallet', 'PPOB', 'Pulsa', 'Token', 'Game'];
+                for (let sheet of deps) {
+                    if (!window.BGL2_CACHE[sheet]) window.BGL2_CACHE[sheet] = await getFromFirebase(sheet) || [];
+                }
             } catch(e) { console.error("Gagal memuat cache dependensi form", e); }
             if (typeof Swal !== 'undefined') Swal.close();
         }
