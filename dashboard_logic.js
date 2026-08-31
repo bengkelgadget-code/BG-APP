@@ -9,14 +9,12 @@ window.renderDashboardPage = async function() {
 
     try {
         if (!window.BGL2_CACHE['DB_konter']) {
-            if(typeof gasRun !== 'undefined') window.BGL2_CACHE['DB_konter'] = await gasRun('getData', 'DB_konter');
-            else window.BGL2_CACHE['DB_konter'] = [];
+            window.BGL2_CACHE['DB_konter'] = await window.getFromFirebase('DB_konter') || [];
         }
 
     const loadStock = async (sheet) => {
         if (!window.BGL2_CACHE[sheet]) {
-            if(typeof gasRun !== 'undefined') window.BGL2_CACHE[sheet] = await gasRun('getData', sheet);
-            else window.BGL2_CACHE[sheet] = [];
+            window.BGL2_CACHE[sheet] = await window.getFromFirebase(sheet) || [];
         }
         return window.BGL2_CACHE[sheet];
     };

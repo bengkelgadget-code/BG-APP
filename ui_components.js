@@ -337,20 +337,26 @@ async function toggleForm(forceShow) {
                 requireServerData = currentConfig.fields.some(f => f.type === 'select_dynamic' || f.type === 'select_dynamic_add');
             }
 
-            if (requireServerData && (!window.BGL2_DROPDOWN_CACHE || Object.keys(window.BGL2_DROPDOWN_CACHE).length === 0)) {
-                Swal.fire({ title: 'Memuat Form...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
+            var mockDb = {};
+            if (requireServerData) {
+                Swal.fire({ title: 'Menyiapkan Form...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
                 try {
-                    var db = await gasRun('getDropdownData');
-                    window.BGL2_DROPDOWN_CACHE = db;
-                    localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
-                    Swal.close();
-                } catch(e) {
-                    Swal.fire('Error', 'Gagal memuat opsi form: ' + e.message, 'error');
-                    return; 
-                }
+                    let dProv = window.BGL2_CACHE['Provider'] || await getFromFirebase('Provider') || [];
+                    let dGame = window.BGL2_CACHE['KategoriGame'] || await getFromFirebase('KategoriGame') || [];
+                    let dAcc = window.BGL2_CACHE['KategoriACC'] || await getFromFirebase('KategoriACC') || [];
+                    
+                    window.BGL2_CACHE['Provider'] = dProv;
+                    window.BGL2_CACHE['KategoriGame'] = dGame;
+                    window.BGL2_CACHE['KategoriACC'] = dAcc;
+
+                    mockDb.providerData = dProv.map(v => v[1]);
+                    mockDb.kategoriGameData = dGame.map(v => v[1]);
+                    mockDb.kategoriAccData = dAcc.map(v => v[1]);
+                } catch(e) { console.error("Gagal load opsi", e); }
+                Swal.close();
             }
 
-            buildGenHTML(window.BGL2_DROPDOWN_CACHE || {});
+            buildGenHTML(mockDb);
             if(editIndex === -1) initGenericForm();
             openGenericModal();
         } else { closeGenericModal(); }
@@ -436,23 +442,19 @@ async function openSmartPasteModal() {
     var sel = document.getElementById('pasteProvider');
     sel.innerHTML = '<option value="">Memuat...</option>';
     
-    if (!window.BGL2_DROPDOWN_CACHE || !window.BGL2_DROPDOWN_CACHE.providerData) {
-        Swal.fire({ title: 'Memuat Data...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
-        try {
-            window.BGL2_DROPDOWN_CACHE = await gasRun('getDropdownData');
-            localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(window.BGL2_DROPDOWN_CACHE));
-            Swal.close();
-        } catch(e) {
-            Swal.fire('Error', 'Gagal memuat data opsi', 'error');
-            return;
-        }
-    }
-    
     var provs = [];
-    if (currentSheet === 'Game') {
-        provs = window.BGL2_DROPDOWN_CACHE.kategoriGameData || [];
-    } else {
-        provs = window.BGL2_DROPDOWN_CACHE.providerData || [];
+    try {
+        if (currentSheet === 'Game') {
+            let dGame = window.BGL2_CACHE['KategoriGame'] || await getFromFirebase('KategoriGame') || [];
+            window.BGL2_CACHE['KategoriGame'] = dGame;
+            provs = dGame.map(v => v[1]);
+        } else {
+            let dProv = window.BGL2_CACHE['Provider'] || await getFromFirebase('Provider') || [];
+            window.BGL2_CACHE['Provider'] = dProv;
+            provs = dProv.map(v => v[1]);
+        }
+    } catch(e) {
+        console.error("Gagal load opsi Smart Paste", e);
     }
 
     var opts = '<option value="">-- ' + (currentSheet === 'Game' ? 'Pilih Game' : 'Pilih Provider') + ' --</option>';

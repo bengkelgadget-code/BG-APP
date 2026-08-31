@@ -432,8 +432,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitAddKategori(e) {
         e.preventDefault();
-        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
-
         var btn = document.getElementById('btnSubmitKategori');
         var namaKat = document.getElementById('inputNamaKategori').value;
         btn.disabled = true; btn.innerText = "Menyimpan...";
@@ -441,12 +439,10 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             var newId = 'K-' + new Date().getTime().toString().slice(-6);
             await saveToFirebase('KategoriACC', [newId, namaKat]);
-            gasRun('saveData', 'KategoriACC', [newId, namaKat]).catch(e=>{});
+            if (typeof gasRun !== 'undefined') gasRun('saveData', 'KategoriACC', [newId, namaKat]).catch(e=>{});
             
-            localStorage.removeItem('bgl2_dropdown_cache');
-            var db = await gasRun('getDropdownData');
-            window.BGL2_DROPDOWN_CACHE = db;
-            localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
+            if (!window.BGL2_CACHE['KategoriACC']) window.BGL2_CACHE['KategoriACC'] = [];
+            window.BGL2_CACHE['KategoriACC'].push([newId, namaKat]);
             
             var sel = document.getElementById('kategori');
             if(sel) {
@@ -461,8 +457,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitAddProvider(e) {
         e.preventDefault();
-        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
-
         var btn = document.getElementById('btnSubmitProvider');
         var namaProv = document.getElementById('inputNamaProvider').value;
         btn.disabled = true; btn.innerText = "Menyimpan...";
@@ -470,12 +464,10 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             var newId = 'P-' + new Date().getTime().toString().slice(-6);
             await saveToFirebase('Provider', [newId, namaProv]);
-            gasRun('saveData', 'Provider', [newId, namaProv]).catch(e=>{});
+            if (typeof gasRun !== 'undefined') gasRun('saveData', 'Provider', [newId, namaProv]).catch(e=>{});
             
-            localStorage.removeItem('bgl2_dropdown_cache');
-            var db = await gasRun('getDropdownData');
-            window.BGL2_DROPDOWN_CACHE = db;
-            localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
+            if (!window.BGL2_CACHE['Provider']) window.BGL2_CACHE['Provider'] = [];
+            window.BGL2_CACHE['Provider'].push([newId, namaProv]);
             
             var sel = document.getElementById('provider');
             if(sel) {
@@ -496,26 +488,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function submitAddKategoriGame(e) {
         e.preventDefault();
-        if (typeof gasRun === 'undefined') return Swal.fire('Error', 'API belum siap. Silakan refresh halaman.', 'error');
-
         var btn = document.getElementById('btnSubmitKategoriGame');
         var namaGame = document.getElementById('inputNamaKategoriGame').value;
         btn.disabled = true; btn.innerText = "Menyimpan...";
         
         try {
-            var res = await gasRun('saveData', 'KategoriGame', ["", namaGame]);
-            if(res && res.status === 'error') {
-                if(res.message.includes('appendRow')) {
-                    throw new Error("Backend Code.gs Anda belum diperbarui sepenuhnya! Tabel 'KategoriGame' belum tercetak di Spreadsheet. Silakan perbarui file Code.gs Anda.");
-                }
-                throw new Error(res.message);
-            }
+            var newId = 'G-' + new Date().getTime().toString().slice(-6);
+            await saveToFirebase('KategoriGame', [newId, namaGame]);
+            if (typeof gasRun !== 'undefined') gasRun('saveData', 'KategoriGame', [newId, namaGame]).catch(e=>{});
             
-
-            localStorage.removeItem('bgl2_dropdown_cache');
-            var db = await gasRun('getDropdownData');
-            window.BGL2_DROPDOWN_CACHE = db;
-            localStorage.setItem('bgl2_dropdown_cache', JSON.stringify(db));
+            if (!window.BGL2_CACHE['KategoriGame']) window.BGL2_CACHE['KategoriGame'] = [];
+            window.BGL2_CACHE['KategoriGame'].push([newId, namaGame]);
             
             var sel = document.getElementById('kategori_game');
             if(sel) {
@@ -1220,9 +1203,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     await deleteFromFirebase(actualSheet, docId); 
                     
-                    window.BGL2_DROPDOWN_CACHE = null;
-                    localStorage.removeItem('bgl2_dropdown_cache'); 
-                    
                     Swal.fire({title: 'Berhasil', icon: 'success', timer: 1500, showConfirmButton: false}); 
 
                     // ZETTBOT FIX: Silent background sync to Google Sheet
@@ -1314,8 +1294,7 @@ document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({title: 'Sukses', icon: 'success', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false}); 
 
             // Clear dropdown cache so next transaction popup gets fresh data
-            window.BGL2_DROPDOWN_CACHE = null;
-            localStorage.removeItem('bgl2_dropdown_cache');
+                    
 
         } catch(err) { Swal.fire('Error', String(err), 'error'); } finally { window.isSubmittingMaster = false; }
     }
