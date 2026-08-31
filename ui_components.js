@@ -270,10 +270,10 @@ async function toggleForm(forceShow) {
     var isOpeningMutasi = (currentSheet === 'Mutasi') && (forceShow === true || (mMut && mMut.classList.contains('opacity-0')));
     
     if (isOpeningKonter || isOpeningMutasi) {
-        if (!window.BGL2_CACHE['Sumber_Dana'] || !window.BGL2_CACHE['Voucher'] || !window.BGL2_CACHE['Bank']) {
+        if (!window.BGL2_CACHE['Sumber_Dana'] || !window.BGL2_CACHE['Voucher'] || !window.BGL2_CACHE['PPOB']) {
             if (typeof Swal !== 'undefined') Swal.fire({ title: 'Menyiapkan Form...', toast: true, position: 'top-end', showConfirmButton: false, didOpen: () => Swal.showLoading() });
             try {
-                const deps = ['Sumber_Dana', 'Voucher', 'Perdana', 'ACC', 'Bank', 'E_Wallet', 'PPOB', 'Pulsa', 'Token', 'Game'];
+                const deps = ['Sumber_Dana', 'Voucher', 'Perdana', 'ACC', 'PPOB', 'Pulsa', 'Token', 'Game'];
                 for (let sheet of deps) {
                     if (!window.BGL2_CACHE[sheet]) window.BGL2_CACHE[sheet] = await getFromFirebase(sheet) || [];
                 }

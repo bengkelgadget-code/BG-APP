@@ -622,14 +622,14 @@ document.addEventListener('DOMContentLoaded', function() {
             var opts = [];
             
             if(jenis === 'TRANSFER' || jenis === 'TARIK TUNAI') {
-                let d = window.BGL2_CACHE['Bank'];
-                if(!d || d.length===0) { d = await window.getFromFirebase('Bank'); window.BGL2_CACHE['Bank'] = d; }
-                opts = (d || []).filter(v => v && v[1]).map(v => `<option value="${v[1]}">${v[1]}</option>`);
+                let d = window.BGL2_CACHE['Sumber_Dana'];
+                if(!d || d.length===0) { d = await window.getFromFirebase('Sumber_Dana'); window.BGL2_CACHE['Sumber_Dana'] = d; }
+                opts = (d || []).filter(v => v && v[1] && v[2] === 'Rekening Bank').map(v => `<option value="${v[1]}">${v[1]}</option>`);
             }
             else if(jenis === 'E-WALLET') {
-                let d = window.BGL2_CACHE['E_Wallet'];
-                if(!d || d.length===0) { d = await window.getFromFirebase('E_Wallet'); window.BGL2_CACHE['E_Wallet'] = d; }
-                opts = (d || []).filter(v => v && v[0]).map(v => `<option value="${v[0]}">${v[1]}</option>`);
+                let d = window.BGL2_CACHE['Sumber_Dana'];
+                if(!d || d.length===0) { d = await window.getFromFirebase('Sumber_Dana'); window.BGL2_CACHE['Sumber_Dana'] = d; }
+                opts = (d || []).filter(v => v && v[1] && v[2] === 'E-Wallet').map(v => `<option value="${v[1]}">${v[1]}</option>`);
             }
             else if(jenis === 'PPOB') {
                 let d = window.BGL2_CACHE['PPOB'];
